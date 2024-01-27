@@ -7,14 +7,13 @@ let appUrl = process.env.REACT_APP_ETHERSCAN_URL
 let apikey = process.env.REACT_APP_ETHERSCAN_KEY
 let module = "module=account&";
 let action = "action=txsBeaconWithdrawal&";
-let address = "address=0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f&";
+let address = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let startblock = "startblock=0&";
 let endblock = "endblock=99999999&";
 let page = "page=1&";
 let offset = "offset=100&";
 let sort = "sort=asc&";
 let url = (appUrl + module + action + address + startblock + endblock + page + offset + sort + "apikey=" + apikey)
-
 function App() {
   const [withdrawls, setWithdrawls] = React.useState([]);
   const fetchWithdrawls = async () => {
@@ -25,37 +24,41 @@ function App() {
       // setWithdrawls(data); // use with fetch()
       //console.log("data:", irr);
     } catch (error) {
-      console.log(error);
+      console.log("Axios Error:", error);
     }
   };
 
   useEffect(() => {
     fetchWithdrawls();
   }, [])
-//  const ax = await axios.formToJSON
-
+  //  const ax = await axios.formToJSON
   //const w_data = withdrawls.data;
-  const w_result = withdrawls.result;
-  const w = withdrawls;
-  const map1 = w_result.map((ttt) => ttt.timestamp );
-  console.log("Full Response:", withdrawls, "\nResults:", w_result, "\nJust timesta,p:", map1);
+  let w_result = withdrawls.result;
 
-return (
-  <div className="App">
-    <header className="App-header">
-      <section>
-        {/* {withdrawls.result.map((payout) => {
-            return (
-        <article>
-          <p>Index: {payout.withdrawlIndex} Amount:{payout.result.amount} Time: {payout.result.timestamp}</p>
-        </article>
-        );
-          })} */}
-      </section>
+  var wd = [];
+  wd = (w_result || []).map(function (element) {
+    let date = new Date(element.timestamp * 1000);
+    const withdrawlsItem = ["Index: ", element.validatorIndex, " ", date.toDateString(), ": " + element.amount / 1000000000, " Eth"];
+    return withdrawlsItem;
+  }
+  );
+  console.log(wd);
+  //console.log("Minipool Withdrawls:", wd);
 
-    </header>
-  </div>
-);
+  return (
+    <div className="App">
+      <header className="App-header">
+        <section>
+          {
+            wd.map((item, index) => (
+              <p key={index}>{item}</p>
+            ))
+          }
+        </section>
+
+      </header>
+    </div>
+  );
 }
 
 
