@@ -3,6 +3,7 @@ import axios, { all } from 'axios';
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
+import irr from "./irr.js";
 let appUrl = process.env.REACT_APP_ETHERSCAN_URL
 let apikey = process.env.REACT_APP_ETHERSCAN_KEY
 let module = "module=account&";
@@ -20,50 +21,37 @@ let url2 = (appUrl + module + action + address2 + startblock + endblock + page +
 let url3 = (appUrl + module + action + address3 + startblock + endblock + page + offset + sort + "apikey=" + apikey)
 let minipoolArray = [url1, url2, url3];
 let allWithdrawls = [];
+let datetest = [];
 function App() {
   const [withdrawls, setWithdrawls] = React.useState([]);
   async function fetchWithdrawls(url) {
     try {
-      const irr = await axios(url);
-      return irr.data;
+      const payouts = await axios(url);
+      return payouts.data;
     } catch (error) {
       console.log("Axios Error:", error);
     }
   };
-
+//console.log("Test payouts.data: ", payouts.data);
   const hasRun = useRef(false);
-
-  // useEffect(() => {
-  //   if (!hasRun.current) {
-  //     minipoolArray.forEach(async (url) => {
-  //       let oneWithdrawl = await fetchWithdrawls(url);
-  //       allWithdrawls = allWithdrawls.concat(oneWithdrawl.result);
-  //       console.log("allWithdrawls:", allWithdrawls);
-  //       setWithdrawls(allWithdrawls.data);
-  //     });
-  //     hasRun.current = true;
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (!hasRun.current) {
       minipoolArray.forEach((url) => {
         fetchWithdrawls(url).then(oneWithdrawl => {
           allWithdrawls = allWithdrawls.concat(oneWithdrawl.result);
-          console.log("allWithdrawls:", allWithdrawls);
+          //console.log("allWithdrawls:", allWithdrawls);
           setWithdrawls(allWithdrawls);
-          //let w_result = withdrawls.result; // Now this should work
         });
       });
       hasRun.current = true;
     }
   }, []);
 
-  //let w_result = withdrawls;
+
   var wd = [];
   if (hasRun.current) {
 
-    //let w_data = withdrawls.data;
     wd = (withdrawls || []).map(function (element) {
       let date = new Date(element.timestamp * 1000);
       const withdrawlsItem = ["Index: ", element.validatorIndex, " ", date.toDateString(), ": " + element.amount / 1000000000, " Eth"];
