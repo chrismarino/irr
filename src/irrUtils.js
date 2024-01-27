@@ -3,33 +3,29 @@ import { convertRate } from 'node-irr';
 import { xirr } from 'node-irr';
 import axios, { all } from 'axios';
 
-export function irr(paymentArray) {
+export function calcMinipoolIrr(paymentArray) {
   // A utility function used to calculate the irr of a given set of cash flows, paymentArray. 
-  // paymentArray is a any any array that incldudes an 'amount' and 'timestamp' key. This arry is 
-  // typically the result of a query to the etherscan API.
-  const startDate = new Date(2021, 5, 1);
-  let year = startDate.getFullYear();
-  let month = String(startDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed in JavaScript
-  let day = String(startDate.getDate()).padStart(2, '0');
-  const formattedStartDate = `${year}${month}${day}`;
+  // paymentArray is a any any array that incldudes an 'amount' and 'timestamp' key. It returns 
+  //an arry day counts and irr. paymentArray is typically the result of a query to the etherscan API.
+  var newArray = [];
 
-  const today = new Date();
-  year = today.getFullYear();
-  month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed in JavaScript
-  day = String(today.getDate()).padStart(2, '0');
-  const formattedToday = `${year}${month}${day}`;
-  const data3 = [
-    { amount: -10, date: formattedStartDate },
-    { amount: 11, date: formattedToday },
-  ]
+  paymentArray = (paymentArray || []).map(function (element) {
+    let paymentDate = new Date(element.timestamp * 1000);
+    let year = paymentDate.getFullYear();
+    let month = String(paymentDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed in JavaScript
+    let day = String(paymentDate.getDate()).padStart(2, '0');
+    const formattedPaymentDate = `${year}${month}${day}`;
+    return { amount: element.amount / 32E18, date: formattedPaymentDate };
+
+  });
   const dailyRate = xirr(paymentArray).rate;
   const days = xirr(paymentArray).days;
 
   //Balance is uniformly earned over the period.
 
   //express the rate in APR
-  //let rate = convertRate(dailyRate, "year")
-  let rate = 100 * (data3 / 32E18) * (365 / days); //APR
+  let rate = convertRate(dailyRate, "year")
+  //let rate = 100 * (data3 / 32E18) * (365 / days); //APR
   return { days, rate };
 }
 
