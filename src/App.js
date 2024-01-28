@@ -6,7 +6,17 @@ import { calcMinipoolIrr, fetchWithdrawls } from "./irrUtils.js";
 let address1 = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
-let minipoolArray = [address1, address2, address3];
+//Mock up a depositArray
+const deposits = [
+  { validatorIndex: 983397, amount: -1000000000, timestamp: 1698661967 },
+  { validatorIndex: 983397, amount: -31000000000, timestamp: 1698671967 },
+  { validatorIndex: 1101573, amount: -1000000000, timestamp: 1698681967 },
+  { validatorIndex: 1101573, amount: -31000000000, timestamp: 1698691967 },
+  { validatorIndex: 810338, amount: -1000000000, timestamp: 1698670967 },
+  { validatorIndex: 810338, amount: -31000000000, timestamp: 1698671967 },
+
+]
+let minipoolArray = [address1, address2, address3 ];
 let allWithdrawls = [];
 let datetest = [];
 function App() {
@@ -37,7 +47,7 @@ function App() {
 
   var wd = [];
   if (callCount === minipoolArray.length) {
-    const { days, rate } = calcMinipoolIrr(withdrawls);
+    const { days, rate } = calcMinipoolIrr(deposits, withdrawls);
     console.log("days:", days, "rate:", rate);
     wd = (withdrawls || []).map(function (element) {
       let date = new Date(element.timestamp * 1000);
