@@ -8,15 +8,15 @@ let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
 //Mock up a depositArray
 const deposits = [
-  { validatorIndex: 983397, amount: -1000000000, timestamp: 1698661967 },
-  { validatorIndex: 983397, amount: -31000000000, timestamp: 1698671967 },
-  { validatorIndex: 1101573, amount: -1000000000, timestamp: 1698681967 },
-  { validatorIndex: 1101573, amount: -31000000000, timestamp: 1698691967 },
-  { validatorIndex: 810338, amount: -1000000000, timestamp: 1698670967 },
-  { validatorIndex: 810338, amount: -31000000000, timestamp: 1698671967 },
+  { validatorIndex: "983397", amount: -1000000000, timestamp: "1698661967" },
+  { validatorIndex: "983397", amount: -31000000000, timestamp: "1698671967" },
+  { validatorIndex: "1101573", amount: -1000000000, timestamp: "1698681967" },
+  { validatorIndex: "1101573", amount: -31000000000, timestamp: "1698691967" },
+  { validatorIndex: "810338", amount: -1000000000, timestamp: "1698670967" },
+  { validatorIndex: "810338", amount: -31000000000, timestamp: "1698671967" },
 
 ]
-let minipoolArray = [address1, address2, address3 ];
+let minipoolArray = [address1, address2, address3];
 let allWithdrawls = [];
 let datetest = [];
 function App() {
@@ -46,9 +46,9 @@ function App() {
 
 
   var wd = [];
+  let minipoolIrrs = calcMinipoolIrr(deposits, withdrawls);
   if (callCount === minipoolArray.length) {
-    const { days, rate } = calcMinipoolIrr(deposits, withdrawls);
-    console.log("days:", days, "rate:", rate);
+    //console.log("minipool:", minpoolIrrs.minipool, "days:", minpoolIrrs.days, "rate:", minpoolIrrs.rate);
     wd = (withdrawls || []).map(function (element) {
       let date = new Date(element.timestamp * 1000);
       const withdrawlsItem = ["Index: ", element.validatorIndex, " ", date.toDateString(), ": " + element.amount / 1000000000, " Eth"];
@@ -68,7 +68,13 @@ function App() {
             ))
           }
         </section>
-
+        <section>
+          {
+            (minipoolIrrs.minipoolIrrs || []).map((item, index) => (
+              <p key={index}>Index={item.minipool} Age={item.days} Rate={item.irr}</p>
+            ))
+          }
+        </section>
       </header>
     </div>
   );

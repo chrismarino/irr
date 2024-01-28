@@ -34,14 +34,17 @@ export function calcMinipoolIrr(depositArray, withdrawlArray) {
   const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
 
   //filter the array for each minipool and calculate the IRR
-  const minpoolIrrs = uniqueValidatorIndexes.forEach(minipool => {
+  const minipoolIrrs = []
+  uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    //let dailyRate = xirr(filteredArray).rate;
-    //let days = xirr(filteredArray).days;
-    //let irr = convertRate(dailyRate, "year")
+    let dailyRate = xirr(filteredArray).rate;
+    let days = xirr(filteredArray).days;
+    let irr = convertRate(dailyRate, "year");
+
+    minipoolIrrs.push({ minipool: minipool, days: days, irr: irr });
   });
 
-  return { minpoolIrrs };
+  return { minipoolIrrs };
 }
 
 export async function fetchWithdrawls(address) {
