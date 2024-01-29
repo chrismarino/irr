@@ -2,6 +2,7 @@
 import { convertRate, xirr } from 'node-irr';
 import axios, { all } from 'axios';
 import { formatArray } from './irrUtils'; // Import the formatArray function
+import _ from "lodash";
 
 export function calcMinipoolIrr(depositArray, withdrawlArray) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
@@ -35,6 +36,9 @@ export function calcMinipoolIrr(depositArray, withdrawlArray) {
 
   //filter the array for each minipool and calculate the IRR
   const minipoolIrrs = []
+  //Failed attempt to use lodash to filter the array for each minipool and calculate the IRR
+  //let uniq = _.uniqBy(totalArray, 'validatorIndex');
+  //uniq.forEach(minipool => {
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     let dailyRate = xirr(filteredArray).rate;
@@ -52,6 +56,7 @@ export async function fetchWithdrawls(address) {
   // Note: Probably should this to take minipool address as an argument.
   let appUrl = process.env.REACT_APP_ETHERSCAN_URL
   let apikey = process.env.REACT_APP_ETHERSCAN_KEY
+  let apiEndpoint = appUrl + "api?"
   let module = "module=account&";
   let action = "action=txsBeaconWithdrawal&";
   let startblock = "startblock=0&";
@@ -59,12 +64,41 @@ export async function fetchWithdrawls(address) {
   let page = "page=1&";
   let offset = "offset=100&";
   let sort = "sort=asc&";
-  let url = (appUrl + module + action + address + startblock + endblock + page + offset + sort + "apikey=" + apikey)
+  let withdrawalUrl = (apiEndpoint + module + action + address + startblock + endblock + page + offset + sort + "apikey=" + apikey)
+
   try {
     let payouts = [];
-    payouts = await axios(url);
+    payouts = await axios(withdrawalUrl);
     return payouts.data;
   } catch (error) {
-    console.log("Axios Error:", error);
+    console.log("Axios Error on Withdrawls Fetch:", error);
   }
 };
+
+export async function fetchDeposits(index) {
+  // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
+
+  // the deposit url using the beaconcha.in API
+  let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
+  let apiEndpoint = appUrl + "api/v1/validator/"
+  let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
+  let deposit_action = "/deposits?";
+
+  let depositlUrl = (apiEndpoint + index + deposit_action + "apikey=" + apikey)
+  try {
+    let payouts = [];
+    payouts = await axios(depositlUrl);
+    // map the deposits to the same format as the withdrawls (beasoncha.in API returns a different format)
+    const renamedPayouts = payouts.data.data.map(item => ({
+      timestamp: item.block_ts, //change the timestamp field
+      amount: item.amount, //leave the other fields the same
+      validatorIndex: index //add the validatorIndex field
+
+    }));
+    return renamedPayouts;
+    //return payouts.data;
+  } catch (error) {
+    console.log("Axios Error on Deposit Fetch:", error);
+  }
+};
+
