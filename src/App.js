@@ -62,7 +62,7 @@ function App() {
 
   useEffect(() => {
     async function fetchData2() {
-      if (!withdrawalsHasRun.current) {
+      if (!depositsHasRun.current) {
         for (const address of minipoolAddressArray) {
           try {
             const oneDeposit = await fetchWithdrawls(address);
@@ -76,27 +76,27 @@ function App() {
           }
         }
       }
-      withdrawalsHasRun.current = true;
+      depositsHasRun.current = true;
     }
 
     fetchData2();
   }, []);
   //Now that we have all the withdrawls, we can calculate the IRR.
 
-  if (!withdrawls || !deposits) {
+  if (!withdrawls.length || !deposits.length) {
     return <div>Loading...</div>; // Or your loading spinner
   }
 
   var wd = [];
   var minipoolIrrs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
+
+  // only render when the withdrawls and deposits have been fetched
   if (depositsHasRun.current && withdrawalsHasRun.current) {
+    // render the irrs...
     minipoolIrrs = calcMinipoolIrr(deposits, withdrawls);
     console.log("Minipool IRRs:", minipoolIrrs);
-  }
-  // only render when the withdrawls and deposits have been fetched
-  if (withdrawlCount === minipoolAddressArray.length && depositCount === minipoolIndexArray.length) {
-    //console.log("minipool:", minpoolIrrs.minipool, "days:", minpoolIrrs.days, "rate:", minpoolIrrs.rate);
+    //render the withdrawls...);
     wd = (withdrawls || []).map(function (element) {
       let date = new Date(element.timestamp * 1000);
       const withdrawlsItem = ["Index: ", element.validatorIndex, " ", date.toDateString(), ": " + element.amount / 1000000000, " Eth"];
