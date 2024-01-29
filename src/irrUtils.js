@@ -69,7 +69,7 @@ export async function fetchWithdrawls(address) {
   try {
     let payouts = [];
     payouts = await axios(withdrawalUrl);
-    return payouts.data;
+    return payouts.data.result;
   } catch (error) {
     console.log("Axios Error on Withdrawls Fetch:", error);
   }

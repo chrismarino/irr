@@ -27,8 +27,8 @@ const mockDeposits = [
 ]
 let minipoolAddressArray = [address1, address2, address3];
 let minipoolIndexArray = [index1, index2, index3];
-let allWithdrawls = [];
-let allDeposits = [];
+
+
 function App() {
   const [withdrawls, setWithdrawls] = React.useState([]);
   const [deposits, setDeposits] = React.useState([]);
@@ -39,46 +39,44 @@ function App() {
   const withdrawalsHasRun = useRef(false);
   const depositsHasRun = useRef(false);
   useEffect(() => {
+    let allWithdrawls = [];
     async function fetchData1() {
       if (!withdrawalsHasRun.current) {
         for (const address of minipoolAddressArray) {
           try {
             const oneWithdrawl = await fetchWithdrawls(address);
-            allWithdrawls = allWithdrawls.concat(oneWithdrawl.data);
+            allWithdrawls = allWithdrawls.concat(oneWithdrawl);
             setWithdrawls(allWithdrawls);
-            //setWithdrawlCount(withdrawlCount => withdrawlCount + 1);
             console.log("All Withdrawals:", allWithdrawls, "Withdrawl Count:", withdrawlCount);
           }
           catch (error) {
             console.log("Error creating withdrawal array:", error);
           }
         }
+        withdrawalsHasRun.current = true;
       }
-      withdrawalsHasRun.current = true;
     }
-
     fetchData1();
   }, []);
 
   useEffect(() => {
+    let allDeposits = [];
     async function fetchData2() {
       if (!depositsHasRun.current) {
-        for (const address of minipoolAddressArray) {
+        for (const index of minipoolIndexArray) {
           try {
-            const oneDeposit = await fetchWithdrawls(address);
-            allDeposits = allDeposits.concat(oneDeposit.data); //different format than the withdrawls
-            setWithdrawls(allWithdrawls);
-            //setWithdrawlCount(withdrawlCount => withdrawlCount + 1);
+            const oneDeposit = await fetchDeposits(index);
+            allDeposits = allDeposits.concat(oneDeposit); //response structure is different for deposits
+            setDeposits(allDeposits);
             console.log("All Deposits:", allDeposits, "Deposit Count:", depositCount);
           }
           catch (error) {
             console.log("Error creating deposit array:", error);
           }
         }
+        depositsHasRun.current = true;
       }
-      depositsHasRun.current = true;
     }
-
     fetchData2();
   }, []);
   //Now that we have all the withdrawls, we can calculate the IRR.
