@@ -13,7 +13,10 @@ let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
 let index1 = "983397";
 let index2 = "1101573";
 let index3 = "810338";
-let nodeAddress = "0x635D06a61a36566003D71428F1895e146CdBD54E";
+let nodeAddress1 = "0x635D06a61a36566003D71428F1895e146CdBD54E";
+let nodeAddress2 = "0x84cf8a46e6f77dbc6a33855320d68f7a1698c528";
+let nodeAddress3 = "0xc2392cbe1a23c755cd4c197d8f31cdbd678d80da"; //does not work
+let nodeAddress4 = "0xd9c2d5c041ad53b8b0d70968da88ecbf5e973cd3";
 
 //Mock up a depositArray
 const mockDeposits = [
@@ -45,7 +48,7 @@ function App() {
 
   useEffect(() => {
     async function fetchValidatorArray() {
-      validatorArray = await fetchValidators(nodeAddress);
+      validatorArray = await fetchValidators(nodeAddress4);
       if (!validatorsHasRun.current) {
         try {
           minipoolAddressArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
