@@ -44,7 +44,12 @@ export function calcMinipoolIrr(depositsAndWithdrawals) {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     let dailyRate = xirr(filteredArray).rate;
     let days = xirr(filteredArray).days;
-    let irr = convertRate(dailyRate, "year");
+    // I actually want the APR, need to refactor...
+    //let irr = convertRate(dailyRate, "year");
+    let sum = _.sumBy(filteredArray, 'amount');
+    if (sum > 0) { sum = sum - 32000000000} //back out the 32 eth deposit
+    let apr = ((-1)*(365/days)* sum / 320000000).toFixed(3);
+    let irr = apr // will need to refactor this to use the xirr function
 
     minipoolIrrs.push({ minipool: minipool, days: days, irr: irr });
   });

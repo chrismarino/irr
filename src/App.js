@@ -136,13 +136,6 @@ function App() {
       <header className="App-header">
         <section>
           {
-            wd.map((item, index) => (
-              <p key={index}>{item}</p>
-            ))
-          }
-        </section>
-        <section>
-          {
             (minipoolIrrs.minipoolIrrs || []).map((item, index) => (
               <p key={index}>Index={item.minipool} Age={item.days} Rate={item.irr}</p>
             ))
