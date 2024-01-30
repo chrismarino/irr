@@ -32,7 +32,7 @@ let minipoolIndexArray = [];
 
 function App() {
   const [withdrawls, setWithdrawls] = React.useState([]);
-  const [deposits, setDeposits] = React.useState([]);
+  const [depositsAndWithdrawals, setDepositsAndWIthdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
   const [withdrawlCount, setWithdrawlCount] = useState(1);
   const [depositCount, setDepositCount] = useState(1);
@@ -84,17 +84,17 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let allDeposits = [];
+    let allDepositsAndWithdrawals = [];
     async function fetchData2() {
       if (validatorsHasRun.current) { //only run this after the validators have been fetched
         console.log("Validators Has Run. minipools:", minipools);
         if (!depositsHasRun.current) {
           for (const index of minipools) {
             try {
-              const oneDeposit = await fetchDeposits(index);
-              allDeposits = allDeposits.concat(oneDeposit); //response structure is different for deposits
-              setDeposits(allDeposits);
-              console.log("All Deposits:", allDeposits, "Deposit Count:", depositCount);
+              const oneIndex = await fetchDeposits(index);
+              allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex); //response structure is different for deposits
+              setDepositsAndWIthdrawals(allDepositsAndWithdrawals);
+              console.log("All Deposits:", allDepositsAndWithdrawals, "Deposit Count:", depositCount);
             }
             catch (error) {
               console.log("Error creating deposit array:", error);
@@ -108,7 +108,7 @@ function App() {
   }, [minipoolIndexArray, validatorsHasRun.current]);
   //Now that we have all the withdrawls, we can calculate the IRR.
 
-  if (!withdrawls.length || !deposits.length) {
+  if (!withdrawls.length || !depositsAndWithdrawals.length) {
     return <div>Loading...</div>; // Or your loading spinner
   }
 
@@ -119,7 +119,7 @@ function App() {
   // only render when the withdrawls and deposits have been fetched
   if (depositsHasRun.current && withdrawalsHasRun.current) {
     // render the irrs...
-    minipoolIrrs = calcMinipoolIrr(deposits, withdrawls);
+    minipoolIrrs = calcMinipoolIrr(depositsAndWithdrawals);
     console.log("Minipool IRRs:", minipoolIrrs);
     //render the withdrawls...);
     wd = (withdrawls || []).map(function (element) {

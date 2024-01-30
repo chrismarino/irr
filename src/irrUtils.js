@@ -4,7 +4,7 @@ import axios, { all } from 'axios';
 import { formatArray } from './irrUtils'; // Import the formatArray function
 import _ from "lodash";
 
-export function calcMinipoolIrr(depositArray, withdrawlArray) {
+export function calcMinipoolIrr(depositsAndWithdrawals) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -19,21 +19,22 @@ export function calcMinipoolIrr(depositArray, withdrawlArray) {
 
   function formatArray(array) {
     return (array || []).map(function (element) {
-      let paymentDate = new Date(element.timestamp * 1000);
-      let year = paymentDate.getFullYear();
-      let month = String(paymentDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed in JavaScript
-      let day = String(paymentDate.getDate()).padStart(2, '0');
-      const formattedPaymentDate = `${year}${month}${day}`;
-      return { validatorIndex: element.validatorIndex, amount: element.amount, date: formattedPaymentDate };
+      const originalDate = element.day;
+      const reformattedDate = originalDate.split('T')[0];
+      const dailyFlow = element.deposits_amount - element.withdrawals_amount;
+      return { validatorIndex: element.validatorIndex, amount: dailyFlow, date: reformattedDate };
     });
   }
   //combine the despots and withdrawls into a single array for the IRR calculation
-  totalArray = formatArray(depositArray).concat(formatArray(withdrawlArray));
-  totalArray.sort() //make sure they are sorted by date
+  totalArray = formatArray(depositsAndWithdrawals);
+  //totalArray.sort() //make sure they are sorted by date
+  totalArray = _.sortBy(totalArray, function(item) {
+    return new Date(item.date);
+  });
   //finc the minipool indices...
   // write the code that creates an array containg unique ValidatorIndex values in totalArray
   const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
-
+ // don't think I need this since I saved the list of validators in the from the node API
   //filter the array for each minipool and calculate the IRR
   const minipoolIrrs = []
   //Failed attempt to use lodash to filter the array for each minipool and calculate the IRR
@@ -75,7 +76,7 @@ export async function fetchWithdrawls(address) {
   }
 };
 
-export async function fetchDeposits(index) {
+export async function oldFetchDeposits(index) {
   // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
 
   // the deposit url using the beaconcha.in API
@@ -120,5 +121,33 @@ export async function fetchValidators(ethAddress) {
     return validators;
   } catch (error) {
     console.log("Axios Error on Node Detail Fetch:", error);
+  }
+};
+
+// New fetchDeposit function that uses the validator stats API endpoint
+export async function fetchDeposits(validatorIndex) {
+  // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
+
+  let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
+  let apiEndpoint = appUrl + "api/v1"
+  let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
+  let node_action = "/validator/stats/";
+
+  let statsUrl = (apiEndpoint + node_action + validatorIndex + "?apikey=" + apikey)
+  try {
+    let payouts = [];
+    payouts = await axios(statsUrl);
+    // map the deposits to the same format as the withdrawls (beasoncha.in API returns a different format)
+    const depositsAndWithdrawals = payouts.data.data.map(item => ({
+      day: item.day_start, 
+      deposits: item.deposits,
+      withdrawals: item.withdrawals,
+      deposits_amount: item.deposits_amount,
+      withdrawals_amount: item.withdrawals_amount,
+      validatorIndex: validatorIndex
+    })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
+    return depositsAndWithdrawals;
+  } catch (error) {
+    console.log("Axios Error on Deposit Fetch:", error);
   }
 };
