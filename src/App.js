@@ -26,19 +26,42 @@ const mockDeposits = [
 
 ]
 let minipoolAddressArray = [address1, address2, address3];
-let minipoolIndexArray = [index1, index2, index3];
+//let minipoolIndexArray = [index1, index2, index3];
+let minipoolIndexArray = [];
 
 
 function App() {
   const [withdrawls, setWithdrawls] = React.useState([]);
   const [deposits, setDeposits] = React.useState([]);
+  const [minipools, setMinipools] = React.useState([]);
   const [withdrawlCount, setWithdrawlCount] = useState(1);
   const [depositCount, setDepositCount] = useState(1);
 
   //console.log("Test payouts.data: ", payouts.data);
   const withdrawalsHasRun = useRef(false);
   const depositsHasRun = useRef(false);
-  fetchValidators(nodeAddress);
+  const validatorsHasRun = useRef(false);
+  var validatorArray = [];
+
+  useEffect(() => {
+    async function fetchValidatorArray() {
+      validatorArray = await fetchValidators(nodeAddress);
+      if (!validatorsHasRun.current) {
+        try {
+          minipoolAddressArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
+          setMinipools(minipoolAddressArray);
+          console.log("Minipool Address Array:", minipoolAddressArray);
+        }
+        catch (error) {
+          console.log("Error creating validator array:", error);
+        }
+      }
+      validatorsHasRun.current = true;
+    }
+    fetchValidatorArray();
+  }, []);
+
+
   useEffect(() => {
     let allWithdrawls = [];
     async function fetchData1() {
@@ -63,23 +86,26 @@ function App() {
   useEffect(() => {
     let allDeposits = [];
     async function fetchData2() {
-      if (!depositsHasRun.current) {
-        for (const index of minipoolIndexArray) {
-          try {
-            const oneDeposit = await fetchDeposits(index);
-            allDeposits = allDeposits.concat(oneDeposit); //response structure is different for deposits
-            setDeposits(allDeposits);
-            console.log("All Deposits:", allDeposits, "Deposit Count:", depositCount);
+      if (validatorsHasRun.current) { //only run this after the validators have been fetched
+        console.log("Validators Has Run. minipools:", minipools);
+        if (!depositsHasRun.current) {
+          for (const index of minipools) {
+            try {
+              const oneDeposit = await fetchDeposits(index);
+              allDeposits = allDeposits.concat(oneDeposit); //response structure is different for deposits
+              setDeposits(allDeposits);
+              console.log("All Deposits:", allDeposits, "Deposit Count:", depositCount);
+            }
+            catch (error) {
+              console.log("Error creating deposit array:", error);
+            }
           }
-          catch (error) {
-            console.log("Error creating deposit array:", error);
-          }
+          depositsHasRun.current = true;
         }
-        depositsHasRun.current = true;
       }
     }
     fetchData2();
-  }, []);
+  }, [minipoolIndexArray, validatorsHasRun.current]);
   //Now that we have all the withdrawls, we can calculate the IRR.
 
   if (!withdrawls.length || !deposits.length) {
@@ -102,7 +128,7 @@ function App() {
       return withdrawlsItem;
     }
     );
-    console.log(wd);
+    //console.log(wd);
     //console.log("Minipool Withdrawls:", wd);
   }
   return (
