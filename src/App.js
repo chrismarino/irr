@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { calcMinipoolIrr, fetchWithdrawls, fetchDeposits, fetchValidators } from "./irrUtils.js";
+import { calcMinipoolIrr, fetchMinipoolData, fetchValidators } from "./irrUtils.js";
 let address1 = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
@@ -30,102 +30,78 @@ const mockDeposits = [
 ]
 let minipoolAddressArray = [address1, address2, address3];
 //let minipoolIndexArray = [index1, index2, index3];
-let minipoolIndexArray = [];
+//let minipoolIndexArray = [];
 
 
 function App() {
-  const [withdrawls, setWithdrawls] = React.useState([]);
+
   const [depositsAndWithdrawals, setDepositsAndWIthdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
-  const [withdrawlCount, setWithdrawlCount] = useState(1);
+
   const [depositCount, setDepositCount] = useState(1);
+  const [nodeAddress, setNodeAddress] = React.useState(""); // Add this line
 
   //console.log("Test payouts.data: ", payouts.data);
-  const withdrawalsHasRun = useRef(false);
-  const depositsHasRun = useRef(false);
+  const depositsAndWithdrawalsHasRun = useRef(false);
   const validatorsHasRun = useRef(false);
   var validatorArray = [];
 
   useEffect(() => {
     async function fetchValidatorArray() {
-      validatorArray = await fetchValidators(nodeAddress4);
-      if (!validatorsHasRun.current) {
-        try {
-          minipoolAddressArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
-          setMinipools(minipoolAddressArray);
-          console.log("Minipool Address Array:", minipoolAddressArray);
-        }
-        catch (error) {
-          console.log("Error creating validator array:", error);
-        }
+      validatorArray = await fetchValidators(nodeAddress);
+      depositsAndWithdrawalsHasRun.current = false // new node address, so reset the depositsAndWithdrawalsHasRun flag
+      try {
+        minipoolAddressArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
+        setMinipools(minipoolAddressArray);
+        console.log("Minipool Address Array:", minipoolAddressArray);
       }
-      validatorsHasRun.current = true;
+      catch (error) {
+        console.log("Error creating validator array:", error);
+      }
+
     }
     fetchValidatorArray();
-  }, []);
+  }, [nodeAddress]);
 
 
-  useEffect(() => {
-    let allWithdrawls = [];
-    async function fetchData1() {
-      if (!withdrawalsHasRun.current) {
-        for (const address of minipoolAddressArray) {
-          try {
-            const oneWithdrawl = await fetchWithdrawls(address);
-            allWithdrawls = allWithdrawls.concat(oneWithdrawl);
-            setWithdrawls(allWithdrawls);
-            console.log("All Withdrawals:", allWithdrawls, "Withdrawl Count:", withdrawlCount);
-          }
-          catch (error) {
-            console.log("Error creating withdrawal array:", error);
-          }
-        }
-        withdrawalsHasRun.current = true;
-      }
-    }
-    fetchData1();
-  }, []);
 
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
-    async function fetchData2() {
-      if (validatorsHasRun.current) { //only run this after the validators have been fetched
-        console.log("Validators Has Run. minipools:", minipools);
-        if (!depositsHasRun.current) {
-          for (const index of minipools) {
-            try {
-              const oneIndex = await fetchDeposits(index);
-              allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex); //response structure is different for deposits
-              setDepositsAndWIthdrawals(allDepositsAndWithdrawals);
-              console.log("All Deposits:", allDepositsAndWithdrawals, "Deposit Count:", depositCount);
-            }
-            catch (error) {
-              console.log("Error creating deposit array:", error);
-            }
+    async function fetchDepositsAndWithdrawals() {
+
+      console.log("Validators Has Run. minipools:", minipools);
+      if (!depositsAndWithdrawalsHasRun.current) {
+        for (const index of minipools) {
+          try {
+            const oneIndex = await fetchMinipoolData(index);
+            allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex); //response structure is different for deposits
+            setDepositsAndWIthdrawals(allDepositsAndWithdrawals);
+            console.log("All Deposits:", allDepositsAndWithdrawals, "Deposit Count:", depositCount);
           }
-          depositsHasRun.current = true;
+          catch (error) {
+            console.log("Error creating deposit array:", error);
+          }
+          depositsAndWithdrawalsHasRun.current = true;
         }
       }
     }
-    fetchData2();
-  }, [minipoolIndexArray, validatorsHasRun.current]);
+
+    fetchDepositsAndWithdrawals();
+  }, [minipools]);
   //Now that we have all the withdrawls, we can calculate the IRR.
 
-  if (!withdrawls.length || !depositsAndWithdrawals.length) {
-    return <div>Loading...</div>; // Or your loading spinner
-  }
 
   var wd = [];
   var minipoolIrrs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the withdrawls and deposits have been fetched
-  if (depositsHasRun.current && withdrawalsHasRun.current) {
+  if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
     minipoolIrrs = calcMinipoolIrr(depositsAndWithdrawals);
     console.log("Minipool IRRs:", minipoolIrrs);
     //render the withdrawls...);
-    wd = (withdrawls || []).map(function (element) {
+    wd = (depositsAndWithdrawals || []).map(function (element) {
       let date = new Date(element.timestamp * 1000);
       const withdrawlsItem = ["Index: ", element.validatorIndex, " ", date.toDateString(), ": " + element.amount / 1000000000, " Eth"];
       return withdrawlsItem;
@@ -138,11 +114,32 @@ function App() {
     <div className="App">
       <header className="App-header">
         <section>
-          {
-            (minipoolIrrs.minipoolIrrs || []).map((item, index) => (
-              <p key={index}>Index={item.minipool} Age={item.days} Rate={item.irr}</p>
-            ))
-          }
+          <input
+            type="text"
+            value={nodeAddress}
+            onChange={event => setNodeAddress(event.target.value)}
+            placeholder="Enter node address"
+          />
+          <table>
+            <thead>
+              <tr>
+                <th>Index</th>
+                <th>Age</th>
+                <th>Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                (minipoolIrrs.minipoolIrrs || []).map((item, index) => (
+                  <tr key={index}>
+                    <td> {item.minipool} </td>
+                    <td> {item.days} days </td>
+                    <td> {item.irr}%</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
         </section>
       </header>
     </div>

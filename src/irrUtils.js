@@ -130,7 +130,7 @@ export async function fetchValidators(ethAddress) {
 };
 
 // New fetchDeposit function that uses the validator stats API endpoint
-export async function fetchDeposits(validatorIndex) {
+export async function fetchMinipoolData(validatorIndex) {
   // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
 
   let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
