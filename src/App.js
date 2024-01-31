@@ -88,7 +88,6 @@ function App() {
 
     fetchDepositsAndWithdrawals();
   }, [minipools]);
-  //Now that we have all the withdrawls, we can calculate the IRR.
 
 
   var wd = [];

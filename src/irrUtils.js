@@ -150,9 +150,34 @@ export async function fetchMinipoolData(validatorIndex) {
       deposits_amount: item.deposits_amount,
       withdrawals_amount: item.withdrawals_amount,
       validatorIndex: validatorIndex
-    })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
+    })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0); 
+    let price = await fetchPriceData("01-06-2023"); // Fetch the price asynchronously
+    // Add the price field to each item in the depositsAndWithdrawals array
+    depositsAndWithdrawals.forEach(item => {
+      item.price = price;
+    });
     return depositsAndWithdrawals;
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);
   }
 };
+//Get  the price of ETH from CoinGecko for the days of the deposit
+export async function fetchPriceData(date) {
+  // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
+
+  let appUrl = process.env.REACT_APP_COINGECKO_URL
+  let apiEndpoint = appUrl + "/api/v3"
+  let apikey = process.env.REACT_APP_COINGECKO_KEY
+  let node_action = "/coins/ethereum/history";
+  let priceUrl = (apiEndpoint + node_action + "?date=" + date + "?x_cg_demo_api_key=" + apikey)
+  try {
+    let price = [];
+    let payouts = await axios(priceUrl);
+    price.date = date
+    price.price_usd = payouts.data.market_data.current_price.usd;
+    return price;
+  } catch (error) {
+    console.log("Error setting the price:", error);
+  }
+};
+
