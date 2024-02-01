@@ -108,7 +108,7 @@ function App() {
   // only render when the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
-    minipoolAPRs = calcMinipoolAPRs(depositsAndWithdrawals);
+    minipoolAPRs = calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday);
     console.log("Minipool IRRs:", minipoolAPRs);
     //render the withdrawls...);
     wd = (depositsAndWithdrawals || []).map(function (element) {

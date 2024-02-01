@@ -4,7 +4,7 @@ import axios, { all } from 'axios';
 import _ from "lodash";
 
 
-export function calcMinipoolAPRs(depositsAndWithdrawals) {
+export function calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -42,12 +42,17 @@ export function calcMinipoolAPRs(depositsAndWithdrawals) {
     let days = (maxDay - minDay);
     // I actually want the APR, need to refactor...
     //let irr = convertRate(dailyRate, "year");
-    let eth_sum = _.sumBy(filteredArray, 'eth_amount');
-    let fiat_sum = _.sumBy(filteredArray, 'fiat_amount');
-    if (eth_sum > 0) { eth_sum = eth_sum - 32000000000 } //back out the 32 eth deposit
-    const eth_balance = eth_sum / 1000000000
-    const eth_apr = ((-100) * (365 / days) * eth_balance).toFixed(3)/32;
-    const fiat_apr = ((-100) * (365 / days) * eth_balance * 2350).toFixed(2)/(32*2350);
+    const totalEthDeposited = 32;
+    let totalEthEarned = _.sumBy(filteredArray, 'eth_amount');
+    let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount');
+
+    if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
+    totalEthEarned = totalEthEarned / 1000000000
+    totalFiatDeposited = totalFiatDeposited / 1000000000
+    const totalFiatGain = (totalEthEarned * ethPriceToday.price_usd);
+    //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
+    const eth_apr = ((((-100) * (365 / days) * totalEthEarned))/totalEthDeposited).toFixed(3);
+    const fiat_apr = (((-100) * (365 / days) * totalFiatGain)/(totalFiatDeposited)).toFixed(3);
     minipoolAPRs.push({ minipool: minipool, age: days, eth_apr: eth_apr, fiat_apr: fiat_apr });
   });
 
@@ -112,8 +117,8 @@ export async function fetchMinipoolData(validatorIndex) {
       if (item.deposits_amount > 0) {
         const lookupDate = item.date.split('T')[0]; //need to format the date for the API
         const priceData = await fetchPriceData(lookupDate);
-        item.eth_price = priceData.price;
-        item.fiat_amount = item.deposits_amount * priceData.price;
+        item.eth_price = priceData.price_usd;
+        item.fiat_amount = item.deposits_amount * item.eth_price;
       }
       return item;
     }));
