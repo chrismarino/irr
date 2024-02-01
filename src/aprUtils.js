@@ -34,14 +34,17 @@ export function calcMinipoolAPRs(depositsAndWithdrawals) {
   //uniq.forEach(minipool => {
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    let dailyRate = xirr(filteredArray).rate;
-    let days = xirr(filteredArray).days;
+    //let dailyRate = xirr(filteredArray).rate;
+    //let days = xirr(filteredArray).days;
+    let minDay = _.minBy(filteredArray, 'days').days;
+    let maxDay = _.maxBy(filteredArray, 'days').days;
+    let days = (maxDay - minDay) ;
     // I actually want the APR, need to refactor...
     //let irr = convertRate(dailyRate, "year");
     let sum = _.sumBy(filteredArray, 'amount');
     if (sum > 0) { sum = sum - 32000000000 } //back out the 32 eth deposit
     let apr = ((-1) * (365 / days) * sum / 320000000).toFixed(3);
-    minipoolAPRs.push({ minipool: minipool, days: days, apr: apr });
+    minipoolAPRs.push({ minipool: minipool, age: days, apr: apr });
   });
 
   return { minipoolAPRs };
@@ -139,13 +142,13 @@ function formatArray(array) {
     // YYYYMMDD, YYYY-MM-DD, YYYY/MM/DD
     ///const originalDate = element.day;
     //const reformattedDate = originalDate.split('T')[0];
-    const dateObject = new Date(element.day);
+    const dateObject = new Date(element.date);
     const year = dateObject.getFullYear();
     const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
     const day = String(dateObject.getDate()).padStart(2, '0');
 
     const reformattedDate = `${year}-${month}-${day}`;
     const dailyFlow = element.deposits_amount - element.withdrawals_amount;
-    return { validatorIndex: element.validatorIndex, amount: dailyFlow, date: reformattedDate };
+    return { validatorIndex: element.validatorIndex, amount: dailyFlow, days: element.day, date: reformattedDate };
   });
 }

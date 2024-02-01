@@ -132,8 +132,8 @@ function App() {
                 (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
                   <tr key={index}>
                     <td> {item.minipool} </td>
-                    <td> {item.days} days </td>
-                    <td> {item.irr}%</td>
+                    <td> {item.age} days </td>
+                    <td> {item.apr}%</td>
                   </tr>
                 ))
               }
