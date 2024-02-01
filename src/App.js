@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { calcMinipoolIrr, fetchMinipoolData, fetchValidators } from "./irrUtils.js";
+import { calcMinipoolAPRs, fetchMinipoolData, fetchValidators } from "./irrUtils.js";
 let address1 = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
@@ -91,14 +91,14 @@ function App() {
 
 
   var wd = [];
-  var minipoolIrrs = [];
+  var minipoolAPRs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
-    minipoolIrrs = calcMinipoolIrr(depositsAndWithdrawals);
-    console.log("Minipool IRRs:", minipoolIrrs);
+    minipoolAPRs = calcMinipoolAPRs(depositsAndWithdrawals);
+    console.log("Minipool IRRs:", minipoolAPRs);
     //render the withdrawls...);
     wd = (depositsAndWithdrawals || []).map(function (element) {
       let date = new Date(element.timestamp * 1000);
@@ -129,7 +129,7 @@ function App() {
             </thead>
             <tbody>
               {
-                (minipoolIrrs.minipoolIrrs || []).map((item, index) => (
+                (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
                   <tr key={index}>
                     <td> {item.minipool} </td>
                     <td> {item.days} days </td>

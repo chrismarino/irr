@@ -1,10 +1,9 @@
 // Desc: This hook will calculate the IRR of a given set of cash flows.
 import { convertRate, xirr } from 'node-irr';
 import axios, { all } from 'axios';
-import { formatArray } from './irrUtils'; // Import the formatArray function
 import _ from "lodash";
 
-export function calcMinipoolIrr(depositsAndWithdrawals) {
+export function calcMinipoolAPRs(depositsAndWithdrawals) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -17,14 +16,7 @@ export function calcMinipoolIrr(depositsAndWithdrawals) {
   // an annay of day counts and irr per minpool. paymentArray is typically the result of a query to the etherscan API.
   var totalArray = [];
 
-  function formatArray(array) {
-    return (array || []).map(function (element) {
-      const originalDate = element.day;
-      const reformattedDate = originalDate.split('T')[0];
-      const dailyFlow = element.deposits_amount - element.withdrawals_amount;
-      return { validatorIndex: element.validatorIndex, amount: dailyFlow, date: reformattedDate };
-    });
-  }
+
   //combine the despots and withdrawls into a single array for the IRR calculation
   totalArray = formatArray(depositsAndWithdrawals);
   //totalArray.sort() //make sure they are sorted by date
@@ -36,77 +28,24 @@ export function calcMinipoolIrr(depositsAndWithdrawals) {
   const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
  // don't think I need this since I saved the list of validators in the from the node API
   //filter the array for each minipool and calculate the IRR
-  const minipoolIrrs = []
+  const minipoolAPRs = []
   //Failed attempt to use lodash to filter the array for each minipool and calculate the IRR
   //let uniq = _.uniqBy(totalArray, 'validatorIndex');
   //uniq.forEach(minipool => {
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    let dailyRate = xirr(filteredArray).rate;
-    let days = xirr(filteredArray).days;
-    // I actually want the APR, need to refactor...
-    //let irr = convertRate(dailyRate, "year");
+    let minDate = new Date(Math.min(...filteredArray.map(item => new Date(item.date))));
+    let maxDate = new Date(Math.max(...filteredArray.map(item => new Date(item.date))));
+    let days = Math.floor((maxDate - minDate) / (1000 * 60 * 60 * 24));
     let sum = _.sumBy(filteredArray, 'amount');
     if (sum > 0) { sum = sum - 32000000000} //back out the 32 eth deposit
     let apr = ((-1)*(365/days)* sum / 320000000).toFixed(3);
-    let irr = apr // will need to refactor this to use the xirr function
-
-    minipoolIrrs.push({ minipool: minipool, days: days, irr: irr });
+    minipoolAPRs.push({ minipool: minipool, days: days, apr: apr });
   });
 
-  return { minipoolIrrs };
+  return { minipoolAPRs };
 }
 
-export async function fetchWithdrawls(address) {
-  // A utility function used to fetch the withdrawls from the ethscan API. Take a url as an argument.
-  // Note: Probably should this to take minipool address as an argument.
-  let appUrl = process.env.REACT_APP_ETHERSCAN_URL
-  let apikey = process.env.REACT_APP_ETHERSCAN_KEY
-  let apiEndpoint = appUrl + "api?"
-  let module = "module=account&";
-  let action = "action=txsBeaconWithdrawal&";
-  let startblock = "startblock=0&";
-  let endblock = "endblock=99999999&";
-  let page = "page=1&";
-  let offset = "offset=100&";
-  let sort = "sort=asc&";
-  let withdrawalUrl = (apiEndpoint + module + action + address + startblock + endblock + page + offset + sort + "apikey=" + apikey)
-
-  try {
-    let payouts = [];
-    payouts = await axios(withdrawalUrl);
-    return payouts.data.result;
-  } catch (error) {
-    console.log("Axios Error on Withdrawls Fetch:", error);
-  }
-};
-
-export async function oldFetchDeposits(index) {
-  // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
-
-  // the deposit url using the beaconcha.in API
-  let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
-  let apiEndpoint = appUrl + "api/v1/validator/"
-  let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
-  let deposit_action = "/deposits?";
-
-  let depositlUrl = (apiEndpoint + index + deposit_action + "apikey=" + apikey)
-  try {
-    let payouts = [];
-    payouts = await axios(depositlUrl);
-    // map the deposits to the same format as the withdrawls (beasoncha.in API returns a different format)
-    const renamedPayouts = payouts.data.data.map(item => ({
-      timestamp: item.block_ts, //change the timestamp field
-      amount: item.amount, //leave the other fields the same
-      validatorIndex: index //add the validatorIndex field
-
-    }));
-    return renamedPayouts;
-    //return payouts.data;
-  } catch (error) {
-    console.log("Axios Error on Deposit Fetch:", error);
-  }
-};
 export async function fetchValidators(ethAddress) {
   // Fetch validator list from Beaconcha.in using eth1 address. 
   // Response includes a record for each validator. 
@@ -143,19 +82,23 @@ export async function fetchMinipoolData(validatorIndex) {
     let payouts = [];
     payouts = await axios(statsUrl);
     // map the deposits to the same format as the withdrawls (beasoncha.in API returns a different format)
-    const depositsAndWithdrawals = payouts.data.data.map(item => ({
-      day: item.day_start, 
+    var depositsAndWithdrawals = payouts.data.data.map(item => ({
+      date: item.day_start.split('T')[0].split('-').reverse().join('-'),  //format the timestamp to DD-MM-YYYY
       deposits: item.deposits,
       withdrawals: item.withdrawals,
       deposits_amount: item.deposits_amount,
       withdrawals_amount: item.withdrawals_amount,
-      validatorIndex: validatorIndex
+      validatorIndex: validatorIndex,
+      price: ""
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0); 
-    let price = await fetchPriceData("01-06-2023"); // Fetch the price asynchronously
     // Add the price field to each item in the depositsAndWithdrawals array
-    depositsAndWithdrawals.forEach(item => {
-      item.price = price;
-    });
+    depositsAndWithdrawals = await Promise.all(depositsAndWithdrawals.map(async item => {
+      if (item.deposits_amount > 0) {
+        const priceData = await fetchPriceData(item.date);
+        item.eth_price = priceData.price;
+      }
+      return item;
+    }));
     return depositsAndWithdrawals;
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);
@@ -163,7 +106,7 @@ export async function fetchMinipoolData(validatorIndex) {
 };
 //Get  the price of ETH from CoinGecko for the days of the deposit
 export async function fetchPriceData(date) {
-  // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
+  // A utility function used to fetch price from an API. Take a url as an argument.
 
   let appUrl = process.env.REACT_APP_COINGECKO_URL
   let apiEndpoint = appUrl + "/api/v3"
@@ -181,3 +124,11 @@ export async function fetchPriceData(date) {
   }
 };
 
+function formatArray(array) {
+  return (array || []).map(function (element) {
+    //const originalDate = element.day;
+    //const reformattedDate = originalDate.split('T')[0];
+    const dailyFlow = element.deposits_amount - element.withdrawals_amount;
+    return { validatorIndex: element.validatorIndex, amount: dailyFlow, date: element.date };
+  });
+}
