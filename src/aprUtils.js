@@ -3,6 +3,7 @@ import { convertRate, xirr } from 'node-irr';
 import axios, { all } from 'axios';
 import _ from "lodash";
 
+
 export function calcMinipoolAPRs(depositsAndWithdrawals) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
@@ -38,13 +39,16 @@ export function calcMinipoolAPRs(depositsAndWithdrawals) {
     //let days = xirr(filteredArray).days;
     let minDay = _.minBy(filteredArray, 'days').days;
     let maxDay = _.maxBy(filteredArray, 'days').days;
-    let days = (maxDay - minDay) ;
+    let days = (maxDay - minDay);
     // I actually want the APR, need to refactor...
     //let irr = convertRate(dailyRate, "year");
-    let sum = _.sumBy(filteredArray, 'amount');
-    if (sum > 0) { sum = sum - 32000000000 } //back out the 32 eth deposit
-    let apr = ((-1) * (365 / days) * sum / 320000000).toFixed(3);
-    minipoolAPRs.push({ minipool: minipool, age: days, apr: apr });
+    let eth_sum = _.sumBy(filteredArray, 'eth_amount');
+    let fiat_sum = _.sumBy(filteredArray, 'fiat_amount');
+    if (eth_sum > 0) { eth_sum = eth_sum - 32000000000 } //back out the 32 eth deposit
+    const eth_balance = eth_sum / 1000000000
+    const eth_apr = ((-100) * (365 / days) * eth_balance).toFixed(3)/32;
+    const fiat_apr = ((-100) * (365 / days) * eth_balance * 2350).toFixed(2)/(32*2350);
+    minipoolAPRs.push({ minipool: minipool, age: days, eth_apr: eth_apr, fiat_apr: fiat_apr });
   });
 
   return { minipoolAPRs };
@@ -60,6 +64,9 @@ export async function fetchValidators(ethAddress) {
   let node_action = "/validator/eth1/";
 
   let nodeUrl = (apiEndpoint + node_action + ethAddress + "?apikey=" + apikey)
+  if (ethAddress === "") {
+    return;
+  }
   try {
     let nodeValidators = [];
 
@@ -97,7 +104,8 @@ export async function fetchMinipoolData(validatorIndex) {
       deposits_amount: item.deposits_amount,
       withdrawals_amount: item.withdrawals_amount,
       validatorIndex: validatorIndex,
-      price: ""
+      eth_price: "",
+      fiat_amount: 0
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Add the price field to each item in the depositsAndWithdrawals array
     depositsAndWithdrawals = await Promise.all(depositsAndWithdrawals.map(async item => {
@@ -105,6 +113,7 @@ export async function fetchMinipoolData(validatorIndex) {
         const lookupDate = item.date.split('T')[0]; //need to format the date for the API
         const priceData = await fetchPriceData(lookupDate);
         item.eth_price = priceData.price;
+        item.fiat_amount = item.deposits_amount * priceData.price;
       }
       return item;
     }));
@@ -148,7 +157,8 @@ function formatArray(array) {
     const day = String(dateObject.getDate()).padStart(2, '0');
 
     const reformattedDate = `${year}-${month}-${day}`;
-    const dailyFlow = element.deposits_amount - element.withdrawals_amount;
-    return { validatorIndex: element.validatorIndex, amount: dailyFlow, days: element.day, date: reformattedDate };
+    const dailyEthFlow = element.deposits_amount - element.withdrawals_amount;
+    return { validatorIndex: element.validatorIndex, eth_amount: dailyEthFlow, fiat_amount: element.fiat_amount, days: element.day, date: reformattedDate };
   });
 }
+

@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { calcMinipoolAPRs, fetchMinipoolData, fetchValidators } from "./aprUtils.js";
+import { calcMinipoolAPRs, fetchMinipoolData, fetchValidators, fetchPriceData } from "./aprUtils.js";
 let address1 = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
@@ -33,18 +33,29 @@ let minipoolAddressArray = [address1, address2, address3];
 //let minipoolIndexArray = [];
 
 
+
 function App() {
 
   const [depositsAndWithdrawals, setDepositsAndWIthdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
-
   const [depositCount, setDepositCount] = useState(1);
-  const [nodeAddress, setNodeAddress] = React.useState(""); // Add this line
+  const [nodeAddress, setNodeAddress] = React.useState(""); 
+  const [ethPriceToday, setEthPriceToday] = React.useState(0);
 
   //console.log("Test payouts.data: ", payouts.data);
   const depositsAndWithdrawalsHasRun = useRef(false);
   const validatorsHasRun = useRef(false);
   var validatorArray = [];
+
+  useEffect(() => {
+    async function fetchEthPrice() {
+      var today = new Date();
+      const formattedDate = today.toISOString().slice(0, -14); //take off 14 characters to get the date in the format needed for the API
+      const priceToday = await fetchPriceData(formattedDate);
+      setEthPriceToday(priceToday);
+    }
+    fetchEthPrice();
+  }, []);
 
   useEffect(() => {
     async function fetchValidatorArray() {
@@ -124,7 +135,8 @@ function App() {
               <tr>
                 <th>Index</th>
                 <th>Age</th>
-                <th>Rate</th>
+                <th>Native Rate</th>
+                <th>Fiat Rate</th>
               </tr>
             </thead>
             <tbody>
@@ -133,7 +145,8 @@ function App() {
                   <tr key={index}>
                     <td> {item.minipool} </td>
                     <td> {item.age} days </td>
-                    <td> {item.apr}%</td>
+                    <td> {item.eth_apr}%</td>
+                    <td> {item.fiat_apr}%</td>
                   </tr>
                 ))
               }
