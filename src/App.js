@@ -14,9 +14,10 @@ let index1 = "983397";
 let index2 = "1101573";
 let index3 = "810338";
 let nodeAddress1 = "0x635D06a61a36566003D71428F1895e146CdBD54E";
-let nodeAddress2 = "0x84cf8a46e6f77dbc6a33855320d68f7a1698c528";
-let nodeAddress3 = "0xc2392cbe1a23c755cd4c197d8f31cdbd678d80da"; //does not work
-let nodeAddress4 = "0xd9c2d5c041ad53b8b0d70968da88ecbf5e973cd3";
+let nodeAddress2 = "0x84cf8a46e6f77dbc6a33855320d68f7a1698c528"; //does not work. Throttled by coingecko
+let nodeAddress4 = "0x1829f19524429a2edaf07bd13d1e47af19643d9b"
+let nodeAddress3 = "0x20a3aba3c6851dd3b4f3c8cd73911cfb0a5e38a4"; 
+let nodeAddress5 = "0xd9c2d5c041ad53b8b0d70968da88ecbf5e973cd3";
 
 //Mock up a depositArray
 const mockDeposits = [
@@ -135,8 +136,9 @@ function App() {
               <tr>
                 <th>Index</th>
                 <th>Age</th>
-                <th>Native Rate</th>
-                <th>Fiat Rate</th>
+                <th>Native APR</th>
+                <th>Fiat Gain</th>
+                <th>Fiat APR</th>
               </tr>
             </thead>
             <tbody>
@@ -146,6 +148,7 @@ function App() {
                     <td> {item.minipool} </td>
                     <td> {item.age} days </td>
                     <td> {item.eth_apr}%</td>
+                    <td> {item.fiat_gain}</td>
                     <td> {item.fiat_apr}%</td>
                   </tr>
                 ))

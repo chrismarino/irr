@@ -49,11 +49,12 @@ export function calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday) {
     if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
     totalEthEarned = totalEthEarned / 1000000000
     totalFiatDeposited = totalFiatDeposited / 1000000000
-    const totalFiatGain = (totalEthEarned * ethPriceToday.price_usd);
+    const totalFiatGain = ((totalEthEarned + totalEthDeposited)* ethPriceToday.price_usd)-totalFiatDeposited;
+    let formattedTotalFiatGain = totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     const eth_apr = ((((-100) * (365 / days) * totalEthEarned))/totalEthDeposited).toFixed(3);
-    const fiat_apr = (((-100) * (365 / days) * totalFiatGain)/(totalFiatDeposited)).toFixed(3);
-    minipoolAPRs.push({ minipool: minipool, age: days, eth_apr: eth_apr, fiat_apr: fiat_apr });
+    const fiat_apr = (((100) * (365 / days) * totalFiatGain)/(totalFiatDeposited)).toFixed(2);
+    minipoolAPRs.push({ minipool: minipool, age: days, eth_apr: eth_apr, fiat_gain: formattedTotalFiatGain, fiat_apr: fiat_apr });
   });
 
   return { minipoolAPRs };
