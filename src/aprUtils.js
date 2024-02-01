@@ -20,13 +20,13 @@ export function calcMinipoolAPRs(depositsAndWithdrawals) {
   //combine the despots and withdrawls into a single array for the IRR calculation
   totalArray = formatArray(depositsAndWithdrawals);
   //totalArray.sort() //make sure they are sorted by date
-  totalArray = _.sortBy(totalArray, function(item) {
+  totalArray = _.sortBy(totalArray, function (item) {
     return new Date(item.date);
   });
   //finc the minipool indices...
   // write the code that creates an array containg unique ValidatorIndex values in totalArray
   const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
- // don't think I need this since I saved the list of validators in the from the node API
+  // don't think I need this since I saved the list of validators in the from the node API
   //filter the array for each minipool and calculate the IRR
   const minipoolAPRs = []
   //Failed attempt to use lodash to filter the array for each minipool and calculate the IRR
@@ -34,12 +34,13 @@ export function calcMinipoolAPRs(depositsAndWithdrawals) {
   //uniq.forEach(minipool => {
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    let minDate = new Date(Math.min(...filteredArray.map(item => new Date(item.date))));
-    let maxDate = new Date(Math.max(...filteredArray.map(item => new Date(item.date))));
-    let days = Math.floor((maxDate - minDate) / (1000 * 60 * 60 * 24));
+    let dailyRate = xirr(filteredArray).rate;
+    let days = xirr(filteredArray).days;
+    // I actually want the APR, need to refactor...
+    //let irr = convertRate(dailyRate, "year");
     let sum = _.sumBy(filteredArray, 'amount');
-    if (sum > 0) { sum = sum - 32000000000} //back out the 32 eth deposit
-    let apr = ((-1)*(365/days)* sum / 320000000).toFixed(3);
+    if (sum > 0) { sum = sum - 32000000000 } //back out the 32 eth deposit
+    let apr = ((-1) * (365 / days) * sum / 320000000).toFixed(3);
     minipoolAPRs.push({ minipool: minipool, days: days, apr: apr });
   });
 
@@ -82,19 +83,24 @@ export async function fetchMinipoolData(validatorIndex) {
     let payouts = [];
     payouts = await axios(statsUrl);
     // map the deposits to the same format as the withdrawls (beasoncha.in API returns a different format)
+    //       "day": 1155,
+    //        "day_end": "2024-01-31T12:00:23Z",
+    //        "day_start": "2024-01-30T12:00:23Z",
     var depositsAndWithdrawals = payouts.data.data.map(item => ({
-      date: item.day_start.split('T')[0].split('-').reverse().join('-'),  //format the timestamp to DD-MM-YYYY
+      day: item.day, // The day in the life of the chain
+      date: item.day_start, // day of the deposit or withdrawl. Don't reformat this date needed as Date later
       deposits: item.deposits,
       withdrawals: item.withdrawals,
       deposits_amount: item.deposits_amount,
       withdrawals_amount: item.withdrawals_amount,
       validatorIndex: validatorIndex,
       price: ""
-    })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0); 
+    })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Add the price field to each item in the depositsAndWithdrawals array
     depositsAndWithdrawals = await Promise.all(depositsAndWithdrawals.map(async item => {
       if (item.deposits_amount > 0) {
-        const priceData = await fetchPriceData(item.date);
+        const lookupDate = item.date.split('T')[0]; //need to format the date for the API
+        const priceData = await fetchPriceData(lookupDate);
         item.eth_price = priceData.price;
       }
       return item;
@@ -112,6 +118,8 @@ export async function fetchPriceData(date) {
   let apiEndpoint = appUrl + "/api/v3"
   let apikey = process.env.REACT_APP_COINGECKO_KEY
   let node_action = "/coins/ethereum/history";
+  // fix the date format to be DD-MM-YYYY for coingecko API.
+  date = date.split('-').reverse().join('-'); // Reformatting the date to DD-MM-YYYY
   let priceUrl = (apiEndpoint + node_action + "?date=" + date + "?x_cg_demo_api_key=" + apikey)
   try {
     let price = [];
@@ -126,9 +134,18 @@ export async function fetchPriceData(date) {
 
 function formatArray(array) {
   return (array || []).map(function (element) {
-    //const originalDate = element.day;
+
+    // currently accepted formats for strings:
+    // YYYYMMDD, YYYY-MM-DD, YYYY/MM/DD
+    ///const originalDate = element.day;
     //const reformattedDate = originalDate.split('T')[0];
+    const dateObject = new Date(element.day);
+    const year = dateObject.getFullYear();
+    const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+    const day = String(dateObject.getDate()).padStart(2, '0');
+
+    const reformattedDate = `${year}-${month}-${day}`;
     const dailyFlow = element.deposits_amount - element.withdrawals_amount;
-    return { validatorIndex: element.validatorIndex, amount: dailyFlow, date: element.date };
+    return { validatorIndex: element.validatorIndex, amount: dailyFlow, date: reformattedDate };
   });
 }
