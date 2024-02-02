@@ -103,8 +103,8 @@ function MinipoolAPR({ nodeAddress }) {
           catch (error) {
             console.log("Error creating deposit array:", error);
           }
-          depositsAndWithdrawalsHasRun.current = true;
         }
+        depositsAndWithdrawalsHasRun.current = true;
       }
     }
 
@@ -115,11 +115,12 @@ function MinipoolAPR({ nodeAddress }) {
   var minipoolAPRs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
-  // only render when the withdrawls and deposits have been fetched
+  // only render when the all the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
     minipoolAPRs = calcMinipoolAPRs(minipoolIndexArray, depositsAndWithdrawals, ethPriceToday);
-    console.log("Minipool IRRs:", minipoolAPRs);
+    //update the minipool status in the APR array.
+    minipoolAPRs.minipoolAPRs.forEach(item => { item.status = minipoolIndexArray.find(minipool => minipool.validatorIndex === item.minipool).status });
 
   }
   return (
