@@ -38,7 +38,7 @@ export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals,
     //minipoolIndexArray.forEach(minipool => {
       const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     //const filteredArray = totalArray.filter(item => item.validatorIndex === minipool.validatorIndex);
-    console.log("Unique Validator Indexes:", uniqueValidatorIndexes, "minipoolIndexArray:", minipoolIndexArray, "filteredArray:", filteredArray);
+    //console.log("Unique Validator Indexes:", uniqueValidatorIndexes, "minipoolIndexArray:", minipoolIndexArray, "filteredArray:", filteredArray);
     //let dailyRate = xirr(filteredArray).rate;
     //let days = xirr(filteredArray).days;
     let minDay = _.minBy(filteredArray, 'days').days;

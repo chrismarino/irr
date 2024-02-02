@@ -98,7 +98,7 @@ function MinipoolAPR({ nodeAddress }) {
               setMinipools(index.status = false);
             }
 
-            console.log("valudator Count:", validatorCount, "total minipools:", minipools.length);
+            //console.log("valudator Count:", validatorCount, "total minipools:", minipools.length);
           }
           catch (error) {
             console.log("Error creating deposit array:", error);
@@ -112,25 +112,15 @@ function MinipoolAPR({ nodeAddress }) {
   }, [minipools]);
 
 
-  var wd = [];
   var minipoolAPRs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
-    console.log("Deposits and Withdrawals:", depositsAndWithdrawals, "minpool Index", minipoolIndexArray, "eth price", ethPriceToday);
     minipoolAPRs = calcMinipoolAPRs(minipoolIndexArray, depositsAndWithdrawals, ethPriceToday);
     console.log("Minipool IRRs:", minipoolAPRs);
-    //render the withdrawls...);
-    wd = (depositsAndWithdrawals || []).map(function (element) {
-      let date = new Date(element.timestamp * 1000);
-      const withdrawlsItem = ["Index: ", element.validatorIndex, " ", date.toDateString(), ": " + element.amount / 1000000000, " Eth"];
-      return withdrawlsItem;
-    }
-    );
-    //console.log(wd);
-    //console.log("Minipool Withdrawls:", wd);
+
   }
   return (
     <div className="MinipoolAPR">
