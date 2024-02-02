@@ -75,8 +75,12 @@ export async function fetchValidators(ethAddress) {
   let node_action = "/validator/eth1/";
 
   let nodeUrl = (apiEndpoint + node_action + ethAddress + "?apikey=" + apikey)
-  if (ethAddress === "") {
-    return;
+  function isValidEthAddress(ethAddress) {
+    const regex = /^0x[a-fA-F0-9]{40}$/;
+    return regex.test(ethAddress);
+  }
+  if (!isValidEthAddress(ethAddress)) {
+    return [];
   }
   try {
     let nodeValidators = [];

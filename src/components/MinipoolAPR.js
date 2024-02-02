@@ -35,12 +35,11 @@ let minipoolIndexArray = [];
 
 
 
-function MinipoolAPR() {
+function MinipoolAPR({ nodeAddress }) {
 
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
   const [validatorCount, setValidatorCount] = useState(0);
-  const [nodeAddress, setNodeAddress] = React.useState("");
   const [ethPriceToday, setEthPriceToday] = React.useState(0);
 
 
@@ -61,16 +60,15 @@ function MinipoolAPR() {
   useEffect(() => {
     async function fetchValidatorArray() {
       if (nodeAddress === "") return;
-      validatorArray = await fetchValidators(nodeAddress);
-      depositsAndWithdrawalsHasRun.current = false // new node address, so reset the depositsAndWithdrawalsHasRun flag
       try {
-        minipoolIndexArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
-        minipoolIndexArray = minipoolIndexArray.map(item => ({
+        validatorArray = await fetchValidators(nodeAddress);
+        depositsAndWithdrawalsHasRun.current = false // new node address, so reset the depositsAndWithdrawalsHasRun flag
+        minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
+        minipoolIndexArray = (minipoolIndexArray || []).map(item => ({
           validatorIndex: item,
           status: true  //set the status of the minipool to active
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
-
         console.log("Minipool Index Array:", minipoolIndexArray);
       }
       catch (error) {
@@ -87,7 +85,7 @@ function MinipoolAPR() {
     async function fetchDepositsAndWithdrawals() {
       if (minipools.length === 0) return;
       console.log("Validators Has Run. minipools:", minipools);
-      if (!depositsAndWithdrawalsHasRun.current && (validatorCount < minipools.length) ) {
+      if (!depositsAndWithdrawalsHasRun.current && (validatorCount < minipools.length)) {
         for (const index of minipools) {
           try {
             count = validatorCount + 1; //only run till the validator count is reached
@@ -98,9 +96,9 @@ function MinipoolAPR() {
             //see if the minipool has exited. Set it to false if it has.
             if (oneIndex.nodeDepositsAndWithdrawals.some(item => item.status === false)) {
               setMinipools(index.status = false);
-            } 
+            }
 
-            console.log( "valudator Count:", validatorCount, "total minipools:", minipools.length);
+            console.log("valudator Count:", validatorCount, "total minipools:", minipools.length);
           }
           catch (error) {
             console.log("Error creating deposit array:", error);
@@ -121,7 +119,7 @@ function MinipoolAPR() {
   // only render when the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
-    console.log("Deposits and Withdrawals:", depositsAndWithdrawals, "minpool Index",  minipoolIndexArray, "eth price", ethPriceToday);
+    console.log("Deposits and Withdrawals:", depositsAndWithdrawals, "minpool Index", minipoolIndexArray, "eth price", ethPriceToday);
     minipoolAPRs = calcMinipoolAPRs(minipoolIndexArray, depositsAndWithdrawals, ethPriceToday);
     console.log("Minipool IRRs:", minipoolAPRs);
     //render the withdrawls...);
@@ -138,12 +136,6 @@ function MinipoolAPR() {
     <div className="MinipoolAPR">
       <header className="MinipoolAPR-header">
         <section>
-          <input
-            type="text"
-            value={nodeAddress}
-            onChange={event => setNodeAddress(event.target.value)}
-            placeholder="Enter node address"
-          />
           <table>
             <thead>
               <tr>
