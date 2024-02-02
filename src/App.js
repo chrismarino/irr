@@ -16,7 +16,7 @@ let index3 = "810338";
 let nodeAddress1 = "0x635D06a61a36566003D71428F1895e146CdBD54E";
 let nodeAddress2 = "0x84cf8a46e6f77dbc6a33855320d68f7a1698c528"; //does not work. Throttled by coingecko
 let nodeAddress4 = "0x1829f19524429a2edaf07bd13d1e47af19643d9b"
-let nodeAddress3 = "0x20a3aba3c6851dd3b4f3c8cd73911cfb0a5e38a4"; 
+let nodeAddress3 = "0x20a3aba3c6851dd3b4f3c8cd73911cfb0a5e38a4";
 let nodeAddress5 = "0xd9c2d5c041ad53b8b0d70968da88ecbf5e973cd3";
 
 //Mock up a depositArray
@@ -29,18 +29,18 @@ const mockDeposits = [
   { validatorIndex: "810338", amount: -31000000000, timestamp: "1698671967" },
 
 ]
-let minipoolAddressArray = [address1, address2, address3];
+//let minipoolAddressArray = [address1, address2, address3];
 //let minipoolIndexArray = [index1, index2, index3];
-//let minipoolIndexArray = [];
+let minipoolIndexArray = [];
 
 
 
 function App() {
 
-  const [depositsAndWithdrawals, setDepositsAndWIthdrawals] = React.useState([]);
+  const [depositsAndWithdrawals, setDepositsAndWithdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
   const [depositCount, setDepositCount] = useState(1);
-  const [nodeAddress, setNodeAddress] = React.useState(""); 
+  const [nodeAddress, setNodeAddress] = React.useState("");
   const [ethPriceToday, setEthPriceToday] = React.useState(0);
 
   //console.log("Test payouts.data: ", payouts.data);
@@ -50,9 +50,7 @@ function App() {
 
   useEffect(() => {
     async function fetchEthPrice() {
-      var today = new Date();
-      const formattedDate = today.toISOString().slice(0, -14); //take off 14 characters to get the date in the format needed for the API
-      const priceToday = await fetchPriceData(formattedDate);
+      const priceToday = await fetchPriceData(""); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(priceToday);
     }
     fetchEthPrice();
@@ -63,14 +61,17 @@ function App() {
       validatorArray = await fetchValidators(nodeAddress);
       depositsAndWithdrawalsHasRun.current = false // new node address, so reset the depositsAndWithdrawalsHasRun flag
       try {
-        minipoolAddressArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
-        setMinipools(minipoolAddressArray);
-        console.log("Minipool Address Array:", minipoolAddressArray);
+        minipoolIndexArray = validatorArray.map(item => item.validatorindex);  //get the minipool addresses
+        minipoolIndexArray = minipoolIndexArray.map(item => ({
+          validatorIndex: item,
+          status: true  //set the status of the minipool to active
+        }));  //get the minipool addresses
+        setMinipools(minipoolIndexArray);
+        console.log("Minipool Index Array:", minipoolIndexArray);
       }
       catch (error) {
-        console.log("Error creating validator array:", error);
+        console.log("Error creating validator index array:", error);
       }
-
     }
     fetchValidatorArray();
   }, [nodeAddress]);
@@ -85,9 +86,13 @@ function App() {
       if (!depositsAndWithdrawalsHasRun.current) {
         for (const index of minipools) {
           try {
-            const oneIndex = await fetchMinipoolData(index);
-            allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex); //response structure is different for deposits
-            setDepositsAndWIthdrawals(allDepositsAndWithdrawals);
+            const oneIndex = await fetchMinipoolData(index.validatorIndex);
+            allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
+            setDepositsAndWithdrawals(allDepositsAndWithdrawals);
+            if (oneIndex.nodeDepositsAndWithdrawals.some(item => item.status === false)) {
+              setMinipools(index.status = false);
+            }
+
             console.log("All Deposits:", allDepositsAndWithdrawals, "Deposit Count:", depositCount);
           }
           catch (error) {
@@ -135,6 +140,7 @@ function App() {
             <thead>
               <tr>
                 <th>Index</th>
+                <th>Status</th>
                 <th>Age</th>
                 <th>Native APR</th>
                 <th>Fiat Gain</th>
@@ -146,6 +152,7 @@ function App() {
                 (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
                   <tr key={index}>
                     <td> {item.minipool} </td>
+                    <td> {item.status ? 'Active' : 'Exited'} </td>
                     <td> {item.age} days </td>
                     <td> {item.eth_apr}%</td>
                     <td> {item.fiat_gain}</td>

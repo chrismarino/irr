@@ -4,7 +4,7 @@ import axios, { all } from 'axios';
 import _ from "lodash";
 
 
-export function calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday) {
+export function calcMinipoolAPRs(nodeDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -19,7 +19,7 @@ export function calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday) {
 
 
   //combine the despots and withdrawls into a single array for the IRR calculation
-  totalArray = formatArray(depositsAndWithdrawals);
+  totalArray = formatArray(nodeDepositsAndWithdrawals);
   //totalArray.sort() //make sure they are sorted by date
   totalArray = _.sortBy(totalArray, function (item) {
     return new Date(item.date);
@@ -49,12 +49,13 @@ export function calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday) {
     if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
     totalEthEarned = totalEthEarned / 1000000000
     totalFiatDeposited = totalFiatDeposited / 1000000000
-    const totalFiatGain = ((totalEthEarned + totalEthDeposited)* ethPriceToday.price_usd)-totalFiatDeposited;
+    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.price_usd) - totalFiatDeposited;
     let formattedTotalFiatGain = totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
-    const eth_apr = ((((-100) * (365 / days) * totalEthEarned))/totalEthDeposited).toFixed(3);
-    const fiat_apr = (((100) * (365 / days) * totalFiatGain)/(totalFiatDeposited)).toFixed(2);
-    minipoolAPRs.push({ minipool: minipool, age: days, eth_apr: eth_apr, fiat_gain: formattedTotalFiatGain, fiat_apr: fiat_apr });
+    let status = true;
+    const eth_apr = ((((-100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(3);
+    const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
+    minipoolAPRs.push({ minipool: minipool, status: status, age: days, eth_apr: eth_apr, fiat_gain: formattedTotalFiatGain, fiat_apr: fiat_apr });
   });
 
   return { minipoolAPRs };
@@ -88,7 +89,7 @@ export async function fetchValidators(ethAddress) {
 // New fetchDeposit function that uses the validator stats API endpoint
 export async function fetchMinipoolData(validatorIndex) {
   // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
-
+  let status = true;
   let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
   let apiEndpoint = appUrl + "api/v1"
   let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
@@ -102,7 +103,7 @@ export async function fetchMinipoolData(validatorIndex) {
     //       "day": 1155,
     //        "day_end": "2024-01-31T12:00:23Z",
     //        "day_start": "2024-01-30T12:00:23Z",
-    var depositsAndWithdrawals = payouts.data.data.map(item => ({
+    var nodeDepositsAndWithdrawals = payouts.data.data.map(item => ({
       day: item.day, // The day in the life of the chain
       date: item.day_start, // day of the deposit or withdrawl. Don't reformat this date needed as Date later
       deposits: item.deposits,
@@ -111,19 +112,34 @@ export async function fetchMinipoolData(validatorIndex) {
       withdrawals_amount: item.withdrawals_amount,
       validatorIndex: validatorIndex,
       eth_price: "",
-      fiat_amount: 0
+      fiat_amount: 0,
+      status: true
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
-    // Add the price field to each item in the depositsAndWithdrawals array
-    depositsAndWithdrawals = await Promise.all(depositsAndWithdrawals.map(async item => {
+    // Set the minipool status to false if the minipool has exited. Do this before another async call.
+    // nodeDepositsAndWithdrawals.map(item => {
+    //if (item.withdrawals_amount === 32000000000) { // if the withdrawal is the 32 eth the minipool has exited.
+    //  item.status = false;
+    //  status = false; //set in the parent function as well.
+    //}
+    nodeDepositsAndWithdrawals = nodeDepositsAndWithdrawals.map(item => {
+      if (item.withdrawals_amount === 32000000000) {
+        return { ...item, status: false };
+      } else {
+        return item;
+      }
+    });
+    // Add the price field to each item in the nodeDepositsAndWithdrawals array
+    nodeDepositsAndWithdrawals = await Promise.all(nodeDepositsAndWithdrawals.map(async item => {
       if (item.deposits_amount > 0) {
         const lookupDate = item.date.split('T')[0]; //need to format the date for the API
         const priceData = await fetchPriceData(lookupDate);
         item.eth_price = priceData.price_usd;
         item.fiat_amount = item.deposits_amount * item.eth_price;
       }
-      return item;
+      return item; //return the item unchanged if no deposit
     }));
-    return depositsAndWithdrawals;
+    console.log("Node Deposits and Withdrawals:", nodeDepositsAndWithdrawals, "Status:", status);
+    return { nodeDepositsAndWithdrawals, status };
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);
   }
@@ -131,6 +147,7 @@ export async function fetchMinipoolData(validatorIndex) {
 //Get  the price of ETH from CoinGecko for the days of the deposit
 export async function fetchPriceData(date) {
   // A utility function used to fetch price from an API. Take a url as an argument.
+  // if 'date' = '' then use the current time price API
 
   let appUrl = process.env.REACT_APP_COINGECKO_URL
   let apiEndpoint = appUrl + "/api/v3"
@@ -139,14 +156,32 @@ export async function fetchPriceData(date) {
   // fix the date format to be DD-MM-YYYY for coingecko API.
   date = date.split('-').reverse().join('-'); // Reformatting the date to DD-MM-YYYY
   let priceUrl = (apiEndpoint + node_action + "?date=" + date + "?x_cg_demo_api_key=" + apikey)
-  try {
-    let price = [];
-    let payouts = await axios(priceUrl);
-    price.date = date
-    price.price_usd = payouts.data.market_data.current_price.usd;
-    return price;
-  } catch (error) {
-    console.log("Error setting the price:", error);
+
+  if (date === "") {
+    // url shuld be 
+    //https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&precision=full
+    //https://api.coingecko.com/api/v3simple/price?ids=ethereum&vs_currencies=usd&precision=full?x_cg_demo_api_key=CG-YufuxVfD5JK12tvvrXh7sF3f
+    let node_action = "/simple/price?ids=ethereum&vs_currencies=usd&precision=full";
+    let priceUrl = (apiEndpoint + node_action + "?x_cg_demo_api_key=" + apikey)
+    try {
+      let price = [];
+      let payouts = await axios(priceUrl);
+      price.date = "now"
+      price.price_usd = payouts.data.ethereum.usd;
+      return price;
+    } catch (error) {
+      console.log("Error setting the current price:", error);
+    }
+  } else {
+    try {
+      let price = [];
+      let payouts = await axios(priceUrl);
+      price.date = date
+      price.price_usd = payouts.data.market_data.current_price.usd;
+      return price;
+    } catch (error) {
+      console.log("Error setting the historical price:", error);
+    }
   }
 };
 
