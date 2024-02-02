@@ -39,14 +39,16 @@ function App() {
 
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
-  const [depositCount, setDepositCount] = useState(1);
+  const [validatorCount, setValidatorCount] = useState(0);
   const [nodeAddress, setNodeAddress] = React.useState("");
   const [ethPriceToday, setEthPriceToday] = React.useState(0);
+
 
   //console.log("Test payouts.data: ", payouts.data);
   const depositsAndWithdrawalsHasRun = useRef(false);
   const validatorsHasRun = useRef(false);
   var validatorArray = [];
+  var count = 0;
 
   useEffect(() => {
     async function fetchEthPrice() {
@@ -58,6 +60,7 @@ function App() {
 
   useEffect(() => {
     async function fetchValidatorArray() {
+      if (nodeAddress === "") return;
       validatorArray = await fetchValidators(nodeAddress);
       depositsAndWithdrawalsHasRun.current = false // new node address, so reset the depositsAndWithdrawalsHasRun flag
       try {
@@ -67,6 +70,7 @@ function App() {
           status: true  //set the status of the minipool to active
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
+
         console.log("Minipool Index Array:", minipoolIndexArray);
       }
       catch (error) {
@@ -81,19 +85,22 @@ function App() {
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
     async function fetchDepositsAndWithdrawals() {
-
+      if (minipools.length === 0) return;
       console.log("Validators Has Run. minipools:", minipools);
-      if (!depositsAndWithdrawalsHasRun.current) {
+      if (!depositsAndWithdrawalsHasRun.current && (validatorCount < minipools.length) ) {
         for (const index of minipools) {
           try {
+            count = validatorCount + 1; //only run till the validator count is reached
+            setValidatorCount(count);
             const oneIndex = await fetchMinipoolData(index.validatorIndex);
             allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
             setDepositsAndWithdrawals(allDepositsAndWithdrawals);
+            //see if the minipool has exited. Set it to false if it has.
             if (oneIndex.nodeDepositsAndWithdrawals.some(item => item.status === false)) {
               setMinipools(index.status = false);
-            }
+            } 
 
-            console.log("All Deposits:", allDepositsAndWithdrawals, "Deposit Count:", depositCount);
+            console.log( "valudator Count:", validatorCount, "total minipools:", minipools.length);
           }
           catch (error) {
             console.log("Error creating deposit array:", error);
@@ -114,7 +121,8 @@ function App() {
   // only render when the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
-    minipoolAPRs = calcMinipoolAPRs(depositsAndWithdrawals, ethPriceToday);
+    console.log("Deposits and Withdrawals:", depositsAndWithdrawals, "minpool Index",  minipoolIndexArray, "eth price", ethPriceToday);
+    minipoolAPRs = calcMinipoolAPRs(minipoolIndexArray, depositsAndWithdrawals, ethPriceToday);
     console.log("Minipool IRRs:", minipoolAPRs);
     //render the withdrawls...);
     wd = (depositsAndWithdrawals || []).map(function (element) {

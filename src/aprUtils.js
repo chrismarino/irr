@@ -4,7 +4,7 @@ import axios, { all } from 'axios';
 import _ from "lodash";
 
 
-export function calcMinipoolAPRs(nodeDepositsAndWithdrawals, ethPriceToday) {
+export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -34,7 +34,11 @@ export function calcMinipoolAPRs(nodeDepositsAndWithdrawals, ethPriceToday) {
   //let uniq = _.uniqBy(totalArray, 'validatorIndex');
   //uniq.forEach(minipool => {
   uniqueValidatorIndexes.forEach(minipool => {
-    const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
+
+    //minipoolIndexArray.forEach(minipool => {
+      const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
+    //const filteredArray = totalArray.filter(item => item.validatorIndex === minipool.validatorIndex);
+    console.log("Unique Validator Indexes:", uniqueValidatorIndexes, "minipoolIndexArray:", minipoolIndexArray, "filteredArray:", filteredArray);
     //let dailyRate = xirr(filteredArray).rate;
     //let days = xirr(filteredArray).days;
     let minDay = _.minBy(filteredArray, 'days').days;
@@ -52,7 +56,7 @@ export function calcMinipoolAPRs(nodeDepositsAndWithdrawals, ethPriceToday) {
     const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.price_usd) - totalFiatDeposited;
     let formattedTotalFiatGain = totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
-    let status = true;
+    let status = minipool.status;
     const eth_apr = ((((-100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(3);
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
     minipoolAPRs.push({ minipool: minipool, status: status, age: days, eth_apr: eth_apr, fiat_gain: formattedTotalFiatGain, fiat_apr: fiat_apr });
