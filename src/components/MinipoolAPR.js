@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { calcMinipoolAPRs, fetchMinipoolData, fetchValidators, fetchPriceData } from "../aprUtils.js";
+import { calcMinipoolAPRs, fetchValidatorStats, fetchValidators, fetchPriceData, fetchRocketpoolValidatorStats } from "../aprUtils.js";
 let address1 = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
@@ -46,7 +46,8 @@ function MinipoolAPR({ nodeAddress }) {
   //console.log("Test payouts.data: ", payouts.data);
   const depositsAndWithdrawalsHasRun = useRef(false);
   const validatorsHasRun = useRef(false);
-  var validatorArray = [];
+  var validatorArray = []; // reset the validator array
+  var minipoolArray = []; // reset the minipool array
   var count = 0;
 
   useEffect(() => {
@@ -59,10 +60,13 @@ function MinipoolAPR({ nodeAddress }) {
 
   useEffect(() => {
     async function fetchValidatorArray() {
+      // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
+      // stats for each validator. 
       if (nodeAddress === "") return;
       try {
         validatorArray = await fetchValidators(nodeAddress);
         depositsAndWithdrawalsHasRun.current = false // new node address, so reset the depositsAndWithdrawalsHasRun flag
+        validatorsHasRun.current = false; // new node address, so reset the validatorsHasRun flag
         minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
         minipoolIndexArray = (minipoolIndexArray || []).map(item => ({
           validatorIndex: item,
@@ -74,11 +78,35 @@ function MinipoolAPR({ nodeAddress }) {
       catch (error) {
         console.log("Error creating validator index array:", error);
       }
+
+
     }
     fetchValidatorArray();
   }, [nodeAddress]);
 
-
+  useEffect(() => {
+    async function fetchRocketpoolValidatorStatsArray() {
+      if (validatorsHasRun.current === false && minipools.length > 0) {
+        try {
+          minipoolArray = await fetchRocketpoolValidatorStats(minipools); //minipools includes an array of validator indexes
+          //minipoolIndexArray = (minipoolArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
+          let updatedMinipoolIndexArray = minipools;
+          updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
+            minipoolStats: item,
+            validatorIndex: minipools[index].validatorIndex,
+            status: minipools[index].status
+          }));  //get the minipool addresses
+          //setMinipools(minipoolIndexArray);
+          console.log("Updated Minipool Index Array with Minipool stats:", minipoolIndexArray);
+        }
+        catch (error) {
+          console.log("Error creating validator index array:", error);
+        }
+        validatorsHasRun.current = true;
+      }
+    }
+    fetchRocketpoolValidatorStatsArray();
+  }, [minipools]);
 
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
@@ -90,7 +118,7 @@ function MinipoolAPR({ nodeAddress }) {
           try {
             count = validatorCount + 1; //only run till the validator count is reached
             setValidatorCount(count);
-            const oneIndex = await fetchMinipoolData(index.validatorIndex);
+            const oneIndex = await fetchValidatorStats(index.validatorIndex);
             allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
             setDepositsAndWithdrawals(allDepositsAndWithdrawals);
             //see if the minipool has exited. Set it to false if it has.
@@ -154,7 +182,7 @@ function MinipoolAPR({ nodeAddress }) {
             </tbody>
           </table>
         </section>
-        <p>ETH Price Today: ${ethPriceToday.eth_price_usd} RPL Price Today: ${ ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
+        <p>ETH Price Today: ${ethPriceToday.eth_price_usd} RPL Price Today: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
       </header>
     </div>
   );

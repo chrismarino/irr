@@ -64,6 +64,28 @@ export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals,
 
   return { minipoolAPRs };
 }
+export async function fetchRocketpoolValidatorStats(validatorArray) {
+  // Fetch the minipool stats from Beaconcha.in from an arry of validator indexes. Return an array of objects with the
+  // Rocketpool values. This should be updated whenever the Node address feild is changed on the page. 
+  let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
+  let apiEndpoint = appUrl + "api/v1"
+  let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
+  let node_action = "/rocketpool/validator/";
+  // URL https://beaconcha.in/api/v1/rocketpool/validator/983397%2C1101573%2C810338
+  let validatorIndexString = validatorArray.map(validator => validator.validatorIndex).join(',');
+  // "http://beaconcha.in/api/v1/rocketpool/validator/[object%20Object]%2C[object%20Object]%2C[object%20Object]?apikey=a0ZFaGMxc0FwNTdTZXJaQXdJV3lUd3pHdjNtag"
+  let nodeUrl = (apiEndpoint + node_action + validatorIndexString + "?apikey=" + apikey)
+  try {
+    let rocketpoolValidators = [];
+
+    rocketpoolValidators = await axios(nodeUrl);
+    // map the deposits to the same format as the withdrawls (beasoncha.in API returns a different format)
+    const validators = rocketpoolValidators.data.data;
+    return validators;
+  } catch (error) {
+    console.log("Axios Error on Rocketpool Validator Stats Fetch:", error);
+  }
+};
 
 export async function fetchValidators(ethAddress) {
   // Fetch validator list from Beaconcha.in using eth1 address. 
@@ -95,8 +117,8 @@ export async function fetchValidators(ethAddress) {
 };
 
 // New fetchDeposit function that uses the validator stats API endpoint
-export async function fetchMinipoolData(validatorIndex) {
-  // A utility function used to fetch the deposits and withdrawls from an API. Take a url as an argument.
+export async function fetchValidatorStats(validatorIndex) {
+  // A utility function used to fetch the deposits and withdrawl history from an API. Take a url as an argument.
   let status = true;
   let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
   let apiEndpoint = appUrl + "api/v1"
