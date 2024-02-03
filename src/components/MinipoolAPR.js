@@ -73,6 +73,7 @@ function MinipoolAPR({ nodeAddress }) {
           status: true  //set the status of the minipool to active
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
+
         console.log("Minipool Index Array:", minipoolIndexArray);
       }
       catch (error) {
@@ -98,7 +99,7 @@ function MinipoolAPR({ nodeAddress }) {
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
           }));  //get the minipool addresses
-          setMinipools(updatedMinipoolIndexArray);
+          setMinipools(prevMinipools => [...prevMinipools, ...minipoolIndexArray]);
           console.log("Updated Minipool Index Array with Minipool stats:", updatedMinipoolIndexArray);
         }
         catch (error) {
@@ -125,7 +126,9 @@ function MinipoolAPR({ nodeAddress }) {
             setDepositsAndWithdrawals(allDepositsAndWithdrawals);
             //see if the minipool has exited. Set it to false if it has.
             if (oneIndex.nodeDepositsAndWithdrawals.some(item => item.status === false)) {
-              setMinipools(index.status = false);
+              setMinipools(minipools.map(minipool => 
+                minipool === index ? {...minipool, status: false} : minipool
+                ));
             }
 
             //console.log("valudator Count:", validatorCount, "total minipools:", minipools.length);
