@@ -154,6 +154,7 @@ function MinipoolAPR({ nodeAddress }) {
             </tbody>
           </table>
         </section>
+        <p>ETH Price Today: ${ethPriceToday.eth_price_usd} RPL Price Today: ${ ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
       </header>
     </div>
   );

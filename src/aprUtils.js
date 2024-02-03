@@ -53,7 +53,7 @@ export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals,
     if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
     totalEthEarned = totalEthEarned / 1000000000
     totalFiatDeposited = totalFiatDeposited / 1000000000
-    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.price_usd) - totalFiatDeposited;
+    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
     let formattedTotalFiatGain = totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     let status = minipool.status;
@@ -167,15 +167,16 @@ export async function fetchPriceData(date) {
 
   if (date === "") {
     // url shuld be 
-    //https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&precision=full
     //https://api.coingecko.com/api/v3simple/price?ids=ethereum&vs_currencies=usd&precision=full?x_cg_demo_api_key=CG-YufuxVfD5JK12tvvrXh7sF3f
-    let node_action = "/simple/price?ids=ethereum&vs_currencies=usd&precision=full";
+    // adding rpl to the ids returns the price of rpl as well
+    let node_action = "/simple/price?ids=ethereum,rocket-pool&vs_currencies=usd&precision=full";
     let priceUrl = (apiEndpoint + node_action + "?x_cg_demo_api_key=" + apikey)
     try {
       let price = [];
       let payouts = await axios(priceUrl);
       price.date = "now"
-      price.price_usd = payouts.data.ethereum.usd;
+      price.eth_price_usd = payouts.data.ethereum.usd;
+      price.rpl_price_usd = payouts.data['rocket-pool'].usd;
       return price;
     } catch (error) {
       console.log("Error setting the current price:", error);

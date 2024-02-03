@@ -16,6 +16,7 @@ function App() {
             placeholder="Enter node address"
           />
           <MinipoolAPR nodeAddress={nodeAddress} />
+
         </header>
       </div>
 
