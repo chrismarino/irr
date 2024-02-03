@@ -91,13 +91,15 @@ function MinipoolAPR({ nodeAddress }) {
           minipoolArray = await fetchRocketpoolValidatorStats(minipools); //minipools includes an array of validator indexes
           //minipoolIndexArray = (minipoolArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
           let updatedMinipoolIndexArray = minipools;
+          let bond = 32 ;  //get the bond
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
             validatorIndex: minipools[index].validatorIndex,
+            bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
           }));  //get the minipool addresses
-          //setMinipools(minipoolIndexArray);
-          console.log("Updated Minipool Index Array with Minipool stats:", minipoolIndexArray);
+          setMinipools(updatedMinipoolIndexArray);
+          console.log("Updated Minipool Index Array with Minipool stats:", updatedMinipoolIndexArray);
         }
         catch (error) {
           console.log("Error creating validator index array:", error);
