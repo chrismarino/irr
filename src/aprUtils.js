@@ -4,7 +4,7 @@ import axios, { all } from 'axios';
 import _ from "lodash";
 
 
-export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals, ethPriceToday) {
+export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -16,7 +16,7 @@ export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals,
   // 'timestamp' field. It returns 
   // an annay of day counts and irr per minpool. paymentArray is typically the result of a query to the etherscan API.
   var totalArray = [];
-
+  var minipools = minipools;
 
   //combine the despots and withdrawls into a single array for the IRR calculation
   totalArray = formatArray(nodeDepositsAndWithdrawals);
@@ -36,7 +36,7 @@ export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals,
   uniqueValidatorIndexes.forEach(minipool => {
 
     //minipoolIndexArray.forEach(minipool => {
-      const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
+    const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     //const filteredArray = totalArray.filter(item => item.validatorIndex === minipool.validatorIndex);
     //console.log("Unique Validator Indexes:", uniqueValidatorIndexes, "minipoolIndexArray:", minipoolIndexArray, "filteredArray:", filteredArray);
     //let dailyRate = xirr(filteredArray).rate;
@@ -56,10 +56,20 @@ export function calcMinipoolAPRs(minipoolIndexArray, nodeDepositsAndWithdrawals,
     const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
     let formattedTotalFiatGain = totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
-    let status = minipool.status;
+    let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);
+    let status = minipoolIndex.status;
     const eth_apr = ((((-100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(3);
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
-    minipoolAPRs.push({ minipool: minipool, status: status, age: days, eth_apr: eth_apr, fiat_gain: formattedTotalFiatGain, fiat_apr: fiat_apr });
+    minipoolAPRs.push({
+      minipool: minipool,
+      status: status,
+      age: days,
+      eth_apr:
+        eth_apr,
+      fiat_gain:
+        formattedTotalFiatGain,
+      fiat_apr: fiat_apr
+    });
   });
 
   return { minipoolAPRs };
@@ -146,17 +156,13 @@ export async function fetchValidatorStats(validatorIndex) {
       status: true
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Set the minipool status to false if the minipool has exited. Do this before another async call.
-    // nodeDepositsAndWithdrawals.map(item => {
-    //if (item.withdrawals_amount === 32000000000) { // if the withdrawal is the 32 eth the minipool has exited.
-    //  item.status = false;
-    //  status = false; //set in the parent function as well.
-    //}
-    nodeDepositsAndWithdrawals = nodeDepositsAndWithdrawals.map(item => {
-      if (item.withdrawals_amount === 32000000000) {
-        return { ...item, status: false };
-      } else {
-        return item;
-      }
+     nodeDepositsAndWithdrawals = nodeDepositsAndWithdrawals.map(item => {
+       if (item.withdrawals_amount === 32000000000) {
+        status = false; // set the status for this minipool to false
+         return { ...item, status: false }; //set it in the data array as well.
+       } else {
+         return item;
+       }
     });
     // Add the price field to each item in the nodeDepositsAndWithdrawals array
     nodeDepositsAndWithdrawals = await Promise.all(nodeDepositsAndWithdrawals.map(async item => {

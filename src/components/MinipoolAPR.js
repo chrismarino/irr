@@ -92,15 +92,17 @@ function MinipoolAPR({ nodeAddress }) {
           minipoolArray = await fetchRocketpoolValidatorStats(minipools); //minipools includes an array of validator indexes
           //minipoolIndexArray = (minipoolArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
           let updatedMinipoolIndexArray = minipools;
-          let bond = 32 ;  //get the bond
+          let bond = 32;  //get the bond
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
             validatorIndex: minipools[index].validatorIndex,
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
           }));  //get the minipool addresses
-          setMinipools(prevMinipools => [...prevMinipools, ...minipoolIndexArray]);
+
           console.log("Updated Minipool Index Array with Minipool stats:", updatedMinipoolIndexArray);
+          setMinipools(updatedMinipoolIndexArray);
+          console.log("Just set minipool array:", minipools);
         }
         catch (error) {
           console.log("Error creating validator index array:", error);
@@ -125,10 +127,14 @@ function MinipoolAPR({ nodeAddress }) {
             allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
             setDepositsAndWithdrawals(allDepositsAndWithdrawals);
             //see if the minipool has exited. Set it to false if it has.
-            if (oneIndex.nodeDepositsAndWithdrawals.some(item => item.status === false)) {
-              setMinipools(minipools.map(minipool => 
-                minipool === index ? {...minipool, status: false} : minipool
-                ));
+            if (oneIndex.status === false) {
+              let exitedMinipools = minipools.map(minipool =>
+                minipool === index ? {
+                  ...minipool,
+                  status: false
+                } : minipool);
+                setMinipools(exitedMinipools);
+                console.log("Minipool has exited setting minipools state to:", exitedMinipools, "Minipools:", minipools);
             }
 
             //console.log("valudator Count:", validatorCount, "total minipools:", minipools.length);
@@ -139,6 +145,8 @@ function MinipoolAPR({ nodeAddress }) {
         }
         depositsAndWithdrawalsHasRun.current = true;
       }
+      // update minipool status here
+
     }
 
     fetchDepositsAndWithdrawals();
@@ -151,10 +159,8 @@ function MinipoolAPR({ nodeAddress }) {
   // only render when the all the withdrawls and deposits have been fetched
   if (depositsAndWithdrawalsHasRun.current) {
     // render the irrs...
-    minipoolAPRs = calcMinipoolAPRs(minipoolIndexArray, depositsAndWithdrawals, ethPriceToday);
-    //update the minipool status in the APR array.
-    minipoolAPRs.minipoolAPRs.forEach(item => { item.status = minipoolIndexArray.find(minipool => minipool.validatorIndex === item.minipool).status });
-
+    minipoolAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday);
+  
   }
   return (
     <div className="MinipoolAPR">
