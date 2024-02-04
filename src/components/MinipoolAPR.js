@@ -9,7 +9,6 @@ let minipoolIndexArray = [];
 function MinipoolAPR({ nodeAddress }) {
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = React.useState([]);
   const [minipools, setMinipools] = React.useState([]);
-  const [validatorCount, setValidatorCount] = useState(0);
   const [ethPriceToday, setEthPriceToday] = React.useState(0);
 
 
@@ -34,11 +33,11 @@ function MinipoolAPR({ nodeAddress }) {
       // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
       // stats for each validator. 
       validatorArrayHasRun.current = false; // will be reset, unless there is an error or empty node address
+      depositsAndWithdrawalsHasRun.current = false // new node address, so reset the HasRun flags
+      rocketpoolValidatorsStatsHasRun.current = false; 
       if (nodeAddress === "") return;
       try {
         validatorArray = await fetchValidators(nodeAddress);
-        depositsAndWithdrawalsHasRun.current = false // new node address, so reset the HasRun flags
-        rocketpoolValidatorsStatsHasRun.current = false; 
         minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
         minipoolIndexArray = (minipoolIndexArray || []).map(item => ({
           validatorIndex: item,
@@ -80,18 +79,16 @@ function MinipoolAPR({ nodeAddress }) {
       }
     }
     fetchRocketpoolValidatorStatsArray();
-  }, [validatorArrayHasRun.current]);
+  }, [validatorArrayHasRun.current, rocketpoolValidatorsStatsHasRun.current]);
 
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
     async function fetchDepositsAndWithdrawals() {
       if (validatorArrayHasRun.current === false || rocketpoolValidatorsStatsHasRun === false ) return;
       console.log("Validators Has Run. minipools:", minipools);
-      if (!depositsAndWithdrawalsHasRun.current && (validatorCount < minipools.length)) {
+      if (!depositsAndWithdrawalsHasRun.current ) {
         for (const index of minipools) {
           try {
-            count = validatorCount + 1; //only run till the validator count is reached
-            setValidatorCount(count);
             const oneIndex = await fetchValidatorStats(index.validatorIndex);
             allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
             setDepositsAndWithdrawals(allDepositsAndWithdrawals);
@@ -105,8 +102,6 @@ function MinipoolAPR({ nodeAddress }) {
                 setMinipools(exitedMinipools);
                 console.log("Minipool has exited setting minipools state to:", exitedMinipools, "Minipools:", minipools);
             }
-
-            //console.log("valudator Count:", validatorCount, "total minipools:", minipools.length);
           }
           catch (error) {
             console.log("Error creating deposit array:", error);
@@ -116,7 +111,7 @@ function MinipoolAPR({ nodeAddress }) {
       }
     }
     fetchDepositsAndWithdrawals();
-  }, [validatorArrayHasRun.current]);
+  }, [validatorArrayHasRun.current, rocketpoolValidatorsStatsHasRun.current]);
 
 
   var minipoolAPRs = [];
