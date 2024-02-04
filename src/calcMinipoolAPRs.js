@@ -35,25 +35,26 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
   
       //minipoolIndexArray.forEach(minipool => {
       const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-      //const filteredArray = totalArray.filter(item => item.validatorIndex === minipool.validatorIndex);
-      //console.log("Unique Validator Indexes:", uniqueValidatorIndexes, "minipoolIndexArray:", minipoolIndexArray, "filteredArray:", filteredArray);
-      //let dailyRate = xirr(filteredArray).rate;
-      //let days = xirr(filteredArray).days;
+      // need to know what minipool we're working with to fetch the details. 
+      let minipoolData = minipools.find(pool => pool.validatorIndex === minipool); 
       let minDay = _.minBy(filteredArray, 'days').days;
       let maxDay = _.maxBy(filteredArray, 'days').days;
       let days = (maxDay - minDay);
-      // I actually want the APR, need to refactor...
-      //let irr = convertRate(dailyRate, "year");
-      const totalEthDeposited = 32; //need to update to use actual bond amount from LEB8s
-      const totalNOEthDeposited = 16;
-      const totalProtocolEthDeposited = 16;
+      var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance;
+      var totalProtocolEthDeposited = minipoolData.minipoolStats.user_deposit_balance;
+      var totalEthDeposited = totalNOEthDeposited + totalProtocolEthDeposited;
+      totalNOEthDeposited = (totalNOEthDeposited / 1E18) //convert to gwei
+      totalProtocolEthDeposited = (totalProtocolEthDeposited / 1E18)
+      totalEthDeposited = (totalEthDeposited / 1E18)
+
       let totalEthEarned = _.sumBy(filteredArray, 'eth_amount'); //total eth earned by the minipool
       let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount'); // total fiat deposited by the minipool
       let totalNOFiatDeposited = totalFiatDeposited / 2;
       let totalProtocolFiatDeposited = totalFiatDeposited / 2;
       if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
       totalEthEarned = (totalEthEarned / 1000000000)
-      const commission = totalEthEarned * .14;
+      
+      const commission = totalEthEarned * minipoolData.minipoolStats.minipool_node_fee;
       const protocolEthEarned = (totalEthEarned / 2) - commission; //need to update to use actual bond amount from LEB8s
       const nodeOperatorEthEarned = (totalEthEarned / 2) + commission;
       const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
@@ -75,17 +76,20 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
         status: status,
         age: days,
         // Overall node results
+        eth_deposited: totalEthDeposited.toFixed(5), //total eth deposited by the minipool
         eth_earned: (-totalEthEarned.toFixed(5)), //total eth earned by the minipool
         eth_apr: eth_apr,
         fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
         fiat_apr: fiat_apr,
         //Node Operator results
+        no_eth_deposited: totalNOEthDeposited.toFixed(5), //node operators eth deposited
         no_eth_earned: (-nodeOperatorEthEarned.toFixed(5)), //node operators eth earned
         no_eth_apr: no_eth_apr, //node operator apr
         no_fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
         no_fiat_apr: no_fiat_apr, //node operator apr
   
         // Protocol results
+        p_eth_deposited: totalProtocolEthDeposited.toFixed(5), //protocol eth deposited
         p_eth_earned: (-protocolEthEarned.toFixed(5)), //protocol eth earned
         p_eth_apr: p_eth_apr, //protocol apr
         p_fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain

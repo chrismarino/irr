@@ -93,7 +93,6 @@ function MinipoolAPR({ nodeAddress }) {
           minipoolArray = await fetchRocketpoolValidatorStats(minipools); //minipools includes an array of validator indexes
           //minipoolIndexArray = (minipoolArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
           let updatedMinipoolIndexArray = minipools;
-          let bond = 32;  //get the bond
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
             validatorIndex: minipools[index].validatorIndex,
@@ -175,6 +174,7 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Index</th>
                 <th>Status</th>
                 <th>Age</th>
+                <th>Eth Deposited</th>
                 <th>Eth Earned</th>
                 <th>Native APR</th>
                 <th>Fiat Gain</th>
@@ -189,6 +189,7 @@ function MinipoolAPR({ nodeAddress }) {
                     <td> {item.minipool} </td>
                     <td> {item.status ? 'Active' : 'Exited'} </td>
                     <td> {item.age} days </td>
+                    <td> {item.eth_deposited} </td>
                     <td> {item.eth_earned} Eth Earned </td>
                     <td> {item.eth_apr}%</td>
                     <td> {item.fiat_gain}</td>
@@ -205,7 +206,7 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Index</th>
                 <th>Status</th>
                 <th>Age</th>
-
+                <th>Eth Deposited</th>
                 <th>P Eth Earned</th>
                 <th>P Native APR</th>
                 <th>P Fiat Gain</th>
@@ -219,7 +220,7 @@ function MinipoolAPR({ nodeAddress }) {
                     <td> {item.minipool} </td>
                     <td> {item.status ? 'Active' : 'Exited'} </td>
                     <td> {item.age} days </td>
-
+                    <td> {item.p_eth_deposited} </td>
                     <td> {item.p_eth_earned} </td>
                     <td> {item.p_eth_apr}%</td>
                     <td> {item.p_fiat_gain}</td>
@@ -235,7 +236,7 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Index</th>
                 <th>Status</th>
                 <th>Age</th>
-
+                <th>Eth Deposited</th>
                 <th>NO Eth Earned</th>
                 <th>NO Native APR</th>
                 <th>NO Fiat Gain</th>
@@ -250,8 +251,7 @@ function MinipoolAPR({ nodeAddress }) {
                     <td> {item.minipool} </td>
                     <td> {item.status ? 'Active' : 'Exited'} </td>
                     <td> {item.age} days </td>
-
-
+                    <td> {item.no_eth_deposited} </td>
                     <td> {item.no_eth_earned} </td>
                     <td> {item.no_eth_apr}%</td>
                     <td> {item.no_fiat_gain}</td>
