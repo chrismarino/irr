@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { calcMinipoolAPRs, fetchValidatorStats, fetchValidators, fetchPriceData, fetchRocketpoolValidatorStats } from "../aprUtils.js";
+import { fetchValidatorStats, fetchValidators, fetchPriceData, fetchRocketpoolValidatorStats } from "../aprUtils.js";
+import { calcMinipoolAPRs } from "../calcMinipoolAPRs.js";
 let address1 = "address=0x6841ccfeAf1a9C1c5BD19BAdF0500B99C0BD7E97&";
 let address2 = "address=0xb3684a0BB31Cde887bf02DBFc5738ebAF29a153A&";
 let address3 = "address=0xA87BD09599B1d7Bcc321e0f08C4AE2B48A7Ece4f&";
