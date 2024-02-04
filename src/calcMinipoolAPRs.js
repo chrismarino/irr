@@ -50,8 +50,9 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
 
     let totalEthEarned = _.sumBy(filteredArray, 'eth_amount'); //total eth earned by the minipool
     let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount'); // total fiat deposited by the minipool
-    let totalNOFiatDeposited = totalFiatDeposited / 2;
-    let totalProtocolFiatDeposited = totalFiatDeposited / 2;
+    // Total fiat deposited is the share of the total fiat deposited.
+    let totalNOFiatDeposited = totalFiatDeposited * (totalNOEthDeposited / totalEthDeposited);
+    let totalProtocolFiatDeposited = totalFiatDeposited * (totalProtocolEthDeposited / totalEthDeposited);
     if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
     totalEthEarned = -(totalEthEarned / 1000000000)
 
@@ -61,8 +62,9 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
     protocolEthEarned = protocolEthEarned - commission; //paid by the protocol
     nodeOperatorEthEarned = nodeOperatorEthEarned + commission; //to the Node Operator
 
-    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
+
     // Fiat gains are the eth earned - eth deposited, times the current price of eth
+    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
     const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceToday.eth_price_usd) - totalProtocolFiatDeposited;
     const nodeOperatorFiatGain = ((nodeOperatorEthEarned + totalNOEthDeposited) * ethPriceToday.eth_price_usd) - totalNOFiatDeposited;
 
@@ -73,8 +75,8 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
     const no_eth_apr = ((((100) * (365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toFixed(3);
     const p_eth_apr = (((100) * (365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toFixed(2);
-    const no_fiat_apr = (((100) * (365 / days) * nodeOperatorFiatGain) / (totalFiatDeposited)).toFixed(2);
-    const p_fiat_apr = (((100) * (365 / days) * protocolFiatGain) / (totalFiatDeposited)).toFixed(2);
+    const no_fiat_apr = (((100) * (365 / days) * nodeOperatorFiatGain) / (totalNOFiatDeposited)).toFixed(2);
+    const p_fiat_apr = (((100) * (365 / days) * protocolFiatGain) / (totalProtocolFiatDeposited)).toFixed(2);
     minipoolAPRs.push({
       minipool: minipool,
       status: status,
