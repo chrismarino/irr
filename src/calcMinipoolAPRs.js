@@ -53,11 +53,14 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
     let totalNOFiatDeposited = totalFiatDeposited / 2;
     let totalProtocolFiatDeposited = totalFiatDeposited / 2;
     if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
-    totalEthEarned = (totalEthEarned / 1000000000)
+    totalEthEarned = -(totalEthEarned / 1000000000)
 
-    const commission = totalEthEarned * minipoolData.minipoolStats.minipool_node_fee || 0;
-    const protocolEthEarned = (totalEthEarned / 2) - commission; //need to update to use actual bond amount from LEB8s
-    const nodeOperatorEthEarned = (totalEthEarned / 2) + commission;
+    var protocolEthEarned = totalEthEarned * (totalProtocolEthDeposited / totalEthDeposited); 
+    var nodeOperatorEthEarned = totalEthEarned * (totalNOEthDeposited / totalEthDeposited);
+    const commission = protocolEthEarned * minipoolData.minipoolStats.minipool_node_fee; //Calculate the commission
+    protocolEthEarned = protocolEthEarned - commission; //paid by the protocol
+    nodeOperatorEthEarned = nodeOperatorEthEarned + commission; //to the Node Operator
+
     const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
     // Fiat gains are the eth earned - eth deposited, times the current price of eth
     const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceToday.eth_price_usd) - totalProtocolFiatDeposited;
@@ -66,7 +69,7 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);
     let status = minipoolIndex.status;
-    const eth_apr = ((((-100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(3);
+    const eth_apr = ((((100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(3);
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
     const no_eth_apr = ((((100) * (365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toFixed(3);
     const p_eth_apr = (((100) * (365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toFixed(2);
@@ -78,7 +81,7 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
       age: days,
       // Overall node results
       eth_deposited: totalEthDeposited.toFixed(5), //total eth deposited by the minipool
-      eth_earned: (-totalEthEarned.toFixed(5)), //total eth earned by the minipool
+      eth_earned: (totalEthEarned.toFixed(5)), //total eth earned by the minipool
       eth_apr: eth_apr,
       fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
       fiat_apr: fiat_apr,

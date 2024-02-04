@@ -138,7 +138,7 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Age</th>
                 <th>Eth Deposited</th>
                 <th>Eth Earned</th>
-                <th>Native APR</th>
+                <th>Node APR</th>
                 <th>Fiat Gain</th>
                 <th>Fiat APR</th>
 
@@ -170,7 +170,7 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Age</th>
                 <th>Eth Deposited</th>
                 <th>P Eth Earned</th>
-                <th>P Native APR</th>
+                <th>P Node APR</th>
                 <th>P Fiat Gain</th>
                 <th>P Fiat APR</th>
               </tr>
@@ -200,7 +200,7 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Age</th>
                 <th>Eth Deposited</th>
                 <th>NO Eth Earned</th>
-                <th>NO Native APR</th>
+                <th>NO Node APR</th>
                 <th>NO Fiat Gain</th>
                 <th>NO Fiat APR</th>
 
