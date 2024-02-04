@@ -165,6 +165,8 @@ function MinipoolAPR({ nodeAddress }) {
   return (
     <div className="MinipoolAPR">
       <header className="MinipoolAPR-header">
+        <h1>Minipool APRs</h1>
+        </header>
         <section>
           <table>
             <thead>
@@ -172,9 +174,11 @@ function MinipoolAPR({ nodeAddress }) {
                 <th>Index</th>
                 <th>Status</th>
                 <th>Age</th>
+                <th>Eth Earned</th>
                 <th>Native APR</th>
                 <th>Fiat Gain</th>
                 <th>Fiat APR</th>
+
               </tr>
             </thead>
             <tbody>
@@ -184,17 +188,82 @@ function MinipoolAPR({ nodeAddress }) {
                     <td> {item.minipool} </td>
                     <td> {item.status ? 'Active' : 'Exited'} </td>
                     <td> {item.age} days </td>
+                    <td> {item.eth_earned} Eth Earned </td>
                     <td> {item.eth_apr}%</td>
                     <td> {item.fiat_gain}</td>
                     <td> {item.fiat_apr}%</td>
+
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th>Index</th>
+                <th>Status</th>
+                <th>Age</th>
+
+                <th>P Eth Earned</th>
+                <th>P Native APR</th>
+                <th>P Fiat Gain</th>
+                <th>P Fiat APR</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
+                  <tr key={index}>
+                    <td> {item.minipool} </td>
+                    <td> {item.status ? 'Active' : 'Exited'} </td>
+                    <td> {item.age} days </td>
+
+                    <td> {item.p_eth_earned} </td>
+                    <td> {item.p_eth_apr}%</td>
+                    <td> {item.p_fiat_gain}</td>
+                    <td> {item.p_fiat_apr}%</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th>Index</th>
+                <th>Status</th>
+                <th>Age</th>
+
+                <th>NO Eth Earned</th>
+                <th>NO Native APR</th>
+                <th>NO Fiat Gain</th>
+                <th>NO Fiat APR</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              {
+                (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
+                  <tr key={index}>
+                    <td> {item.minipool} </td>
+                    <td> {item.status ? 'Active' : 'Exited'} </td>
+                    <td> {item.age} days </td>
+
+
+                    <td> {item.no_eth_earned} </td>
+                    <td> {item.no_eth_apr}%</td>
+                    <td> {item.no_fiat_gain}</td>
+                    <td> {item.no_fiat_apr}%</td>
+
                   </tr>
                 ))
               }
             </tbody>
           </table>
         </section>
-        <p>ETH Price Today: ${ethPriceToday.eth_price_usd} RPL Price Today: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
-      </header>
+        <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
+
     </div>
   );
 }

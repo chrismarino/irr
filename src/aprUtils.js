@@ -46,29 +46,53 @@ export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPrice
     let days = (maxDay - minDay);
     // I actually want the APR, need to refactor...
     //let irr = convertRate(dailyRate, "year");
-    const totalEthDeposited = 32;
-    let totalEthEarned = _.sumBy(filteredArray, 'eth_amount');
-    let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount');
-
+    const totalEthDeposited = 32; //need to update to use actual bond amount from LEB8s
+    const totalNOEthDeposited = 16;
+    const totalProtocolEthDeposited = 16;
+    let totalEthEarned = _.sumBy(filteredArray, 'eth_amount'); //total eth earned by the minipool
+    let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount'); // total fiat deposited by the minipool
+    let totalNOFiatDeposited = totalFiatDeposited / 2;
+    let totalProtocolFiatDeposited = totalFiatDeposited / 2;
     if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
-    totalEthEarned = totalEthEarned / 1000000000
-    totalFiatDeposited = totalFiatDeposited / 1000000000
+    totalEthEarned = (totalEthEarned / 1000000000)
+    const commission = totalEthEarned * .14;
+    const protocolEthEarned = (totalEthEarned / 2) - commission; //need to update to use actual bond amount from LEB8s
+    const nodeOperatorEthEarned = (totalEthEarned / 2) + commission;
     const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday.eth_price_usd) - totalFiatDeposited;
-    let formattedTotalFiatGain = totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    // Fiat gains are the eth earned - eth deposited, times the current price of eth
+    const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceToday.eth_price_usd) - totalProtocolFiatDeposited;
+    const nodeOperatorFiatGain = ((nodeOperatorEthEarned + totalNOEthDeposited) * ethPriceToday.eth_price_usd) - totalNOFiatDeposited;
+
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);
     let status = minipoolIndex.status;
     const eth_apr = ((((-100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(3);
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
+    const no_eth_apr = ((((100) * (365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toFixed(3);
+    const p_eth_apr = (((100) * (365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toFixed(2);
+    const no_fiat_apr = (((100) * (365 / days) * nodeOperatorFiatGain) / (totalFiatDeposited)).toFixed(2);
+    const p_fiat_apr = (((100) * (365 / days) * protocolFiatGain) / (totalFiatDeposited)).toFixed(2);
     minipoolAPRs.push({
       minipool: minipool,
       status: status,
       age: days,
-      eth_apr:
-        eth_apr,
-      fiat_gain:
-        formattedTotalFiatGain,
-      fiat_apr: fiat_apr
+      // Overall node results
+      eth_earned: (-totalEthEarned.toFixed(5)), //total eth earned by the minipool
+      eth_apr: eth_apr,
+      fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
+      fiat_apr: fiat_apr,
+      //Node Operator results
+      no_eth_earned: (-nodeOperatorEthEarned.toFixed(5)), //node operators eth earned
+      no_eth_apr: no_eth_apr, //node operator apr
+      no_fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
+      no_fiat_apr: no_fiat_apr, //node operator apr
+
+      // Protocol results
+      p_eth_earned: (-protocolEthEarned.toFixed(5)), //protocol eth earned
+      p_eth_apr: p_eth_apr, //protocol apr
+      p_fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
+      p_fiat_apr: p_fiat_apr //protocol apr in SD
+
     });
   });
 
@@ -170,7 +194,7 @@ export async function fetchValidatorStats(validatorIndex) {
         const lookupDate = item.date.split('T')[0]; //need to format the date for the API
         const priceData = await fetchPriceData(lookupDate);
         item.eth_price = priceData.price_usd;
-        item.fiat_amount = item.deposits_amount * item.eth_price;
+        item.fiat_amount = (item.deposits_amount * item.eth_price)/1000000000; //scale the amount to gwei
       }
       return item; //return the item unchanged if no deposit
     }));
