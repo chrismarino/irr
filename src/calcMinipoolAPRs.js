@@ -2,7 +2,7 @@
 import _ from "lodash";
 
 
-export function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday) {
+export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 

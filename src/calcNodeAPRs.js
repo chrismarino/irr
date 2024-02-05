@@ -1,6 +1,30 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
-
+// Sturcture of Rocketpool Stats object for each minipool. Need to roll up these totals for the node.
+// "claimed_smoothing_pool": 0,
+// "effective_rpl_stake": 455869217950000000000,
+// "index": 983397,
+// "is_vacant": false,
+// "minipool_address": "0x6841ccfeaf1a9c1c5bd19badf0500b99c0bd7e97",
+// "minipool_deposit_type": "Variable",
+// "minipool_node_fee": 0.14,
+// "minipool_status": "Staking",
+// "minipool_status_time": 1698071063,
+// "node_address": "0x635d06a61a36566003d71428f1895e146cdbd54e",
+// "node_deposit_balance": 16000000000000000000,
+// "node_deposit_credit": 0,
+// "node_max_rpl_stake": 3.982559932502385e+21,
+// "node_min_rpl_stake": 265503995500158980000,
+// "node_refund_balance": 0,
+// "node_rpl_stake": 455869217950000000000,
+// "node_timezone_location": "America/Los_Angeles",
+// "penalty_count": 0,
+// "rpl_cumulative_rewards": 0,
+// "smoothing_pool_opted_in": true,
+// "unclaimed_rpl_rewards": 8473578832143186000,
+// "unclaimed_smoothing_pool": 77122626715194030,
+// "user_deposit_balance": 16000000000000000000,
+// "version": 3
 
 export function calcNodeAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a node.
@@ -8,33 +32,19 @@ export function calcNodeAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToda
   var totalArray = [];
   var minipools = minipools;
 
-  //combine the despots and withdrawls into a single array for the IRR calculation
-  totalArray = formatArray(nodeDepositsAndWithdrawals);
-  //totalArray.sort() //make sure they are sorted by date
-  totalArray = _.sortBy(totalArray, function (item) {
-    return new Date(item.date);
-  });
-  //finc the minipool indices...
-  // write the code that creates an array containg unique ValidatorIndex values in totalArray
-  const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
-  // don't think I need this since I saved the list of validators in the from the node API
-  //filter the array for each minipool and calculate the IRR
+
   const minipoolAPRs = []
-  //Failed attempt to use lodash to filter the array for each minipool and calculate the IRR
-  //let uniq = _.uniqBy(totalArray, 'validatorIndex');
-  //uniq.forEach(minipool => {
-  uniqueValidatorIndexes.forEach(minipool => {
+// Pull the RPL and Smoothingpool data from each minipool
+ nodeRollupCalcs.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     if (minipoolData.minipoolStats === undefined) {
       throw new Error("Minipool data is undefined. Minipool: " + minipool);
     }
-    let minDay = _.minBy(filteredArray, 'days').days;
-    let maxDay = _.maxBy(filteredArray, 'days').days;
-    let days = (maxDay - minDay);
-    var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
-    var totalProtocolEthDeposited = minipoolData.minipoolStats.user_deposit_balance || 0;
+
+    var totalNOEthDeposited = totalNOEthDeposited + minipoolData.minipoolStats.node_deposit_balance;
+    var totalProtocolEthDeposited = totalProtocolEthDeposited + minipoolData.minipoolStats.user_deposit_balance;
     var totalEthDeposited = totalNOEthDeposited + totalProtocolEthDeposited;
     totalNOEthDeposited = (totalNOEthDeposited / 1E18) //convert to gwei
     totalProtocolEthDeposited = (totalProtocolEthDeposited / 1E18)
@@ -69,9 +79,9 @@ export function calcNodeAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToda
     const p_eth_apr = (((100) * (365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toFixed(2);
     const no_fiat_apr = (((100) * (365 / days) * nodeOperatorFiatGain) / (totalNOFiatDeposited)).toFixed(2);
     const p_fiat_apr = (((100) * (365 / days) * protocolFiatGain) / (totalProtocolFiatDeposited)).toFixed(2);
-    minipoolAPRs.push({
-      minipool: minipool,
-      status: status,
+    nodeAPIs.push({
+      node: nodeAddress,
+      minipools: minipools.length,
       age: days,
       // Overall node results
       eth_deposited: totalEthDeposited.toFixed(5), //total eth deposited by the minipool
@@ -96,23 +106,6 @@ export function calcNodeAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToda
     });
   });
 
-  return { minipoolAPRs };
+  return { nodeAPRs };
 }
 
-function formatArray(array) {
-  return (array || []).map(function (element) {
-
-    // currently accepted formats for strings:
-    // YYYYMMDD, YYYY-MM-DD, YYYY/MM/DD
-    ///const originalDate = element.day;
-    //const reformattedDate = originalDate.split('T')[0];
-    const dateObject = new Date(element.date);
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
-    const day = String(dateObject.getDate()).padStart(2, '0');
-
-    const reformattedDate = `${year}-${month}-${day}`;
-    const dailyEthFlow = element.deposits_amount - element.withdrawals_amount;
-    return { validatorIndex: element.validatorIndex, eth_amount: dailyEthFlow, fiat_amount: element.fiat_amount, days: element.day, date: reformattedDate };
-  });
-}
