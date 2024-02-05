@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import getValidators from "../getValidators";
 import getPriceData from "../getPriceData";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
@@ -20,7 +20,6 @@ function MinipoolAPR({ nodeAddress }) {
 
   var validatorArray = []; // reset the validator array
   var minipoolArray = []; // reset the minipool array
-  var count = 0;
 
   useEffect(() => {
     async function fetchEthPriceToday() {
@@ -121,7 +120,7 @@ function MinipoolAPR({ nodeAddress }) {
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the all the stats. withdrawls and deposits have been fetched
-  if (gotDepositsAndWithdrawals) {
+  if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday) { // 
     minipoolAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday);
   }
   return (

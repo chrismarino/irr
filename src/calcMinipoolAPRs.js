@@ -1,7 +1,6 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-
 export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
