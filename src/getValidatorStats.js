@@ -1,5 +1,6 @@
 // New fetchDeposit function that uses the validator stats API endpoint
 import axios from 'axios';
+import getPriceData from "./getPriceData";
 export default async function getValidatorStats(validatorIndex) {
 
   // A utility function used to fetch the deposits and withdrawl history from an API. Take a url as an argument.
@@ -38,8 +39,8 @@ export default async function getValidatorStats(validatorIndex) {
     nodeDepositsAndWithdrawals = await Promise.all(nodeDepositsAndWithdrawals.map(async item => {
       if (item.deposits_amount > 0) {
         const lookupDate = item.date.split('T')[0]; //need to format the date for the API
-        //const priceData = await getPriceData(lookupDate); //***rework this to fetch data separately
-        //item.eth_price = priceData.price_usd;
+        const priceData = await getPriceData(lookupDate); //include the historical price of ETH at time of deposit
+        item.eth_price = priceData.price_usd;
         item.fiat_amount = (item.deposits_amount * item.eth_price)/1000000000; //scale the amount to gwei
       }
       return item; //return the item unchanged if no deposit

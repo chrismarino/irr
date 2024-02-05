@@ -14,7 +14,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   // 'timestamp' field. It returns 
   // an annay of day counts and irr per minpool. paymentArray is typically the result of a query to the etherscan API.
   var totalArray = [];
-  var minipools = minipools;
+  //var minipools = minipools;
 
   //combine the despots and withdrawls into a single array for the IRR calculation
   totalArray = formatArray(nodeDepositsAndWithdrawals);
@@ -41,6 +41,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     let minDay = _.minBy(filteredArray, 'days').days;
     let maxDay = _.maxBy(filteredArray, 'days').days;
     let days = (maxDay - minDay);
+    // make sure all numbers are positive..
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
     var totalProtocolEthDeposited = minipoolData.minipoolStats.user_deposit_balance || 0;
     var totalEthDeposited = totalNOEthDeposited + totalProtocolEthDeposited;
@@ -48,16 +49,16 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     totalProtocolEthDeposited = (totalProtocolEthDeposited / 1E18)
     totalEthDeposited = (totalEthDeposited / 1E18)
 
-    let totalEthEarned = _.sumBy(filteredArray, 'eth_amount'); //total eth earned by the minipool
+    let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
     let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount'); // total fiat deposited by the minipool
     // Total fiat deposited is the share of the total fiat deposited.
     let totalNOFiatDeposited = totalFiatDeposited * (totalNOEthDeposited / totalEthDeposited);
     let totalProtocolFiatDeposited = totalFiatDeposited * (totalProtocolEthDeposited / totalEthDeposited);
-    if (totalEthEarned > 0) { totalEthEarned = totalEthEarned - 32000000000 } //back out the 32 eth deposit
-    totalEthEarned = -(totalEthEarned / 1000000000)
+    if (totalEthEarned < 0) { totalEthEarned = totalEthEarned + 32000000000 } //back out the 32 eth deposit
+    totalEthEarned = (totalEthEarned / 1000000000)
 
-    var protocolEthEarned = totalEthEarned * (totalProtocolEthDeposited / totalEthDeposited); 
-    var nodeOperatorEthEarned = totalEthEarned * (totalNOEthDeposited / totalEthDeposited);
+    var protocolEthEarned = totalEthEarned * (totalProtocolEthDeposited / totalEthDeposited); //Negative because it is a withdrawal
+    var nodeOperatorEthEarned = totalEthEarned * (totalNOEthDeposited / totalEthDeposited); //Negative because it is a withdrawal
     const commission = protocolEthEarned * minipoolData.minipoolStats.minipool_node_fee; //Calculate the commission
     protocolEthEarned = protocolEthEarned - commission; //paid by the protocol
     nodeOperatorEthEarned = nodeOperatorEthEarned + commission; //to the Node Operator
@@ -83,20 +84,20 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
       age: days,
       // Overall node results
       eth_deposited: totalEthDeposited.toFixed(5), //total eth deposited by the minipool
-      eth_earned: (totalEthEarned.toFixed(5)), //total eth earned by the minipool
+      eth_earned: totalEthEarned.toFixed(5), //total eth earned by the minipool
       eth_apr: eth_apr,
       fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
       fiat_apr: fiat_apr,
       //Node Operator results
       no_eth_deposited: totalNOEthDeposited.toFixed(5), //node operators eth deposited
-      no_eth_earned: (-nodeOperatorEthEarned.toFixed(5)), //node operators eth earned
+      no_eth_earned: nodeOperatorEthEarned.toFixed(5), //node operators eth earned
       no_eth_apr: no_eth_apr, //node operator apr
       no_fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
       no_fiat_apr: no_fiat_apr, //node operator apr
 
       // Protocol results
       p_eth_deposited: totalProtocolEthDeposited.toFixed(5), //protocol eth deposited
-      p_eth_earned: (-protocolEthEarned.toFixed(5)), //protocol eth earned
+      p_eth_earned: protocolEthEarned.toFixed(5), //protocol eth earned
       p_eth_apr: p_eth_apr, //protocol apr
       p_fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
       p_fiat_apr: p_fiat_apr //protocol apr in SD
