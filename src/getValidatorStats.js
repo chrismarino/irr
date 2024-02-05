@@ -6,7 +6,7 @@ export default async function getValidatorStats(validatorIndex) {
   // A utility function used to fetch the deposits and withdrawl history from an API. Take a url as an argument.
   let status = true;
   let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
-  let apiEndpoint = appUrl + "api/v1"
+  let apiEndpoint = appUrl + "/api/v1"
   let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
   let node_action = "/validator/stats/";
 

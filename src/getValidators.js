@@ -4,7 +4,7 @@ export default async function getValidators(ethAddress) {
     // Response includes a record for each validator. 
     // This should be updated whenever the Node address feild is changed on the page. Save this array as `nodeValidators`
     let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
-    let apiEndpoint = appUrl + "api/v1"
+    let apiEndpoint = appUrl + "/api/v1"
     let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
     let node_action = "/validator/eth1/";
   

@@ -151,10 +151,10 @@ function MinipoolAPR({ nodeAddress }) {
                   <td> {item.status ? 'Active' : 'Exited'} </td>
                   <td> {item.age} days </td>
                   <td> {item.eth_deposited} </td>
-                  <td> {item.eth_earned} Eth Earned </td>
-                  <td> {item.eth_apr}%</td>
-                  <td> {item.fiat_gain}</td>
-                  <td> {item.fiat_apr}%</td>
+                  <td> {item.eth_earned} </td>
+                  <td> {item.eth_apr}% </td>
+                  <td> {item.fiat_gain} </td>
+                  <td> {item.fiat_apr}% </td>
 
                 </tr>
               ))
@@ -183,9 +183,9 @@ function MinipoolAPR({ nodeAddress }) {
                   <td> {item.age} days </td>
                   <td> {item.p_eth_deposited} </td>
                   <td> {item.p_eth_earned} </td>
-                  <td> {item.p_eth_apr}%</td>
-                  <td> {item.p_fiat_gain}</td>
-                  <td> {item.p_fiat_apr}%</td>
+                  <td> {item.p_eth_apr}% </td>
+                  <td> {item.p_fiat_gain} </td>
+                  <td> {item.p_fiat_apr}% </td>
                 </tr>
               ))
             }
@@ -214,9 +214,9 @@ function MinipoolAPR({ nodeAddress }) {
                   <td> {item.age} days </td>
                   <td> {item.no_eth_deposited} </td>
                   <td> {item.no_eth_earned} </td>
-                  <td> {item.no_eth_apr}%</td>
-                  <td> {item.no_fiat_gain}</td>
-                  <td> {item.no_fiat_apr}%</td>
+                  <td> {item.no_eth_apr}% </td>
+                  <td> {item.no_fiat_gain} </td>
+                  <td> {item.no_fiat_apr}% </td>
 
                 </tr>
               ))
