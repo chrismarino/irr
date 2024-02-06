@@ -22,14 +22,14 @@ const APR_COLS = [
   {
     field: "eth_deposited",
     headerName: "Eth Deposited",
-    type: "date",
+    type: "number",
     width: 120,
 
   }, 
   {
     field: "eth_earned",
     headerName: "Finalized",
-    type: "date",
+    type: "number",
     width: 120,
 
   },
@@ -61,7 +61,12 @@ if (rows === undefined) {
 const columns = APR_COLS;
   return (
     <div style={{ height: 400, width: '100%' }}>
-      <DataGrid rows={rows} columns={columns} pageSize={5} />
+      <DataGrid 
+      rows={rows} 
+      columns={columns} 
+      pageSize={5} 
+      getRowId={(row) => row.minipool} // Use minipool property as unique id
+      />
     </div>
   );
 }

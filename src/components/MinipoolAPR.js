@@ -117,12 +117,13 @@ function MinipoolAPR({ nodeAddress }) {
   }, [gotRocketpoolDetails]);
 
 
-  var minipoolAPRs = [];
+  var nodeAPRs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the all the stats. withdrawls and deposits have been fetched
   if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday) { // 
-    minipoolAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday);
+    nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday);
+    console.log("NodeAPRs:", nodeAPRs);
   }
   return (
     <div className="MinipoolAPR">
@@ -131,104 +132,13 @@ function MinipoolAPR({ nodeAddress }) {
       </header>
       <section>
         <table>
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Status</th>
-              <th>Age</th>
-              <th>Eth Deposited</th>
-              <th>Eth Earned</th>
-              <th>Node APR</th>
-              <th>Fiat Gain</th>
-              <th>Fiat APR</th>
 
-            </tr>
-          </thead>
-          <tbody>
-            {
-              (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
-                <tr key={index}>
-                  <td> {item.minipool} </td>
-                  <td> {item.status ? 'Active' : 'Exited'} </td>
-                  <td> {item.age} days </td>
-                  <td> {item.eth_deposited} </td>
-                  <td> {item.eth_earned} </td>
-                  <td> {item.eth_apr}% </td>
-                  <td> {item.fiat_gain} </td>
-                  <td> {item.fiat_apr}% </td>
-
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-        <table>
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Status</th>
-              <th>Age</th>
-              <th>Eth Deposited</th>
-              <th>P Eth Earned</th>
-              <th>P APR</th>
-              <th>P Fiat Gain</th>
-              <th>P Fiat APR</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
-                <tr key={index}>
-                  <td> {item.minipool} </td>
-                  <td> {item.status ? 'Active' : 'Exited'} </td>
-                  <td> {item.age} days </td>
-                  <td> {item.p_eth_deposited} </td>
-                  <td> {item.p_eth_earned} </td>
-                  <td> {item.p_eth_apr}% </td>
-                  <td> {item.p_fiat_gain} </td>
-                  <td> {item.p_fiat_apr}% </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-        <table>
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Status</th>
-              <th>Age</th>
-              <th>Eth Deposited</th>
-              <th>NO Eth Earned</th>
-              <th>NO APR</th>
-              <th>NO Fiat Gain</th>
-              <th>NO Fiat APR</th>
-
-            </tr>
-          </thead>
-          <tbody>
-            {
-              (minipoolAPRs.minipoolAPRs || []).map((item, index) => (
-                <tr key={index}>
-                  <td> {item.minipool} </td>
-                  <td> {item.status ? 'Active' : 'Exited'} </td>
-                  <td> {item.age} days </td>
-                  <td> {item.no_eth_deposited} </td>
-                  <td> {item.no_eth_earned} </td>
-                  <td> {item.no_eth_apr}% </td>
-                  <td> {item.no_fiat_gain} </td>
-                  <td> {item.no_fiat_apr}% </td>
-
-                </tr>
-              ))
-            }
-          </tbody>
         </table>
       </section>
       <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
-      {<NodeAPRGrid rows={(minipoolAPRs.node || [])} /> }
-      {<NodeAPRGrid rows={(minipoolAPRs.nodeOperator || [])} /> }
-      {<NodeAPRGrid rows={(minipoolAPRs.protocol || [])} /> }
+      {<NodeAPRGrid rows={(nodeAPRs.nodeAPR || [])} /> }
+      {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} /> }
+      {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} /> }
     </div>
   );
 }
