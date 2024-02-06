@@ -131,14 +131,23 @@ function MinipoolAPR({ nodeAddress }) {
         <h1>Minipool APRs</h1>
       </header>
       <section>
-        <table>
 
-        </table>
-      </section>
-      <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
+        <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
+        <p></p><h3>Total Node Returns</h3>
       {<NodeAPRGrid rows={(nodeAPRs.nodeAPR || [])} /> }
+
+      </section>
+      <section>
+      <p></p><h3>Total Node Operator Returns</h3>
+
       {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} /> }
+      </section>
+      <section>
+      <p></p><h3>Total Protocol Returns</h3>
+
       {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} /> }
+
+      </section>
     </div>
   );
 }

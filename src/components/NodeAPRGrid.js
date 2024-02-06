@@ -64,8 +64,9 @@ const columns = APR_COLS;
       <DataGrid 
       rows={rows} 
       columns={columns} 
-      pageSize={5} 
+      pageSize={10} 
       getRowId={(row) => row.minipool} // Use minipool property as unique id
+      style={{ color: 'white' }} // Change font color to red
       />
     </div>
   );
