@@ -26,7 +26,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
   // don't think I need this since I saved the list of validators in the from the node API
   //filter the array for each minipool and calculate the IRR
-  const minipoolAPRs = []
+  const nodeAPRs = []
   //Failed attempt to use lodash to filter the array for each minipool and calculate the IRR
   //let uniq = _.uniqBy(totalArray, 'validatorIndex');
   //uniq.forEach(minipool => {
@@ -77,34 +77,51 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     const p_eth_apr = (((100) * (365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toFixed(2);
     const no_fiat_apr = (((100) * (365 / days) * nodeOperatorFiatGain) / (totalNOFiatDeposited)).toFixed(2);
     const p_fiat_apr = (((100) * (365 / days) * protocolFiatGain) / (totalProtocolFiatDeposited)).toFixed(2);
-    minipoolAPRs.push({
-      minipool: minipool,
-      status: status,
-      age: days,
-      // Overall node results
-      eth_deposited: totalEthDeposited.toFixed(1), //total eth deposited by the minipool
-      eth_earned: totalEthEarned.toFixed(4), //total eth earned by the minipool
-      eth_apr: eth_apr,
-      fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
-      fiat_apr: fiat_apr,
-      //Node Operator results
-      no_eth_deposited: totalNOEthDeposited.toFixed(1), //node operators eth deposited
-      no_eth_earned: nodeOperatorEthEarned.toFixed(4), //node operators eth earned
-      no_eth_apr: no_eth_apr, //node operator apr
-      no_fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
-      no_fiat_apr: no_fiat_apr, //node operator apr
-
-      // Protocol results
-      p_eth_deposited: totalProtocolEthDeposited.toFixed(1), //protocol eth deposited
-      p_eth_earned: protocolEthEarned.toFixed(4), //protocol eth earned
-      p_eth_apr: p_eth_apr, //protocol apr
-      p_fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
-      p_fiat_apr: p_fiat_apr //protocol apr in SD
-
-    });
+    const nodeAPR = [
+      {
+        minipool: minipool,
+        status: status,
+        age: days,
+        eth_deposited: totalEthDeposited.toFixed(5), //total eth deposited by the minipool
+        eth_earned: (totalEthEarned.toFixed(5)), //total eth earned by the minipool
+        eth_apr: eth_apr,
+        fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
+        fiat_apr: fiat_apr
+      } //Total node's apr
+    ];
+    const nodeOperatorAPR = [
+      {
+        minipool: minipool,
+        status: status,
+        age: days,
+        eth_deposited: totalNOEthDeposited.toFixed(5), //node operators eth deposited
+        eth_earned: (-nodeOperatorEthEarned.toFixed(5)), //node operators eth earned
+        eth_apr: no_eth_apr, //node operator apr
+        fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
+        fiat_apr: no_fiat_apr
+      }, //node operator apr
+    ];
+    const protocolAPR = [
+      {
+        minipool: minipool,
+        status: status,
+        age: days,
+        eth_deposited: totalProtocolEthDeposited.toFixed(1), //protocol eth deposited
+        eth_earned: (-protocolEthEarned.toFixed(4)), //protocol eth earned
+        eth_apr: p_eth_apr, //protocol apr
+        fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
+        fiat_apr: p_fiat_apr
+      } //protocol apr in SD
+    ];
+    let nodeAPRs = [{
+      node: nodeAPR,
+      nodeOperator: nodeOperatorAPR,
+      prococol: protocolAPR
+    }];
+    console.log("Node APRs:", nodeAPRs);
   });
 
-  return { minipoolAPRs };
+  return { nodeAPRs };
 }
 
 function formatArray(array) {

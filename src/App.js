@@ -1,6 +1,6 @@
 import React from "react";
 import './App.css';
-import NodeIrrTable from "./components/NodeIrrTable";
+import NodeAPRGrid from "./components/NodeAPRGrid";
 import MinipoolAPR from "./components/MinipoolAPR";
 import { useState, useEffect, useRef } from 'react';
 
@@ -24,7 +24,7 @@ function App() {
           placeholder="Enter node address"
         />
         <MinipoolAPR nodeAddress={nodeAddress} />
-        <NodeIrrTable nodeAddress={nodeAddress} />
+        <NodeAPRGrid nodeAddress={nodeAddress} />
       </header>
     </div>
 

@@ -4,6 +4,7 @@ import getPriceData from "../getPriceData";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
+import NodeAPRGrid from "./NodeAPRGrid";
 let minipoolIndexArray = [];
 
 function MinipoolAPR({ nodeAddress }) {
@@ -225,7 +226,9 @@ function MinipoolAPR({ nodeAddress }) {
         </table>
       </section>
       <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
-
+      {<NodeAPRGrid rows={(minipoolAPRs.node || [])} /> }
+      {<NodeAPRGrid rows={(minipoolAPRs.nodeOperator || [])} /> }
+      {<NodeAPRGrid rows={(minipoolAPRs.protocol || [])} /> }
     </div>
   );
 }

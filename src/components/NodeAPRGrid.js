@@ -1,0 +1,69 @@
+import React from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+const APR_COLS = [
+  {
+    field: "minipool",
+    headerName: "Minipool",
+    width: 165,
+  },
+  {
+    field: "status",
+    headerName: "Status",
+    type: "number",
+    width: 120,
+  },
+  {
+    field: "age",
+    headerName: "Age",
+    type: "number",
+    width: 120,
+  },
+
+  {
+    field: "eth_deposited",
+    headerName: "Eth Deposited",
+    type: "date",
+    width: 120,
+
+  }, 
+  {
+    field: "eth_earned",
+    headerName: "Finalized",
+    type: "date",
+    width: 120,
+
+  },
+  {
+    field: "eth_apr",
+    headerName: "Fiat APR",
+    width: 195,
+  },
+  {
+    field: "fiat_gain",
+    headerName: "Age",
+    type: "number",
+    width: 120,
+
+  }, 
+  {
+    field: "fiat_apr",
+    headerName: "APR",
+    type: "number",
+    width: 120,
+
+  },
+
+];
+function NodeAPRGrid({ rows }) {
+if (rows === undefined) {
+    return <div>Loading...</div>;
+  }
+const columns = APR_COLS;
+  return (
+    <div style={{ height: 400, width: '100%' }}>
+      <DataGrid rows={rows} columns={columns} pageSize={5} />
+    </div>
+  );
+}
+
+export default NodeAPRGrid;
