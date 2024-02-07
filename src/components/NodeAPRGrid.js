@@ -4,52 +4,53 @@ const APR_COLS = [
   {
     field: "minipool",
     headerName: "Minipool",
-    width: 165,
+    // width: 165,
   },
   {
     field: "status",
     headerName: "Status",
     type: "number",
-    width: 120,
+    renderCell: (params) => (params.value ? 'Active' : 'Exited'),
+    //width: 120,
   },
   {
     field: "age",
     headerName: "Age",
     type: "number",
-    width: 120,
+    //width: 120,
   },
 
   {
     field: "eth_deposited",
     headerName: "Eth Deposited",
     type: "number",
-    width: 120,
+    //width: 120,
 
   }, 
   {
     field: "eth_earned",
     headerName: "Eth Earned",
     type: "number",
-    width: 120,
+    //width: 120,
 
   },
   {
     field: "eth_apr",
-    headerName: "Fiat APR",
-    width: 195,
+    headerName: "Eth APR",
+    //width: 195,
   },
   {
     field: "fiat_gain",
     headerName: "Fiat Gain",
     type: "number",
-    width: 120,
+    //width: 120,
 
   }, 
   {
     field: "fiat_apr",
     headerName: "Fiat APR",
     type: "percent",
-    width: 120,
+   // width: 120,
 
   },
 

@@ -31,14 +31,28 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   var protocolAPR = [];
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
+    console.log("Filtered Array:", filteredArray);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     if (minipoolData.minipoolStats === undefined) {
       throw new Error("Minipool data is undefined. Minipool: " + minipool);
     }
+
+    // Calculate the age of active and exited minipools
     let minDay = _.minBy(filteredArray, 'days').days;
-    let maxDay = _.maxBy(filteredArray, 'days').days;
+    let maxDay = _.maxBy(filteredArray, 'days').days; //day of most recent deposit or withdrawal. Not the current day.
+    let today = new Date();
+    let startDate = new Date(_.minBy(filteredArray, 'date').date);  // actual dates
+    let endDate = new Date(_.maxBy(filteredArray, 'date').date);
     let days = (maxDay - minDay);
+    let age = (today - startDate) / (1000 * 60 * 60 * 24); // age from dates
+    age = Math.floor(age); // Just use the whole days...
+    //console.log("Status:", minipoolData.status , "Start Day:", minDay, "End Day:", maxDay, "Days:", days);
+    //console.log("Status:", minipoolData.status ,"Start Date:", startDate, "End Date:", endDate, "Age:", age);
+    if (minipoolData.status === false) { days = days } //if the minipool has exited, use the age from the dates
+    else { days = age } //if the minipool is active, use the days from the deposits until today.
+
+
     // make sure all numbers are positive..
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
     var totalProtocolEthDeposited = minipoolData.minipoolStats.user_deposit_balance || 0;
@@ -85,7 +99,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
       fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
       fiat_apr: fiat_apr
     }; //Total node's apr
-    const newNodeOperatorAPR ={
+    const newNodeOperatorAPR = {
       minipool: minipool,
       status: status,
       age: days,
