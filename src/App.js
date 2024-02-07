@@ -1,11 +1,11 @@
 import React from "react";
 import './App.css';
-import NodeAPRGrid from "./components/NodeAPRGrid";
 import MinipoolAPR from "./components/MinipoolAPR";
 import { useState, useEffect, useRef } from 'react';
 
 
 function App() {
+  //const [nodeAddress, setNodeAddress] = useState("");
   const [nodeAddress, setNodeAddress] = useState("0x635D06a61a36566003D71428F1895e146CdBD54E");
   //const [nodeAddress, setNodeAddress] = useState("0x1829f19524429a2edaf07bd13d1e47af19643d9b");
   // set the node address to the default value of the Rocketpool node for dubugging purposes.
@@ -17,6 +17,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <h1>Minipool APRs</h1>
         <input
           type="text"
           value={nodeAddress}
@@ -24,10 +25,8 @@ function App() {
           placeholder="Enter node address"
         />
         <MinipoolAPR nodeAddress={nodeAddress} />
-        <NodeAPRGrid nodeAddress={nodeAddress} />
       </header>
     </div>
-
   );
 }
 

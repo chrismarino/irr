@@ -45,7 +45,7 @@ export default async function getValidatorStats(validatorIndex) {
       }
       return item; //return the item unchanged if no deposit
     }));
-    console.log("Node Deposits and Withdrawals:", nodeDepositsAndWithdrawals, "Status:", status);
+    //console.log("Node Deposits and Withdrawals pulled from getValidatorStats:", nodeDepositsAndWithdrawals, "Status:", status);
     return { nodeDepositsAndWithdrawals, status };
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);

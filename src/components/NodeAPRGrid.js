@@ -28,7 +28,7 @@ const APR_COLS = [
   }, 
   {
     field: "eth_earned",
-    headerName: "Finalized",
+    headerName: "Eth Earned",
     type: "number",
     width: 120,
 
@@ -40,15 +40,15 @@ const APR_COLS = [
   },
   {
     field: "fiat_gain",
-    headerName: "Age",
+    headerName: "Fiat Gain",
     type: "number",
     width: 120,
 
   }, 
   {
     field: "fiat_apr",
-    headerName: "APR",
-    type: "number",
+    headerName: "Fiat APR",
+    type: "percent",
     width: 120,
 
   },
