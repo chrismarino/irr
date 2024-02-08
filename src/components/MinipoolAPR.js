@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import getValidators from "../getValidators";
 import getPriceData from "../getPriceData";
-import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
+//import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
@@ -33,7 +33,7 @@ function MinipoolAPR({ nodeAddress }) {
       let formattedDate = today.toISOString().split('T')[0];
       //date must be in the format of YYYY-MM-DD for getPriceData
       let dateArray = [formattedDate];
-      const ethPriceToday = await getPriceDataFromCoinbase(dateArray); //fetch the price of eth. No date returns the current price.
+      const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(ethPriceToday);
       //setGotEthPriceToday(true); //not used since I can use the ethPriceToday object
     }
@@ -131,7 +131,9 @@ function MinipoolAPR({ nodeAddress }) {
   useEffect(() => {
     async function fetchEthPriceHistory() {
       if (!depositsAndWithdrawals || gotDepositsAndWithdrawals === false) return; //don't run if the deposits and withdrawals are empty
-      let dateArray = depositsAndWithdrawals.map(item => {
+      const filteredArray = depositsAndWithdrawals.filter(item => 
+        item.deposits_amount === 32000000000 || item.withdrawals_amount === 32000000000);
+      let dateArray = filteredArray.map(item => {
         let date = new Date(item.date);
         let day = ('0' + date.getDate()).slice(-2);
         let month = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -139,10 +141,10 @@ function MinipoolAPR({ nodeAddress }) {
         return year + '-' + month + '-' + day;
       });
       try {
-        const newEthPriceHistory = await getPriceDataFromCoinbase(dateArray); //fetch the price of eth. No date returns the current price.
+        const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
         console.log("ethPriceHistory from MinipoolAPRs:", ethPriceHistory, "New prices", newEthPriceHistory);
-        setGotEthPriceHistory(true); 
+        setGotEthPriceHistory(true);
       } catch (error) {
         console.error("Error setting price history array:", error);
       }

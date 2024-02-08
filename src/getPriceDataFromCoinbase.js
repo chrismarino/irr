@@ -3,7 +3,7 @@ import axios from 'axios';
 const Bottleneck = require('bottleneck');
 // Create a new limiter that allows 1 request per second
 const limiter = new Bottleneck({
-  minTime: 100, // 1 request per 1000ms
+  minTime: 250, // 1 request per 1000ms
 })
 // URL form for the API
 //https://api.coinbase.com/v2/prices/ETH-USD/spot?date=2023-08-31
@@ -22,7 +22,7 @@ export default async function getPriceDataFromCoinbase(dateArray) {
     let priceUrl = (apiEndpoint + node_action + item)
     try {
       let payouts = [];
-      payouts = await limiter.schedule(() => axios(priceUrl));
+      payouts = await limiter.schedule(async () => await axios(priceUrl));
       //payouts = await axios(priceUrl);
       let date = item
       let price_usd = payouts.data.data.amount;

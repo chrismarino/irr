@@ -3,7 +3,7 @@ import axios from 'axios';
 const Bottleneck = require('bottleneck');
 // Create a new limiter that allows 1 request per second
 const limiter = new Bottleneck({
-  minTime: 3000, // 1 request per 1000ms
+  minTime: 50, // 1 request per 1000ms
 })
 export default async function getPriceData(dateArray) {
   // A utility function used to fetch price from an API. Take a url as an argument.
