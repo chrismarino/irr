@@ -131,7 +131,7 @@ function MinipoolAPR({ nodeAddress }) {
   useEffect(() => {
     async function fetchEthPriceHistory() {
       if (!depositsAndWithdrawals || gotDepositsAndWithdrawals === false) return; //don't run if the deposits and withdrawals are empty
-      const filteredArray = depositsAndWithdrawals.filter(item => 
+      const filteredArray = depositsAndWithdrawals.filter(item =>
         item.deposits_amount === 32000000000 || item.withdrawals_amount === 32000000000);
       let dateArray = filteredArray.map(item => {
         let date = new Date(item.date);
@@ -143,7 +143,7 @@ function MinipoolAPR({ nodeAddress }) {
       try {
         const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
-        console.log("ethPriceHistory from MinipoolAPRs:", ethPriceHistory, "New prices", newEthPriceHistory);
+        //console.log("ethPriceHistory from MinipoolAPRs:", ethPriceHistory, "New prices", newEthPriceHistory);
         setGotEthPriceHistory(true);
       } catch (error) {
         console.error("Error setting price history array:", error);
@@ -157,11 +157,15 @@ function MinipoolAPR({ nodeAddress }) {
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the all the stats. withdrawls and deposits have been fetched
-  if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday && gotEthPriceHistory) {
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "ethPrice:", ethPriceToday)
-    nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
-    console.log("NodeAPRs:", nodeAPRs);
-  }
+
+  useEffect(() => {
+    if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday && gotEthPriceHistory) {
+      console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "ethPrice:", ethPriceToday)
+      nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
+      console.log("NodeAPRs:", nodeAPRs);
+    }
+  }, [gotDepositsAndWithdrawals, gotValidatorStats, ethPriceToday, gotEthPriceHistory]);
+
   return (
     <div className="MinipoolAPR">
       <section>

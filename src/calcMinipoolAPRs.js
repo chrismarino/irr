@@ -42,8 +42,10 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     let minDay = _.minBy(filteredArray, 'days').days;
     let maxDay = _.maxBy(filteredArray, 'days').days; //day of most recent deposit or withdrawal. Not the current day.
     let today = new Date();
-    let startDate = new Date(_.minBy(filteredArray, 'date').date);  // actual dates
-    let endDate = new Date(_.maxBy(filteredArray, 'date').date);
+    let startDateString = _.minBy(filteredArray, 'date').date;  // actual dates
+    let endDateString = _.maxBy(filteredArray, 'date').date;
+    let startDate = new Date(startDateString);  // actual dates
+    let endDate = new Date(endDateString);
     let days = (maxDay - minDay);
     let age = (today - startDate) / (1000 * 60 * 60 * 24); // age from dates
     age = Math.floor(age); // Just use the whole days...
@@ -51,7 +53,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     //console.log("Status:", minipoolData.status ,"Start Date:", startDate, "End Date:", endDate, "Age:", age);
     if (minipoolData.status === false) { days = days } //if the minipool has exited, use the age from the dates
     else { days = age } //if the minipool is active, use the days from the deposits until today.
-    console.log("ethPriceHistory:", ethPriceHistory);
+    console.log("ethPriceHistory from Calc:", ethPriceHistory);
 
     // make sure all numbers are positive..
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
@@ -60,6 +62,11 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     totalNOEthDeposited = (totalNOEthDeposited / 1E18) //convert to gwei
     totalProtocolEthDeposited = (totalProtocolEthDeposited / 1E18)
     totalEthDeposited = (totalEthDeposited / 1E18)
+
+    // Get the historical price of eth on the days of deposits and withdrawals.
+    let ethDepositPrice = ethPriceHistory.find(item => item.date == startDateString);
+    let ethWithdrawalPrice = ethPriceHistory.find(item => item.date == endDateString);
+    console.log("History:", minipool, "Start Date:", startDateString, "endDate:", endDateString, "Eth Deposit Price:", ethDepositPrice, "Eth Withdrawal Price:", ethWithdrawalPrice);
 
     let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
     let totalFiatDeposited = _.sumBy(filteredArray, 'fiat_amount'); // total fiat deposited by the minipool

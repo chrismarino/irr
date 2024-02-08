@@ -38,7 +38,7 @@ export default async function getValidatorStats(validatorIndex) {
     // Create an array of deposit dates so we can look up the eth price at the time of the deposit
     let depositDays = await Promise.all(nodeDepositsAndWithdrawals.filter(item => item.deposits_amount > 0));
     depositDaysArray.push(depositDays.date);
-    console.log("Node Deposits and Withdrawals dates:", depositDaysArray);
+    //console.log("Node Deposits and Withdrawals dates:", depositDaysArray);
     return { nodeDepositsAndWithdrawals, depositDaysArray, status };
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);
