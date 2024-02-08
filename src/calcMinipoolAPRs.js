@@ -1,7 +1,7 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday) {
+export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday, ethPriceHistory) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -51,7 +51,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     //console.log("Status:", minipoolData.status ,"Start Date:", startDate, "End Date:", endDate, "Age:", age);
     if (minipoolData.status === false) { days = days } //if the minipool has exited, use the age from the dates
     else { days = age } //if the minipool is active, use the days from the deposits until today.
-
+console.log("ethPriceHistory:", ethPriceHistory);
 
     // make sure all numbers are positive..
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;

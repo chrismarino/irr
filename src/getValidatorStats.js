@@ -1,6 +1,6 @@
 // New fetchDeposit function that uses the validator stats API endpoint
 import axios from 'axios';
-import getPriceData from "./getPriceData";
+
 export default async function getValidatorStats(validatorIndex) {
 
   // A utility function used to fetch the deposits and withdrawl history from an API. Take a url as an argument.
@@ -9,7 +9,7 @@ export default async function getValidatorStats(validatorIndex) {
   let apiEndpoint = appUrl + "/api/v1"
   let apikey = process.env.REACT_APP_BEACONCHAIN_KEY
   let node_action = "/validator/stats/";
-
+  let depositDaysArray = [];
   let statsUrl = (apiEndpoint + node_action + validatorIndex + "?apikey=" + apikey)
   try {
     let payouts = [];
@@ -27,27 +27,19 @@ export default async function getValidatorStats(validatorIndex) {
       status: true
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Set the minipool status to false if the minipool has exited. Do this before another async call.
-     nodeDepositsAndWithdrawals = nodeDepositsAndWithdrawals.map(item => {
-       if (item.withdrawals_amount === 32000000000) {
+    nodeDepositsAndWithdrawals = nodeDepositsAndWithdrawals.map(item => {
+      if (item.withdrawals_amount === 32000000000) {
         status = false; // set the status for this minipool to false
-         return { ...item, status: false }; //set it in the data array as well.
-       } else {
-         return item;
-       }
-    });
-    // Add the price field to each item in the nodeDepositsAndWithdrawals array
-    nodeDepositsAndWithdrawals = await Promise.all(nodeDepositsAndWithdrawals.map(async item => {
-      if (item.deposits_amount > 0) {
-        const lookupDate = item.date.split('T')[0]; //need to format the date for the API
-        let dateArray = [{ date: lookupDate }];
-        const priceData = await getPriceData(dateArray); //include the historical price of ETH at time of deposit
-        item.eth_price = priceData.price_usd;
-        item.fiat_amount = (item.deposits_amount * item.eth_price)/1000000000; //scale the amount to gwei
+        return { ...item, status: false }; //set it in the data array as well.
+      } else {
+        return item;
       }
-      return item; //return the item unchanged if no deposit
-    }));
-    //console.log("Node Deposits and Withdrawals pulled from getValidatorStats:", nodeDepositsAndWithdrawals, "Status:", status);
-    return { nodeDepositsAndWithdrawals, status };
+    });
+    // Create an array of deposit dates so we can look up the eth price at the time of the deposit
+    let depositDays = await Promise.all(nodeDepositsAndWithdrawals.filter(item => item.deposits_amount > 0));
+    depositDaysArray.push(depositDays.date);
+    console.log("Node Deposits and Withdrawals dates:", depositDaysArray);
+    return { nodeDepositsAndWithdrawals, depositDaysArray, status };
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);
   }

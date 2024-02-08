@@ -10,23 +10,26 @@ let minipoolIndexArray = [];
 function MinipoolAPR({ nodeAddress }) {
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
-  const [ethPriceToday, setEthPriceToday] = useState(0);
+  const [ethPriceToday, setEthPriceToday] = useState([]);
+  const [ethPriceHistory, setEthPriceHistory] = useState([]);
   // Some state variables to keep track of the status of the fetches
   //const [gotEthPriceToday, setGotEthPriceToday] = useState([]); //not used since I can use the ethPriceToday object
   const [gotValidators, setGotValidators] = useState(false);
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
-  const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState([]);
+  const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState(false);
 
 
   var validatorArray = []; // reset the validator array
   var minipoolArray = []; // reset the minipool array
 
+
+
   useEffect(() => {
     async function fetchEthPriceToday() {
       let today = new Date();
       let formattedDate = today.toISOString().split('T')[0];
-      let dateArray = [{ date: formattedDate }];
+      let dateArray = [formattedDate];
       const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(ethPriceToday);
       //setGotEthPriceToday(true); //not used since I can use the ethPriceToday object
@@ -122,6 +125,22 @@ function MinipoolAPR({ nodeAddress }) {
     fetchDepositsAndWithdrawals();
   }, [gotRocketpoolDetails]);
 
+  useEffect(() => {
+    async function fetchEthPriceHistory() {
+      if (!depositsAndWithdrawals || gotDepositsAndWithdrawals === false) return; //don't run if the deposits and withdrawals are empty
+      let dateArray = depositsAndWithdrawals.map(item => {
+        let date = new Date(item.date);
+        let day = ('0' + date.getDate()).slice(-2);
+        let month = ('0' + (date.getMonth() + 1)).slice(-2);
+        let year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      });
+      const ethPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
+      setEthPriceHistory(ethPriceHistory);
+      //setGotEthPriceToday(true); //not used since I can use the ethPriceToday object
+    }
+    fetchEthPriceHistory();
+  }, [gotDepositsAndWithdrawals]);
 
   var nodeAPRs = [];
   // only calculate the IRR when the withdrawls and deposits have been fetched
@@ -129,7 +148,7 @@ function MinipoolAPR({ nodeAddress }) {
   // only render when the all the stats. withdrawls and deposits have been fetched
   if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday) {
     console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "ethPrice:", ethPriceToday)
-    nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday);
+    nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
     console.log("NodeAPRs:", nodeAPRs);
   }
   return (
