@@ -24,7 +24,10 @@ function MinipoolAPR({ nodeAddress }) {
 
   useEffect(() => {
     async function fetchEthPriceToday() {
-      const ethPriceToday = await getPriceData(""); //fetch the price of eth. No date returns the current price.
+      let today = new Date();
+      let formattedDate = today.toISOString().split('T')[0];
+      let dateArray = [{ date: formattedDate }];
+      const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(ethPriceToday);
       //setGotEthPriceToday(true); //not used since I can use the ethPriceToday object
     }
@@ -90,31 +93,31 @@ function MinipoolAPR({ nodeAddress }) {
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
     async function fetchDepositsAndWithdrawals() {
-      if (gotRocketpoolDetails=== false) return; //only run if the rocketpool details have run
+      if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
       //console.log("fetchDepositsAndWithdrawals to set allDepositsAndWithdrawals:", minipools, "gotRocketpoolDetails", gotRocketpoolDetails);
-        for (const index of minipools) {
-          try {
-            const oneIndex = await getValidatorStats(index.validatorIndex);
-            allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
-            setDepositsAndWithdrawals(allDepositsAndWithdrawals);
-            //see if the minipool has exited. Set it to false if it has.
-            if (oneIndex.status === false) {
-              let exitedMinipools = minipools.map(minipool =>
-                minipool === index ? {
-                  ...minipool,
-                  status: false
-                } : minipool);
-              setMinipools(exitedMinipools);
-              setGotValidatorStats(true)
-              //console.log("Minipool were updated w/status feild from fetchDepositsAndWithdrawals:", exitedMinipools, "Minipools:", minipools);
-            }
-          }
-          catch (error) {
-            console.log("Error creating deposit array:", error);
+      for (const index of minipools) {
+        try {
+          const oneIndex = await getValidatorStats(index.validatorIndex);
+          allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
+          setDepositsAndWithdrawals(allDepositsAndWithdrawals);
+          //see if the minipool has exited. Set it to false if it has.
+          if (oneIndex.status === false) {
+            let exitedMinipools = minipools.map(minipool =>
+              minipool === index ? {
+                ...minipool,
+                status: false
+              } : minipool);
+            setMinipools(exitedMinipools);
+            setGotValidatorStats(true)
+            //console.log("Minipool were updated w/status feild from fetchDepositsAndWithdrawals:", exitedMinipools, "Minipools:", minipools);
           }
         }
-        setGotDepositsAndWithdrawals(true);
-        console.log("All Depostis and Withdrawals from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
+        catch (error) {
+          console.log("Error creating deposit array:", error);
+        }
+      }
+      setGotDepositsAndWithdrawals(true);
+      console.log("All Depostis and Withdrawals from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
     }
     fetchDepositsAndWithdrawals();
   }, [gotRocketpoolDetails]);
@@ -124,8 +127,8 @@ function MinipoolAPR({ nodeAddress }) {
   // only calculate the IRR when the withdrawls and deposits have been fetched
 
   // only render when the all the stats. withdrawls and deposits have been fetched
-  if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday) { 
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "ethPrice:" , ethPriceToday) 
+  if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday) {
+    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "ethPrice:", ethPriceToday)
     nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday);
     console.log("NodeAPRs:", nodeAPRs);
   }
@@ -135,18 +138,18 @@ function MinipoolAPR({ nodeAddress }) {
 
         <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
         <p></p><h3>Total Node Returns</h3>
-      {<NodeAPRGrid rows={(nodeAPRs.nodeAPR || [])} /> }
+        {<NodeAPRGrid rows={(nodeAPRs.nodeAPR || [])} />}
 
       </section>
       <section>
-      <p></p><h3>Total Node Operator Returns</h3>
+        <p></p><h3>Total Node Operator Returns</h3>
 
-      {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} /> }
+        {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
       </section>
       <section>
-      <p></p><h3>Total Protocol Returns</h3>
+        <p></p><h3>Total Protocol Returns</h3>
 
-      {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} /> }
+        {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} />}
 
       </section>
     </div>
