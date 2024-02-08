@@ -51,7 +51,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     //console.log("Status:", minipoolData.status ,"Start Date:", startDate, "End Date:", endDate, "Age:", age);
     if (minipoolData.status === false) { days = days } //if the minipool has exited, use the age from the dates
     else { days = age } //if the minipool is active, use the days from the deposits until today.
-console.log("ethPriceHistory:", ethPriceHistory);
+    console.log("ethPriceHistory:", ethPriceHistory);
 
     // make sure all numbers are positive..
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
@@ -130,11 +130,7 @@ console.log("ethPriceHistory:", ethPriceHistory);
 
 function formatArray(array) {
   return (array || []).map(function (element) {
-
-    // currently accepted formats for strings:
-    // YYYYMMDD, YYYY-MM-DD, YYYY/MM/DD
-    ///const originalDate = element.day;
-    //const reformattedDate = originalDate.split('T')[0];
+    //date must be in the format of YYYY-MM-DD for getPriceData
     const dateObject = new Date(element.date);
     const year = dateObject.getFullYear();
     const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript

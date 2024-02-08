@@ -29,6 +29,7 @@ function MinipoolAPR({ nodeAddress }) {
     async function fetchEthPriceToday() {
       let today = new Date();
       let formattedDate = today.toISOString().split('T')[0];
+      //date must be in the format of YYYY-MM-DD for getPriceData
       let dateArray = [formattedDate];
       const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(ethPriceToday);
