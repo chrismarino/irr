@@ -22,8 +22,6 @@ export default async function getValidatorStats(validatorIndex) {
       deposits_amount: item.deposits_amount,
       withdrawals_amount: item.withdrawals_amount,
       validatorIndex: validatorIndex,
-      eth_price: "",
-      fiat_amount: 0,
       status: true
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Set the minipool status to false if the minipool has exited. Do this before another async call.
@@ -38,7 +36,7 @@ export default async function getValidatorStats(validatorIndex) {
     // Create an array of deposit dates so we can look up the eth price at the time of the deposit
     let depositDays = await Promise.all(nodeDepositsAndWithdrawals.filter(item => item.deposits_amount > 0));
     depositDaysArray.push(depositDays.date);
-    console.log("Node Deposits and Withdrawals dates:", depositDaysArray);
+    //console.log("Node Deposits and Withdrawals dates:", depositDaysArray);
     return { nodeDepositsAndWithdrawals, depositDaysArray, status };
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);

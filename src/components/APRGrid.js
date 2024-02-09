@@ -55,11 +55,12 @@ const APR_COLS = [
   },
 
 ];
-function NodeAPRGrid({ rows }) {
+function APRGrid({ rows }) {
 if (rows === undefined) {
     return <div>Loading...</div>;
   }
 const columns = APR_COLS;
+//console.log("APRGrid rows:", rows);
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid 
@@ -73,4 +74,4 @@ const columns = APR_COLS;
   );
 }
 
-export default NodeAPRGrid;
+export default APRGrid;
