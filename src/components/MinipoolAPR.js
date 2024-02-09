@@ -14,8 +14,8 @@ function MinipoolAPR({ nodeAddress }) {
   const [ethPriceToday, setEthPriceToday] = useState([]);
   const [ethPriceHistory, setEthPriceHistory] = useState([]);
   // Some state variables to keep track of the status of the fetches
-  //const [gotEthPriceToday, setGotEthPriceToday] = useState([]); //not used since I can use the ethPriceToday object
   const [gotValidators, setGotValidators] = useState(false);
+  const [gotEthPriceToday, setGotEthPriceToday] = useState(false);
   const [gotEthPriceHistory, setGotEthPriceHistory] = useState(false);
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
@@ -35,7 +35,7 @@ function MinipoolAPR({ nodeAddress }) {
       let dateArray = [formattedDate];
       const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(ethPriceToday);
-      //setGotEthPriceToday(true); //not used since I can use the ethPriceToday object
+      setGotEthPriceToday(true); 
     }
     fetchEthPriceToday();
   }, [nodeAddress]);
@@ -82,8 +82,6 @@ function MinipoolAPR({ nodeAddress }) {
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
           }));  //get the minipool addresses
-
-          //console.log("Updated Minipool Index from fetchRocketpoolValidatorStatsArray:", updatedMinipoolIndexArray);
           setMinipools(updatedMinipoolIndexArray);
           setGotRocketpoolDetails(true);
         }
@@ -100,7 +98,6 @@ function MinipoolAPR({ nodeAddress }) {
     let allDepositsAndWithdrawals = [];
     async function fetchDepositsAndWithdrawals() {
       if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
-      //console.log("fetchDepositsAndWithdrawals to set allDepositsAndWithdrawals:", minipools, "gotRocketpoolDetails", gotRocketpoolDetails);
       for (const index of minipools) {
         try {
           const oneIndex = await getValidatorStats(index.validatorIndex);
@@ -115,7 +112,6 @@ function MinipoolAPR({ nodeAddress }) {
               } : minipool);
             setMinipools(exitedMinipools);
             setGotValidatorStats(true)
-            //console.log("Minipool were updated w/status feild from fetchDepositsAndWithdrawals:", exitedMinipools, "Minipools:", minipools);
           }
         }
         catch (error) {
@@ -143,7 +139,6 @@ function MinipoolAPR({ nodeAddress }) {
       try {
         const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
-        //console.log("ethPriceHistory from MinipoolAPRs:", ethPriceHistory, "New prices", newEthPriceHistory);
         setGotEthPriceHistory(true);
       } catch (error) {
         console.error("Error setting price history array:", error);
@@ -159,18 +154,18 @@ function MinipoolAPR({ nodeAddress }) {
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    if (gotDepositsAndWithdrawals && gotValidatorStats && ethPriceToday && gotEthPriceHistory) {
-      console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "ethPrice:", ethPriceToday)
+    if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceToday && gotEthPriceHistory) {
+      console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
       nodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
       console.log("NodeAPRs:", nodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats, ethPriceToday, gotEthPriceHistory]);
+  }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceToday, gotEthPriceHistory]);
 
   return (
     <div className="MinipoolAPR">
       <section>
 
-        <p>ETH Price Now: ${ethPriceToday.eth_price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
+        <p>ETH Price Now: ${ethPriceToday.price_usd} RPL Price Now: ${ethPriceToday.rpl_price_usd}</p> {/* Render ethPriceToday */}
         <p></p><h3>Total Node Returns</h3>
         {<NodeAPRGrid rows={(nodeAPRs.nodeAPR || [])} />}
 

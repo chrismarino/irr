@@ -22,8 +22,6 @@ export default async function getValidatorStats(validatorIndex) {
       deposits_amount: item.deposits_amount,
       withdrawals_amount: item.withdrawals_amount,
       validatorIndex: validatorIndex,
-      eth_price: "",
-      fiat_amount: 0,
       status: true
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Set the minipool status to false if the minipool has exited. Do this before another async call.
