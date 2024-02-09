@@ -62,8 +62,14 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     totalEthDeposited = (totalEthDeposited / 1E18)
 
     // Get the historical price of eth on the days of deposits and withdrawals.
-    let ethDepositPrice = ethPriceHistory.find(item => item.date === startDateString);
-    let ethWithdrawalPrice = ethPriceHistory.find(item => item.date === endDateString);
+    console.log("ethPriceHistory:", ethPriceHistory);
+    try {
+      var ethDepositPrice = ethPriceHistory.find(item => item.date === startDateString);
+      var ethWithdrawalPrice = ethPriceHistory.find(item => item.date === endDateString);
+    }
+    catch (error) {
+      console.log("Error in getPriceData gettimg ethPriceHistor:", error);
+    }
     let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
 
     // Total fiat deposited is amount deposited * price of eth at the time of deposit

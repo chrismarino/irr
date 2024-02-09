@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
-import useMinipoolAPRs from '../useMinipoolAPRs';
+import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 
 function NodeAPRs({ nodeAddress }) {
   const nodeAPRs = useMinipoolAPRs(nodeAddress);

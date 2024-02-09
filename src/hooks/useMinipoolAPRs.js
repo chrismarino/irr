@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import getValidators from "./getValidators";
-import getPriceData from "./getPriceData";
+import getValidators from "../getValidators";
+import getPriceData from "../getPriceData";
 //import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
-import getRocketpoolValidatorStats from "./getRocketpoolValidatorStats";
-import getValidatorStats from "./getValidatorStats";
-import calcMinipoolAPRs from "./calcMinipoolAPRs";
+import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
+import getValidatorStats from "../getValidatorStats";
+import calcMinipoolAPRs from "../calcMinipoolAPRs";
 let minipoolIndexArray = [];
 
 
@@ -47,6 +47,7 @@ function useMinipoolAPRs(nodeAddress) {
       // stats for each validator. 
       if (nodeAddress === "") return; //don't run if the node address is empty
       setMinipools([]); //reset the minipools
+      setGotEthPriceHistory(false); //reset the eth price history each node has a different set of minipools
       setGotValidators(false); // will be reset, unless there is an error or empty node address
       setGotValidatorStats(false);
       setDepositsAndWithdrawals([]);
@@ -129,7 +130,7 @@ function useMinipoolAPRs(nodeAddress) {
     async function fetchEthPriceHistory() {
       if (!depositsAndWithdrawals || gotDepositsAndWithdrawals === false) return; //don't run if the deposits and withdrawals are empty
       const filteredArray = depositsAndWithdrawals.filter(item =>
-        item.deposits_amount === 32000000000 || item.withdrawals_amount === 32000000000);
+        item.deposits_amount > 0 || item.withdrawals_amount === 32000000000);
       let dateArray = filteredArray.map(item => {
         let date = new Date(item.date);
         let day = ('0' + date.getDate()).slice(-2);
@@ -141,6 +142,7 @@ function useMinipoolAPRs(nodeAddress) {
         const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
         setGotEthPriceHistory(true);
+        console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory);
       } catch (error) {
         console.error("Error setting price history array:", error);
       }
