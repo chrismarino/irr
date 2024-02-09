@@ -21,7 +21,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   totalArray = _.sortBy(totalArray, function (item) {
     return new Date(item.date);
   });
-  //finc the minipool indices...
+  //find the minipool indices...
   // write the code that creates an array containg unique ValidatorIndex values in totalArray
   const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
   // don't think I need this since I saved the list of validators in the from the node API
@@ -32,7 +32,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   const ethPriceNow = ethPriceToday[0].price_usd; // ethPriceToday is an array of objects with a single object.
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    console.log("Filtered Array:", filteredArray);
+    // console.log("Filtered Array:", filteredArray);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     if (minipoolData.minipoolStats === undefined) {
@@ -62,7 +62,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     totalEthDeposited = (totalEthDeposited / 1E18)
 
     // Get the historical price of eth on the days of deposits and withdrawals.
-    console.log("ethPriceHistory:", ethPriceHistory);
+    //console.log("ethPriceHistory:", ethPriceHistory);
     try {
       var ethDepositPrice = ethPriceHistory.find(item => item.date === startDateString);
       var ethWithdrawalPrice = ethPriceHistory.find(item => item.date === endDateString);
@@ -93,7 +93,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);
     let status = minipoolIndex.status;
-    console.log("Minipool:", minipool, "Minipool Status:", status);
+    //console.log("Minipool:", minipool, "Minipool Status:", status);
     const eth_apr = ((((100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(2);
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
     const no_eth_apr = ((((100) * (365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toFixed(2);
@@ -130,7 +130,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
       fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
       fiat_apr: p_fiat_apr
     }; ////protocol apr in SD
-    console.log("Added minipool to node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
+    //console.log("Added minipool to node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
     nodeAPR.push(newNodeAPR);
     nodeOperatorAPR.push(newNodeOperatorAPR);
     protocolAPR.push(newprotocolAPR);

@@ -53,7 +53,7 @@ function useMinipoolAPRs(nodeAddress) {
       setDepositsAndWithdrawals([]);
       setGotDepositsAndWithdrawals(false); // new node address, so reset the HasRun flags
       setGotRocketpoolDetails(false);
-      console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
+      //console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
       try {
         validatorArray = await getValidators(nodeAddress);
         minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
@@ -63,7 +63,7 @@ function useMinipoolAPRs(nodeAddress) {
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
         setGotValidators(true);
-        console.log("Minipool Index Array set from fetchValidator Array:", minipoolIndexArray);
+        //console.log("Minipool Index Array set from fetchValidator Array:", minipoolIndexArray);
       }
       catch (error) {
         console.log("Error creating validator index array:", error);
@@ -121,7 +121,7 @@ function useMinipoolAPRs(nodeAddress) {
         }
       }
       setGotDepositsAndWithdrawals(true);
-      console.log("All Depostis and Withdrawals set from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
+      //console.log("All Depostis and Withdrawals set from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
     }
     fetchDepositsAndWithdrawals();
   }, [gotRocketpoolDetails]);
@@ -142,7 +142,7 @@ function useMinipoolAPRs(nodeAddress) {
         const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
         setGotEthPriceHistory(true);
-        console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory);
+        //console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory);
       } catch (error) {
         console.error("Error setting price history array:", error);
       }
@@ -155,7 +155,7 @@ function useMinipoolAPRs(nodeAddress) {
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
+    //console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
     if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceToday && gotEthPriceHistory) {
       const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
       setNodeAPRs(calculatedNodeAPRs);

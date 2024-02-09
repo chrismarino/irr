@@ -9,8 +9,8 @@ function App() {
   //const [nodeAddress, setNodeAddress] = useState("0x8f7fae807c3c3600fc952b7eadaa3a9a68d5b062");
   const [gotNewNodeAddress, setGotNewNodeAddress] = useState(false);
   const [nodeAddress, setNodeAddress] = useState("0x635D06a61a36566003D71428F1895e146CdBD54E");
-  //const [nodeAddress, setNodeAddress] = useState("0x8f7fae807c3c3600fc952b7eadaa3a9a68d5b062"); 2 validators 
-  //const [nodeAddress, setNodeAddress] = useState("0x1829f19524429a2edaf07bd13d1e47af19643d9b");
+  //const [nodeAddress, setNodeAddress] = useState("0x8f7fae807c3c3600fc952b7eadaa3a9a68d5b062"); // 2 validators 
+  //const [nodeAddress, setNodeAddress] = useState("0xee43198c3be288fddabafefabbd49f6111b175c5"); // 6 validators. Works
 
   // set the node address to the default value of the Rocketpool node for dubugging purposes.
   // Some other addresses to test.
