@@ -5,10 +5,12 @@ import { useState, useEffect, useRef } from 'react';
 
 
 function App() {
-  const [nodeAddress, setNodeAddress] = useState("");
+  //const [nodeAddress, setNodeAddress] = useState("0x8f7fae807c3c3600fc952b7eadaa3a9a68d5b062");
   const [gotNewNodeAddress, setGotNewNodeAddress] = useState(false);
-  //const [nodeAddress, setNodeAddress] = useState("0x635D06a61a36566003D71428F1895e146CdBD54E");
+  const [nodeAddress, setNodeAddress] = useState("0x635D06a61a36566003D71428F1895e146CdBD54E");
+  //const [nodeAddress, setNodeAddress] = useState("0x8f7fae807c3c3600fc952b7eadaa3a9a68d5b062"); 2 validators 
   //const [nodeAddress, setNodeAddress] = useState("0x1829f19524429a2edaf07bd13d1e47af19643d9b");
+
   // set the node address to the default value of the Rocketpool node for dubugging purposes.
   // Some other addresses to test.
   //let nodeAddress2 = "0x84cf8a46e6f77dbc6a33855320d68f7a1698c528"; //does not work. Throttled by coingecko
@@ -19,16 +21,21 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Minipool APRs</h1>
-        <input
-          type="text"
-          defaultValue={nodeAddress}
-          onKeyDown={event => {
-            if (event.key === 'Enter') {
-              setNodeAddress(event.target.value)
-            }
+        <form
+          onSubmit={event => {
+            event.preventDefault();
+            setNodeAddress(event.target.elements.nodeAddress.value);
           }}
-          placeholder="Enter node address"
-        />
+        >
+          <input
+            type="text"
+            name="nodeAddress"
+            defaultValue={nodeAddress}
+            onClick={event => event.target.select()}
+            placeholder="Enter node address"
+          />
+          <button type="submit">Enter</button>
+        </form>
         <MinipoolAPR nodeAddress={nodeAddress} />
       </header>
     </div>
