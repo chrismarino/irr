@@ -9,6 +9,7 @@ import NodeAPRGrid from "./NodeAPRGrid";
 let minipoolIndexArray = [];
 
 function MinipoolAPR({ nodeAddress }) {
+
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [ethPriceToday, setEthPriceToday] = useState([]);
@@ -36,7 +37,7 @@ function MinipoolAPR({ nodeAddress }) {
       let dateArray = [formattedDate];
       const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
       setEthPriceToday(ethPriceToday);
-      setGotEthPriceToday(true); 
+      setGotEthPriceToday(true);
     }
     fetchEthPriceToday();
   }, [nodeAddress]);
@@ -62,7 +63,7 @@ function MinipoolAPR({ nodeAddress }) {
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
         setGotValidators(true);
-        //console.log("Minipool Index Array from fetchValidator Array:", minipoolIndexArray);
+        console.log("Minipool Index Array set from fetchValidator Array:", minipoolIndexArray);
       }
       catch (error) {
         console.log("Error creating validator index array:", error);
@@ -112,15 +113,15 @@ function MinipoolAPR({ nodeAddress }) {
                 status: false
               } : minipool);
             setMinipools(exitedMinipools);
-            setGotValidatorStats(true)
           }
+          setGotValidatorStats(true)
         }
         catch (error) {
           console.log("Error creating deposit array:", error);
         }
       }
       setGotDepositsAndWithdrawals(true);
-      //console.log("All Depostis and Withdrawals from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
+      console.log("All Depostis and Withdrawals set from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
     }
     fetchDepositsAndWithdrawals();
   }, [gotRocketpoolDetails]);
@@ -153,11 +154,11 @@ function MinipoolAPR({ nodeAddress }) {
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
+    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
     if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceToday && gotEthPriceHistory) {
-      //console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
       const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
       setNodeAPRs(calculatedNodeAPRs);
-      //console.log("NodeAPRs:", nodeAPRs);
+      console.log("NodeAPRs set from calcMinipoolAPRs:", nodeAPRs);
     }
   }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceToday, gotEthPriceHistory]);
 
@@ -173,12 +174,12 @@ function MinipoolAPR({ nodeAddress }) {
       <section>
         <p></p><h3>Total Node Operator Returns</h3>
 
-        {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />} 
+        {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
       </section>
       <section>
         <p></p><h3>Total Protocol Returns</h3>
 
-        {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} />} 
+        {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} />}
 
       </section>
     </div>

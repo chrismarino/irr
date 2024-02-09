@@ -32,7 +32,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   const ethPriceNow = ethPriceToday[0].price_usd; // ethPriceToday is an array of objects with a single object.
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    //console.log("Filtered Array:", filteredArray);
+    console.log("Filtered Array:", filteredArray);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     if (minipoolData.minipoolStats === undefined) {
@@ -87,6 +87,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);
     let status = minipoolIndex.status;
+    console.log("Minipool:", minipool, "Minipool Status:", status);
     const eth_apr = ((((100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(2);
     const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
     const no_eth_apr = ((((100) * (365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toFixed(2);
@@ -123,7 +124,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
       fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
       fiat_apr: p_fiat_apr
     }; ////protocol apr in SD
-    //console.log("Node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
+    console.log("Added minipool to node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
     nodeAPR.push(newNodeAPR);
     nodeOperatorAPR.push(newNodeOperatorAPR);
     protocolAPR.push(newprotocolAPR);

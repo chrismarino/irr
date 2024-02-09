@@ -5,8 +5,9 @@ import { useState, useEffect, useRef } from 'react';
 
 
 function App() {
-  //const [nodeAddress, setNodeAddress] = useState("");
-  const [nodeAddress, setNodeAddress] = useState("0x635D06a61a36566003D71428F1895e146CdBD54E");
+  const [nodeAddress, setNodeAddress] = useState("");
+  const [gotNewNodeAddress, setGotNewNodeAddress] = useState(false);
+  //const [nodeAddress, setNodeAddress] = useState("0x635D06a61a36566003D71428F1895e146CdBD54E");
   //const [nodeAddress, setNodeAddress] = useState("0x1829f19524429a2edaf07bd13d1e47af19643d9b");
   // set the node address to the default value of the Rocketpool node for dubugging purposes.
   // Some other addresses to test.
@@ -20,8 +21,12 @@ function App() {
         <h1>Minipool APRs</h1>
         <input
           type="text"
-          value={nodeAddress}
-          onChange={event => setNodeAddress(event.target.value)}
+          defaultValue={nodeAddress}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              setNodeAddress(event.target.value)
+            }
+          }}
           placeholder="Enter node address"
         />
         <MinipoolAPR nodeAddress={nodeAddress} />
