@@ -32,7 +32,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   const ethPriceNow = ethPriceToday[0].price_usd; // ethPriceToday is an array of objects with a single object.
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    console.log("Filtered Array:", filteredArray);
+    //console.log("Filtered Array:", filteredArray);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     if (minipoolData.minipoolStats === undefined) {

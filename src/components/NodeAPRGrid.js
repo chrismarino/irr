@@ -60,6 +60,7 @@ if (rows === undefined) {
     return <div>Loading...</div>;
   }
 const columns = APR_COLS;
+console.log("NodeAPRGrid rows:", rows);
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid 
