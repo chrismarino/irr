@@ -1,6 +1,7 @@
 import React from "react";
 import './App.css';
-import MinipoolAPR from "./components/MinipoolAPR";
+import NodeAPRs from "./components/NodeAPRs";
+
 import { useState, useEffect, useRef } from 'react';
 
 
@@ -36,7 +37,7 @@ function App() {
           />
           <button type="submit">Enter</button>
         </form>
-        <MinipoolAPR nodeAddress={nodeAddress} />
+        <NodeAPRs nodeAddress={nodeAddress} />
       </header>
     </div>
   );

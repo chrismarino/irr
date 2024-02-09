@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import getValidators from "../getValidators";
-import getPriceData from "../getPriceData";
+import getValidators from "./getValidators";
+import getPriceData from "./getPriceData";
 //import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
-import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
-import getValidatorStats from "../getValidatorStats";
-import calcMinipoolAPRs from "../calcMinipoolAPRs";
-import NodeAPRGrid from "./NodeAPRGrid";
+import getRocketpoolValidatorStats from "./getRocketpoolValidatorStats";
+import getValidatorStats from "./getValidatorStats";
+import calcMinipoolAPRs from "./calcMinipoolAPRs";
 let minipoolIndexArray = [];
 
-function MinipoolAPR({ nodeAddress }) {
 
+
+function useMinipoolAPRs(nodeAddress) {
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [ethPriceToday, setEthPriceToday] = useState([]);
@@ -26,7 +26,6 @@ function MinipoolAPR({ nodeAddress }) {
 
   var validatorArray = []; // reset the validator array
   var minipoolArray = []; // reset the minipool array
-
 
 
   useEffect(() => {
@@ -53,7 +52,7 @@ function MinipoolAPR({ nodeAddress }) {
       setDepositsAndWithdrawals([]);
       setGotDepositsAndWithdrawals(false); // new node address, so reset the HasRun flags
       setGotRocketpoolDetails(false);
-      if (nodeAddress === "") return;
+      console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
       try {
         validatorArray = await getValidators(nodeAddress);
         minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
@@ -158,33 +157,12 @@ function MinipoolAPR({ nodeAddress }) {
     if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceToday && gotEthPriceHistory) {
       const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
       setNodeAPRs(calculatedNodeAPRs);
-      console.log("NodeAPRs set from calcMinipoolAPRs:", nodeAPRs);
+      console.log("NodeAPRs set from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
   }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceToday, gotEthPriceHistory]);
 
-  return (
-    <div className="MinipoolAPR">
-      <section>
-
-        {/* <p>ETH Price Now: ${(ethPriceToday[0].price_usd || 0)} </p> Render ethPriceToday */}
-        <p></p><h3>Total Node Returns</h3>
-        {<NodeAPRGrid rows={(nodeAPRs.nodeAPR || [])} />}
-
-      </section>
-      <section>
-        <p></p><h3>Total Node Operator Returns</h3>
-
-        {<NodeAPRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
-      </section>
-      <section>
-        <p></p><h3>Total Protocol Returns</h3>
-
-        {<NodeAPRGrid rows={(nodeAPRs.protocolAPR || [])} />}
-
-      </section>
-    </div>
-  );
-}
+  return nodeAPRs
+} 
 
 
-export default MinipoolAPR;
+export default useMinipoolAPRs;
