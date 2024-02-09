@@ -29,7 +29,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   var nodeAPR = [];
   var nodeOperatorAPR = [];
   var protocolAPR = [];
-  const ethPriceNow = ethPriceToday[1].price_usd;
+  const ethPriceNow = ethPriceToday[0].price_usd; // ethPriceToday is an array of objects with a single object.
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     console.log("Filtered Array:", filteredArray);

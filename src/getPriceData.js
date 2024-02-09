@@ -10,7 +10,7 @@ export default async function getPriceData(dateArray) {
   let apikey = process.env.REACT_APP_COINGECKO_KEY
   let node_action = "/coins/ethereum/history";
   // fix the date format to be DD-MM-YYYY for coingecko API.
-  priceHistory = dateArray.map(async item => { 
+  priceHistory = dateArray.map(async item => {
     let lookupDate = item.split('-').reverse().join('-'); // Reformatting the date to DD-MM-YYYY
     let priceUrl = (apiEndpoint + node_action + "?date=" + lookupDate + "?x_cg_demo_api_key=" + apikey)
     try {
@@ -18,10 +18,16 @@ export default async function getPriceData(dateArray) {
       payouts = await axios(priceUrl);
       let date = item
       let price_usd = payouts.data.market_data.current_price.usd;
-      const price = { date, price_usd };
-      priceHistory.push(price);
+      return { date, price_usd };
+
     } catch (error) {
       console.log("Error setting the historical price:", error);
     }
-  }); return priceHistory;
+  }); // end of map
+  try {
+    priceHistory = await Promise.all(priceHistory);
+    return priceHistory;
+  } catch (error) {
+    console.error("Error resolving ethPriceHistory:", error);
+  }
 };
