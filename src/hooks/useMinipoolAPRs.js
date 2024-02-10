@@ -12,7 +12,7 @@ let minipoolIndexArray = [];
 
 
 function useMinipoolAPRs(nodeAddress) {
-  const { ethPriceNow, gotEthPriceNow } = usePriceNow(); // use the custom hook to get the current price of eth
+  const { priceNow: ethPriceNow, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [ethPriceHistory, setEthPriceHistory] = useState([]);
