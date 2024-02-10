@@ -1,0 +1,34 @@
+import getPriceData from "../getPriceData";
+import { useEffect, useState } from 'react';
+export default function usePriceNow() {
+    const [gotEthPriceHistory, setGotEthPriceHistory] = useState(false);
+    const [ethPriceHistory, setEthPriceHistory] = useState([]);
+    useEffect(() => {
+        async function fetchEthPriceHistory() {
+            if (!depositsAndWithdrawals || gotDepositsAndWithdrawals === false) return; //don't run if the deposits and withdrawals are empty
+            const filteredArray = depositsAndWithdrawals.filter(item =>
+                item.deposits_amount > 0 || item.withdrawals_amount === 32000000000);
+            let dateArray = filteredArray.map(item => {
+                let date = new Date(item.date);
+                let day = ('0' + date.getDate()).slice(-2);
+                let month = ('0' + (date.getMonth() + 1)).slice(-2);
+                let year = date.getFullYear();
+                return year + '-' + month + '-' + day;
+            });
+            dateArray = _.uniqBy(dateArray) //remove duplicates
+            try {
+                const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
+                setEthPriceHistory(newEthPriceHistory);
+                setGotEthPriceHistory(true);
+                //console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory, "Dates:", dateArray);
+            } catch (error) {
+                console.error("Error setting price history array:", error);
+            }
+
+        }
+        fetchEthPriceHistory();
+    }, [gotDepositsAndWithdrawals]);
+
+
+    return { ethPriceHistory, gotEthPriceHistory };
+}

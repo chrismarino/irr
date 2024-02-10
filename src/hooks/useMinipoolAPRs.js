@@ -5,20 +5,20 @@ import getPriceData from "../getPriceData";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
+import usePriceNow from './usePriceNow';
 import _ from "lodash";
 let minipoolIndexArray = [];
 
 
 
 function useMinipoolAPRs(nodeAddress) {
+  const { ethPriceNow, gotEthPriceNow } = usePriceNow(); // use the custom hook to get the current price of eth
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
-  const [ethPriceToday, setEthPriceToday] = useState([]);
   const [ethPriceHistory, setEthPriceHistory] = useState([]);
   const [nodeAPRs, setNodeAPRs] = useState([]);
   // Some state variables to keep track of the status of the fetches
   const [gotValidators, setGotValidators] = useState(false);
-  const [gotEthPriceToday, setGotEthPriceToday] = useState(false);
   const [gotEthPriceHistory, setGotEthPriceHistory] = useState(false);
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
@@ -28,18 +28,6 @@ function useMinipoolAPRs(nodeAddress) {
   var validatorArray = []; // reset the validator array
   var minipoolArray = []; // reset the minipool array
 
-  useEffect(() => {
-    async function fetchEthPriceToday() {
-      let today = new Date();
-      let formattedDate = today.toISOString().split('T')[0];
-      //date must be in the format of YYYY-MM-DD for getPriceData
-      let dateArray = [formattedDate];
-      const ethPriceToday = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
-      setEthPriceToday(ethPriceToday);
-      setGotEthPriceToday(true);
-    }
-    fetchEthPriceToday();
-  }, [nodeAddress]);
 
   useEffect(() => {
     async function fetchValidatorArray() {
@@ -157,13 +145,13 @@ function useMinipoolAPRs(nodeAddress) {
 
   useEffect(() => {
     //console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
-    if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceToday && gotEthPriceHistory) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
+    if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceNow && gotEthPriceHistory) {
+      const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceNow, ethPriceHistory);
       setNodeAPRs(calculatedNodeAPRs);
 
       console.log("NodeAPRs set from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceToday, gotEthPriceHistory]);
+  }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceNow, gotEthPriceHistory]);
 
   return { nodeAPRs };
 } 

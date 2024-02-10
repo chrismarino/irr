@@ -1,9 +1,8 @@
 import getPriceData from "../getPriceData";
 import { useEffect, useState } from 'react';
-export default function useGetCurrentPrice() {
-    //const [gotEthPriceToday, setGotEthPriceToday] = useState(false);
+export default function usePriceNow() {
+    const [gotEthPriceNow, setGotEthPriceNow] = useState(false);
     const [ethPriceNow, setEthPriceNow] = useState([]);
-    const [loading, setLoading] = useState(true);
     useEffect(() => {
     async function fetchEthPriceToday() {
         let today = new Date();
@@ -12,11 +11,10 @@ export default function useGetCurrentPrice() {
         let dateArray = [formattedDate];
         const ethPriceNow = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceNow(ethPriceNow);
-        setLoading(false);
-        //setGotEthPriceToday(true);
+        setGotEthPriceNow(true);
     }
     fetchEthPriceToday();
 }, []);
 
-    return { ethPriceNow, loading };
+    return { ethPriceNow, gotEthPriceNow };
 }

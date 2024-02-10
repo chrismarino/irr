@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
-import useGetCurrentPrice from '../hooks/useGetCurrentPrice';
+import usePriceNow from '../hooks/usePriceNow';
 
 function NodeAPRs({ nodeAddress }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress);
-  const { ethPriceNow, loading } = useGetCurrentPrice();
+  const { ethPriceNow, gotEthPriceNow } = usePriceNow();
 
-  if (loading) {
+  if (!gotEthPriceNow) {
     return <div>Loading...</div>;
   } return (
     <div className="NodeAPRs">
