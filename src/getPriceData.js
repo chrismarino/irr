@@ -5,7 +5,7 @@ const Bottleneck = require('bottleneck');
 const limiter = new Bottleneck({
   minTime: 50, // 1 request per 1000ms
 })
-export default async function getPriceData(dateArray) {
+export default async function getPriceData(dateArray, coinID) {
   // A utility function used to fetch price from an API. Take a url as an argument.
   // takes an array of dates in the format of YYYY-MM-DD and returns an array of price objects
   if (dateArray.length === 0) return [];
@@ -13,7 +13,7 @@ export default async function getPriceData(dateArray) {
   let appUrl = process.env.REACT_APP_COINGECKO_URL
   let apiEndpoint = appUrl + "/api/v3"
   let apikey = process.env.REACT_APP_COINGECKO_KEY
-  let node_action = "/coins/ethereum/history";
+  let node_action = "/coins/" + coinID + "/history";
   // fix the date format to be DD-MM-YYYY for coingecko API.
   priceHistory = dateArray.map(async item => {
     let lookupDate = item.split('-').reverse().join('-'); // Reformatting the date to DD-MM-YYYY

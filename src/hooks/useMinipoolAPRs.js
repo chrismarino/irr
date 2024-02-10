@@ -128,7 +128,7 @@ function useMinipoolAPRs(nodeAddress) {
       });
       dateArray = _.uniqBy(dateArray) //remove duplicates
       try {
-        const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
+        const newEthPriceHistory = await getPriceData(dateArray, "ethereum"); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
         setGotEthPriceHistory(true);
         //console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory, "Dates:", dateArray);
