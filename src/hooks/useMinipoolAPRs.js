@@ -5,6 +5,7 @@ import getPriceData from "../getPriceData";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
+import _ from "lodash";
 let minipoolIndexArray = [];
 
 
@@ -138,11 +139,12 @@ function useMinipoolAPRs(nodeAddress) {
         let year = date.getFullYear();
         return year + '-' + month + '-' + day;
       });
+      dateArray = _.uniqBy(dateArray) //remove duplicates
       try {
         const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
         setGotEthPriceHistory(true);
-        //console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory);
+        console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory);
       } catch (error) {
         console.error("Error setting price history array:", error);
       }
