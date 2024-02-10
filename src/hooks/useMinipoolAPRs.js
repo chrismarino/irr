@@ -144,7 +144,7 @@ function useMinipoolAPRs(nodeAddress) {
         const newEthPriceHistory = await getPriceData(dateArray); //fetch the price of eth. No date returns the current price.
         setEthPriceHistory(newEthPriceHistory);
         setGotEthPriceHistory(true);
-        console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory);
+        //console.log("Eth Price History set from fetchEthPriceHistory:", newEthPriceHistory, "Dates:", dateArray);
       } catch (error) {
         console.error("Error setting price history array:", error);
       }
