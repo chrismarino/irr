@@ -28,7 +28,6 @@ function useMinipoolAPRs(nodeAddress) {
   var validatorArray = []; // reset the validator array
   var minipoolArray = []; // reset the minipool array
 
-
   useEffect(() => {
     async function fetchEthPriceToday() {
       let today = new Date();
@@ -161,11 +160,12 @@ function useMinipoolAPRs(nodeAddress) {
     if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceToday && gotEthPriceHistory) {
       const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceToday, ethPriceHistory);
       setNodeAPRs(calculatedNodeAPRs);
+
       console.log("NodeAPRs set from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
   }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceToday, gotEthPriceHistory]);
 
-  return nodeAPRs
+  return { nodeAPRs };
 } 
 
 
