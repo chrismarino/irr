@@ -13,7 +13,7 @@ function App() {
   const { priceNow: rplPriceNow, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
 
   if (!gotEthPriceNow || !gotRplPriceNow ) {
-    return <div>Loading currnet Eth and RPL prices...</div>;
+    return <div>Loading current Eth and RPL prices...</div>;
   } 
   //const [nodeAddress, setNodeAddress] = useState("0x8f7fae807c3c3600fc952b7eadaa3a9a68d5b062"); // 2 validators 
   //const [nodeAddress, setNodeAddress] = useState("0xee43198c3be288fddabafefabbd49f6111b175c5"); // 6 validators. Works

@@ -4,11 +4,23 @@ import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 
 function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
+  const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
-  if (!nodeAPRs.nodeAPR || !nodeAPRs.nodeOperatorAPR || !nodeAPRs.protocolAPR) {
-    return <div>Calculating APRs...</div>;
+  
+  useEffect(() => {
+    setPrevNodeAddress(nodeAddress);
+  }, [nodeAddress]);
+
+  if (nodeAddress !== prevNodeAddress) {
+    return <div>Node address changed, calculating APRs...</div>;
   }
 
+  if (!nodeAPRs.nodeAPR || !nodeAPRs.nodeOperatorAPR || !nodeAPRs.protocolAPR || nodeAPRs.length === 0 ) {
+    return <div>Fetching Price History and Calculating APRs...</div>;
+  }
+  if (nodeAddress !== prevNodeAddress) {
+    return <div>Node address changed, calculating APRs...</div>;
+  } else {
   return (
     <div className="NodeAPRs">
 
@@ -26,6 +38,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
       </section>
     </div>
   );
+  }
 }
 
 export default NodeAPRs;

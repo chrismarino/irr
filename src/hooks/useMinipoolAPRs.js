@@ -5,7 +5,6 @@ import getPriceData from "../getPriceData";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
-import usePriceNow from './usePriceNow';
 import _ from "lodash";
 let minipoolIndexArray = [];
 
@@ -16,7 +15,7 @@ function useMinipoolAPRs(nodeAddress, ethPriceNow) {
   const [minipools, setMinipools] = useState([]);
   const [ethPriceHistory, setEthPriceHistory] = useState([]);
   const [nodeAPRs, setNodeAPRs] = useState([]);
-  // Some state variables to keep track of the status of the fetches
+  // Some state variables to keep track of the status of the fetches    
   const [gotValidators, setGotValidators] = useState(false);
   const [gotEthPriceHistory, setGotEthPriceHistory] = useState(false);
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
@@ -34,6 +33,7 @@ function useMinipoolAPRs(nodeAddress, ethPriceNow) {
       // stats for each validator. 
       if (nodeAddress === "") return; //don't run if the node address is empty
       setMinipools([]); //reset the minipools
+      setNodeAPRs([]); //reset the nodeAPRs
       setGotEthPriceHistory(false); //reset the eth price history each node has a different set of minipools
       setGotValidators(false); // will be reset, unless there is an error or empty node address
       setGotValidatorStats(false);

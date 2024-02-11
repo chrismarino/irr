@@ -96,12 +96,12 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);
     let status = minipoolIndex.status;
     //console.log("Minipool:", minipool, "Minipool Status:", status);
-    const eth_apr = ((((100) * (365 / days) * totalEthEarned)) / totalEthDeposited).toFixed(2);
-    const fiat_apr = (((100) * (365 / days) * totalFiatGain) / (totalFiatDeposited)).toFixed(2);
-    const no_eth_apr = ((((100) * (365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toFixed(2);
-    const p_eth_apr = (((100) * (365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toFixed(2);
-    const no_fiat_apr = (((100) * (365 / days) * nodeOperatorFiatGain) / (totalNOFiatDeposited)).toFixed(2);
-    const p_fiat_apr = (((100) * (365 / days) * protocolFiatGain) / (totalProtocolFiatDeposited)).toFixed(2);
+    const eth_apr = ((((365 / days) * totalEthEarned)) / totalEthDeposited).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const no_eth_apr = ((((365 / days) * nodeOperatorEthEarned)) / totalNOEthDeposited).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const p_eth_apr = (((365 / days) * protocolEthEarned) / (totalProtocolEthDeposited)).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fiat_apr = (((365 / days) * totalFiatGain) / (totalFiatDeposited)).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const no_fiat_apr = (((365 / days) * nodeOperatorFiatGain) / (totalNOFiatDeposited)).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const p_fiat_apr = (((365 / days) * protocolFiatGain) / (totalProtocolFiatDeposited)).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const newNodeAPR = {
       minipool: minipool,
       status: status,
