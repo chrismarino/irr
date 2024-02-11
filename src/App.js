@@ -1,6 +1,7 @@
 import React from "react";
 import './App.css';
 import NodeAPRs from "./components/NodeAPRs";
+import NodeAddressForm from "./components/NodeAddressForm";
 
 import { useState, useEffect, useRef } from 'react';
 
@@ -22,21 +23,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Minipool APRs</h1>
-        <form
-          onSubmit={event => {
-            event.preventDefault();
-            setNodeAddress(event.target.elements.nodeAddress.value);
-          }}
-        >
-          <input
-            type="text"
-            name="nodeAddress"
-            defaultValue={nodeAddress}
-            onClick={event => event.target.select()}
-            placeholder="Enter node address"
-          />
-          <button type="submit">Enter</button>
-        </form>
+        <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
         <NodeAPRs nodeAddress={nodeAddress} />
       </header>
     </div>

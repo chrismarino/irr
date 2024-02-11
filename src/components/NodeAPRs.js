@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import usePriceNow from '../hooks/usePriceNow';
+import CurrentCoinPrices from './CurrentCoinPrices';
 
 function NodeAPRs({ nodeAddress }) {
 
@@ -20,8 +21,7 @@ function NodeAPRs({ nodeAddress }) {
   
   return (
     <div className="NodeAPRs">
-      <p>Current Ethereum Price: {(ethPriceNow[0].price_usd || [])}</p>
-      <p>Current Rocketpool Price: {(rplPriceNow[0].price_usd || [])}</p>
+      <CurrentCoinPrices ethPriceNow={ethPriceNow} rplPriceNow={rplPriceNow} />
       <section>
         <p></p><h3>Total Node Returns</h3>
         {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
