@@ -29,6 +29,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   var nodeAPR = [];
   var nodeOperatorAPR = [];
   var protocolAPR = [];
+  //console.log("ethPriceToday from calc minipools:", ethPriceToday);
   const ethPriceNow = ethPriceToday[0].price_usd; // ethPriceToday is an array of objects with a single object.
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
@@ -53,7 +54,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
 
     if (minipoolData.status === false) { days = days } //if the minipool has exited, use the age from the dates
     else { days = age } //if the minipool is active, use the days from the deposits until today.
-    console.log("ethPriceHistory from calc minipools:", ethPriceHistory);
+    //console.log("ethPriceHistory from calc minipools:", ethPriceHistory);
 
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
     var totalProtocolEthDeposited = minipoolData.minipoolStats.user_deposit_balance || 0;

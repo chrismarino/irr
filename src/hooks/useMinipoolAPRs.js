@@ -11,8 +11,7 @@ let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeAddress) {
-  const { priceNow: ethPriceNow, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
+function useMinipoolAPRs(nodeAddress, ethPriceNow) {
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [ethPriceHistory, setEthPriceHistory] = useState([]);
@@ -145,13 +144,13 @@ function useMinipoolAPRs(nodeAddress) {
 
   useEffect(() => {
     //console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats, "gotEthPriceToday:", gotEthPriceToday, "gotEthPriceHistory:", gotEthPriceHistory)
-    if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceNow && gotEthPriceHistory) {
+    if (gotDepositsAndWithdrawals && gotValidatorStats && gotEthPriceHistory) {
       const calculatedNodeAPRs = calcMinipoolAPRs(minipools, depositsAndWithdrawals, ethPriceNow, ethPriceHistory);
       setNodeAPRs(calculatedNodeAPRs);
 
-      console.log("NodeAPRs set from calcMinipoolAPRs:", calculatedNodeAPRs);
+      //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceNow, gotEthPriceHistory]);
+  }, [gotDepositsAndWithdrawals, gotValidatorStats, gotEthPriceHistory]);
 
   return { nodeAPRs };
 } 
