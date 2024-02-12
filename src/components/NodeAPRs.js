@@ -11,6 +11,10 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
     setPrevNodeAddress(nodeAddress);
   }, [nodeAddress]);
 
+  if (nodeAddress === "") {
+    return <div>Enter a node address and hit Enter...</div>;
+  }
+
   if (nodeAddress !== prevNodeAddress) {
     return <div>Node address changed, calculating APRs...</div>;
   }
