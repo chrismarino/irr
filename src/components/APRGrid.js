@@ -4,71 +4,86 @@ const APR_COLS = [
   {
     field: "minipool",
     headerName: "Minipool",
-    // width: 165,
+    align: 'left', 
+    flex: 2
   },
   {
     field: "status",
     headerName: "Status",
     type: "number",
     renderCell: (params) => (params.value ? 'Active' : 'Exited'),
-    //width: 120,
+    align: 'center', 
+    flex: 2
   },
   {
     field: "age",
     headerName: "Age",
     type: "number",
-    //width: 120,
+    align: 'center', 
+    flex: 1
   },
 
   {
     field: "eth_deposited",
     headerName: "Eth Deposited",
     type: "number",
-    //width: 120,
+    align: 'center', 
+    flex: 3
 
-  }, 
+  },
   {
     field: "eth_earned",
     headerName: "Eth Earned",
     type: "number",
-    //width: 120,
+    align: 'right', 
+    flex: 3
 
   },
   {
     field: "eth_apr",
     headerName: "Eth APR",
-    //width: 195,
+    align: 'center', 
+    flex: 2
   },
   {
     field: "fiat_gain",
     headerName: "Fiat Gain",
     type: "number",
-    //width: 120,
+    align: 'right', 
+    flex: 3
 
-  }, 
+  },
   {
     field: "fiat_apr",
     headerName: "Fiat APR",
+    align: 'center', 
     type: "percent",
-   // width: 120,
+    flex: 2
 
   },
 
 ];
 function APRGrid({ rows }) {
-if (rows === undefined) {
+  if (rows === undefined) {
     return <div>Loading...</div>;
   }
-const columns = APR_COLS;
-//console.log("APRGrid rows:", rows);
+  const columns = APR_COLS;
+  //console.log("APRGrid rows:", rows);
   return (
-    <div style={{ height: 400, width: '100%' }}>
-      <DataGrid 
-      rows={rows} 
-      columns={columns} 
-      pageSize={10} 
-      getRowId={(row) => row.minipool} // Use minipool property as unique id
-      style={{ color: 'white' }} // Change font color to red
+    <div style={{ height: 400, width: 800 }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={10}
+        getRowId={(row) => row.minipool} // Use minipool property as unique id
+        pageSizeOptions={[5, 10, 20, 50, 100]}
+        style={{ color: 'white' }} // Change font color to red
+        rowSelection={false}
+        autoHeight
+        pagination
+        initialState={{
+          pagination: { paginationModel: { pageSize: 5 } },
+        }}
       />
     </div>
   );

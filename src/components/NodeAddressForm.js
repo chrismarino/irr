@@ -15,6 +15,7 @@ function NodeAddressForm({ setNodeAddress, nodeAddress }) {
         defaultValue={nodeAddress}
         onClick={event => event.target.select()}
         placeholder="Enter node address"
+        style={{ marginRight: '10px' }} 
       />
       <button type="submit">Enter</button>
     </form>

@@ -1,14 +1,23 @@
 import React from 'react';
+import CssBaseline from "@mui/material/CssBaseline";
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 //import './index.css';
 import App from './App';
 import { ThemeModeProvider } from "./theme";
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const queryClient = new QueryClient();
 root.render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <ThemeModeProvider>
+        <CssBaseline />
+        <App />
+      </ThemeModeProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 
