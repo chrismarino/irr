@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
+import MinipoolDetailGrid from "./MinipoolDetailGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
+import useMinipoolDetails from '../hooks/useMinipoolDetails';
 
 function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
+  const  MinipoolDetails  = useMinipoolDetails(nodeAddress);
+  const [minipoolDetails, setMinipoolDetails] = useState([]);
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
-  
+
   useEffect(() => {
     setPrevNodeAddress(nodeAddress);
+  }, [nodeAddress]);
+
+  useEffect(() => {
+    async function fetchMinipoolDetails() {
+      const details = await Promise.all(MinipoolDetails);
+      setMinipoolDetails(details);
+    }
+    fetchMinipoolDetails();
   }, [nodeAddress]);
 
   if (nodeAddress === "") {
@@ -19,29 +31,32 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
     return <div>Node address changed, calculating APRs...</div>;
   }
 
-  if (!nodeAPRs.nodeAPR || !nodeAPRs.nodeOperatorAPR || !nodeAPRs.protocolAPR || nodeAPRs.length === 0 ) {
+  if (!nodeAPRs.nodeAPR || !nodeAPRs.nodeOperatorAPR || !nodeAPRs.protocolAPR || nodeAPRs.length === 0) {
     return <div>Fetching Price History and Calculating APRs...</div>;
   }
   if (nodeAddress !== prevNodeAddress) {
     return <div>Node address changed, calculating APRs...</div>;
   } else {
-  return (
-    <div className="NodeAPRs">
-
-      <section>
-        <p></p><h3>Total Node Returns</h3>
-        {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
-      </section>
-      <section>
-        <p></p><h3>Total Node Operator Returns</h3>
-        {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
-      </section>
-      <section>
-        <p></p><h3>Total Protocol Returns</h3>
-        {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
-      </section>
-    </div>
-  );
+    return (
+      <div className="NodeAPRs">
+        <section>
+          <p></p><h3>Minipool Details</h3>
+          {<MinipoolDetailGrid rows={(MinipoolDetails || [])} />}
+        </section>
+        <section>
+          <p></p><h3>Total Node Returns</h3>
+          {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
+        </section>
+        <section>
+          <p></p><h3>Total Node Operator Returns</h3>
+          {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
+        </section>
+        <section>
+          <p></p><h3>Total Protocol Returns</h3>
+          {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
+        </section>
+      </div>
+    );
   }
 }
 

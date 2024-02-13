@@ -12,15 +12,17 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "alchemy-sdk": "^3.1.2",
     "axios": "^1.6.7",
     "bottleneck": "^2.19.5",
-    "ethers": "^6.10.0",
+    "ethers": "^5.7.0",
     "mui": "^0.0.1",
     "node-irr": "^2.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-scripts": "5.0.1",
+    "wagmi": "^0.12.12",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

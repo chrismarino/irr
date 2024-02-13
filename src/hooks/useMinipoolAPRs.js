@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import getValidators from "../getValidators";
 import getPriceData from "../getPriceData";
 //import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
+//import getValidatorEvents from "../getValidatorEvents";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
 import _ from "lodash";
 let minipoolIndexArray = [];
@@ -23,14 +24,15 @@ function useMinipoolAPRs(nodeAddress, ethPriceNow) {
   const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState(false);
 
 
-  var validatorArray = []; // reset the validator array
-  var minipoolArray = []; // reset the minipool array
+
 
 
   useEffect(() => {
     async function fetchValidatorArray() {
       // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
       // stats for each validator. 
+      var validatorArray = []; // reset the validator array
+
       if (nodeAddress === "") return; //don't run if the node address is empty
       setMinipools([]); //reset the minipools
       setNodeAPRs([]); //reset the nodeAPRs
@@ -61,6 +63,7 @@ function useMinipoolAPRs(nodeAddress, ethPriceNow) {
 
   useEffect(() => {
     async function fetchRocketpoolValidatorStatsArray() {
+      var minipoolArray = []; // reset the minipool array
       if (gotValidators === true && gotRocketpoolDetails === false) { //only run if the validator array has run, but only once.
         try {
           minipoolArray = await getRocketpoolValidatorStats(minipools); //minipools includes an array of validator indexes
@@ -89,6 +92,9 @@ function useMinipoolAPRs(nodeAddress, ethPriceNow) {
       if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
       for (const index of minipools) {
         try {
+          // try to get the deposits and withdrawals events using Alchemy...
+          //const validatoryEvents = await getValidatorEvents(index.validatorIndex);
+          //console.log("validatory Events on:", index.index.validatorIndex, validatoryEvents);
           const oneIndex = await getValidatorStats(index.validatorIndex);
           allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.nodeDepositsAndWithdrawals); //response structure is different for deposits
           setDepositsAndWithdrawals(allDepositsAndWithdrawals);
