@@ -9,9 +9,9 @@ import useMinipoolEvents from '../hooks/useMinipoolEvents';
 function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
   const MinipoolDetails = useMinipoolDetails(nodeAddress);
-  //const MinipoolEvents = useMinipoolEvents(MinipoolDetails);
-  console.log("MinipoolDetails:", MinipoolDetails);
-  //console.log("MinipoolEvents:", MinipoolEvents);
+  const MinipoolEvents = useMinipoolEvents(MinipoolDetails);
+  console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
+  console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
   const [minipoolEvents, setMinipoolEvents] = useState([]);
   const [minipoolDetails, setMinipoolDetails] = useState([]);
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
@@ -25,21 +25,21 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
      async function fetchMinipoolDetails() {
        const details = await Promise.all(MinipoolDetails);
        setMinipoolDetails(details);
-       console.log("MinipoolDetails:", details);
+       //console.log("MinipoolDetails:", details);
      }
      fetchMinipoolDetails();
-   }, []);
+   }, [nodeAddress]);
 
-  // useEffect(() => {
-  //   async function fetchMinipoolEvents() {
-  //     if (MinipoolDetails.length > 0) {
-  //       const events = await Promise.all(MinipoolEvents);
-  //       setMinipoolEvents(events);
-  //       console.log("MinipoolEvents:", events);
-  //     }
-  //   }
-  //   fetchMinipoolEvents();
-  //}, []);  //Only fetch MinipoolEvents after MinipoolDetails are fetched
+   useEffect(() => {
+     async function fetchMinipoolEvents() {
+       if (MinipoolDetails.length > 0) {
+         const events = await Promise.all(MinipoolEvents);
+         setMinipoolEvents(events);
+         //console.log("MinipoolEvents:", events);
+       }
+     }
+     fetchMinipoolEvents();
+  }, [minipoolDetails]);  //Only fetch MinipoolEvents after MinipoolDetails are fetched
 
   if (nodeAddress === "") {
     return <div>Enter a node address and hit Enter...</div>;
