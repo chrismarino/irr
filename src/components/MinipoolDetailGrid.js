@@ -63,7 +63,7 @@ const APR_COLS = [
   },
 
 ];
-function APRGrid({ rows }) {
+function MinipoolDetailGrid({ rows }) {
   if (rows === undefined) {
     return <div>Loading...</div>;
   }
@@ -89,4 +89,4 @@ function APRGrid({ rows }) {
   );
 }
 
-export default APRGrid;
+export default MinipoolDetailGrid;
