@@ -30,7 +30,7 @@ function App() {
       <header className="App-header">
         <h1>Minipool APRs</h1>
         <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
-        <CurrentCoinPrices ethPriceNow={ethPriceNow} rplPriceNow={rplPriceNow} />
+        {/* <CurrentCoinPrices ethPriceNow={ethPriceNow} rplPriceNow={rplPriceNow} /> */}
         <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPriceNow} rplPriceNow={rplPriceNow} />
       </header>
     </div>

@@ -4,6 +4,9 @@ import _ from "lodash";
 import { ethers } from "ethers";
 import contracts from "../contracts";
 import { useQueries } from "react-query";
+import { useEffect, useState } from 'react';
+import RocketMinipoolDelegate from '../generated/contracts/RocketMinipoolDelegate.json'; // Replace with the path to your ABI
+//const [events, setEvents] = useState({ EtherWithdrawn: [], EtherDeposited: [] });
 
 export default function useMinipoolDetails(nodeAddress) {
   let { data: minipools } = useK.RocketMinipoolManager.Find.MinipoolCreated({
@@ -47,6 +50,33 @@ export default function useMinipoolDetails(nodeAddress) {
         );
         // Note: we don't Promise.all these reads to be gentler on the rate-limit.
         // TODO: issue a multi-read call instead.
+        // get the events for the minipool
+        const contract = new ethers.Contract(minipoolAddress, RocketMinipoolDelegate.abi, provider);
+        //const iface = new ethers.utils.Interface(contract.interface);
+        const filterWithdrawn = contract.filters.EtherWithdrawn(null, null);
+        const filterDeposited = contract.filters.EtherDeposited(null, null);
+        const etherWithdrawnEvents = await contract.queryFilter(filterWithdrawn);
+        const etherDepositedEvents = await contract.queryFilter(filterDeposited);
+        const decodedWithdrawnEvents = etherWithdrawnEvents.map(log => {
+          const { name, args } = mpDelegateInterface.parseLog(log);
+        
+          // Convert args
+          const amount = ethers.utils.formatUnits(args.amount, 'ether');
+          const timestamp = new Date(args.timestamp * 1000);
+        
+          return { name, amount, timestamp };
+        });
+        
+        const decodedDepositedEvents = etherDepositedEvents.map(log => {
+          const { name, args } = mpDelegateInterface.parseLog(log);
+        
+          // Convert args
+          const amount = ethers.utils.formatUnits(args.amount, 'ether');
+          const timestamp = new Date(args.timestamp * 1000);
+        
+          return { name, amount, timestamp };
+        });
+        // get the details for the minipool
         let isFinalized = await mp.getFinalised();
         let nodeRefundBalance = await mp.getNodeRefundBalance();
         let version = await mp.version();
@@ -70,6 +100,7 @@ export default function useMinipoolDetails(nodeAddress) {
         nodeBalance = nodeBalance.toHexString();
         protocolBalance = protocolBalance.toHexString();
         let upgraded = version > 2;
+
         return {
           minipoolAddress,
           balance,
@@ -81,6 +112,8 @@ export default function useMinipoolDetails(nodeAddress) {
           status,
           isFinalized,
           upgraded,
+          decodedWithdrawnEvents,
+          decodedDepositedEvents,
         };
       },
     }))
