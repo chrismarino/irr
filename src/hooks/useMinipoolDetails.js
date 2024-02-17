@@ -59,21 +59,18 @@ export default function useMinipoolDetails(nodeAddress) {
         const etherDepositedEvents = await contract.queryFilter(filterDeposited);
         const decodedWithdrawnEvents = etherWithdrawnEvents.map(log => {
           const { name, args } = mpDelegateInterface.parseLog(log);
-        
+
           // Convert args
-          const amount = ethers.utils.formatUnits(args.amount, 'ether');
+          const amount = args.amount;
           const timestamp = new Date(args.time * 1000);
-        
           return { name, amount, timestamp };
         });
-        
         const decodedDepositedEvents = etherDepositedEvents.map(log => {
           const { name, args } = mpDelegateInterface.parseLog(log);
-        
+
           // Convert args
-          const amount = ethers.utils.formatUnits(args.amount, 'ether');
-          const timestamp = new Date(args.time * 1000 );
-        
+          const amount = args.amount;
+          const timestamp = new Date(args.time * 1000);
           return { name, amount, timestamp };
         });
         // get the details for the minipool
@@ -100,16 +97,14 @@ export default function useMinipoolDetails(nodeAddress) {
         calculatedNodeShare = calculatedNodeShare.toHexString();
         nodeBalance = nodeBalance.toHexString();
         protocolBalance = protocolBalance.toHexString();
-        //let totalWithdrawals = _.sumBy(decodedWithdrawnEvents, 'amount');
-        //let totalDeposits = _.sumBy(decodedDepositedEvents, 'amount');
+        let displayTotalWithdrawals = _.sumBy(decodedWithdrawnEvents, event => Number(event.amount))/1E18;
+        let displayTotalDeposits = _.sumBy(decodedDepositedEvents, event => Number(event.amount))/1E18;
         let displayBalance = parseFloat(ethers.utils.formatEther(balance || 0)).toFixed(4);
         let displayNodeDepositBalance = parseFloat(ethers.utils.formatEther(nodeDepositBalance || 0)).toFixed(4);
         let displayNodeRefundBalance = parseFloat(ethers.utils.formatEther(nodeRefundBalance || 0)).toFixed(4);
         let displayCalculatedNodeShare = parseFloat(ethers.utils.formatEther(calculatedNodeShare || 0)).toFixed(4);
         let displayNodeBalance = parseFloat(ethers.utils.formatEther(nodeBalance || 0)).toFixed(4);
         let displayProtocolBalance = parseFloat(ethers.utils.formatEther(protocolBalance || 0)).toFixed(4);
-        //let displayTotalWithdrawals = parseFloat(ethers.utils.formatEther(totalWithdrawals || 0)).toFixed(4);
-        //let displayTotalDeposits = parseFloat(ethers.utils.formatEther(totalDeposits || 0)).toFixed(4);
         let upgraded = version > 2;
 
         return {
@@ -123,8 +118,8 @@ export default function useMinipoolDetails(nodeAddress) {
           status,
           isFinalized,
           upgraded,
-          //displayTotalDeposits,
-          //displayTotalWithdrawals,
+          displayTotalDeposits,
+          displayTotalWithdrawals,
         };
       },
     }))
