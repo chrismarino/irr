@@ -9,7 +9,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
   const MinipoolDetails = useMinipoolDetails(nodeAddress);
   var MinipoolEvents = []
-  console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
+  //console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
   const [minipoolEvents, setMinipoolEvents] = useState(null);
   const [minipoolDetails, setMinipoolDetails] = useState([]);

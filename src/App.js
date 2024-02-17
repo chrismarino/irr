@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 
 
 function App() {
-  const [nodeAddress, setNodeAddress] = useState("0x1829f19524429a2edaf07bd13d1e47af19643d9b");
+  const [nodeAddress, setNodeAddress] = useState("0x635d06a61a36566003d71428f1895e146cdbd54e");
   const { priceNow: ethPriceNow, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
   const { priceNow: rplPriceNow, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
 

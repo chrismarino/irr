@@ -2,8 +2,8 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 const APR_COLS = [
   {
-    field: "minipool",
-    headerName: "Minipool",
+    field: "minipoolIndex",
+    headerName: "Index",
     align: 'left', 
     flex: 2
   },
@@ -16,46 +16,46 @@ const APR_COLS = [
     flex: 2
   },
   {
-    field: "nodeDepositBalance",
-    headerName: "nodeDepositBalance",
+    field: "displayNodeDepositBalance",
+    headerName: "displayNodeDepositBalance",
     type: "number",
     align: 'center', 
     flex: 1
   },
 
   {
-    field: "nodeRefundBalance",
-    headerName: "nodeRefundBalance",
+    field: "displayNodeRefundBalance",
+    headerName: "displayNodeRefundBalance",
     type: "number",
     align: 'center', 
     flex: 3
 
   },
   {
-    field: "calculatedNodeShare",
-    headerName: "calculatedNodeShare",
+    field: "displayCalculatedNodeShare",
+    headerName: "displayCalculatedNodeShare",
     type: "number",
     align: 'right', 
     flex: 3
 
   },
   {
-    field: "nodeBalance",
-    headerName: "nodeBalance",
+    field: "displayNodeBalance",
+    headerName: "displayNodeBalance",
     align: 'center', 
-    flex: 2
+    flex: 4
   },
   {
-    field: "protocolBalance",
-    headerName: "protocolBalance",
+    field: "displayProtocolBalance",
+    headerName: "displayProtocolBalance",
     type: "number",
     align: 'right', 
     flex: 3
 
   },
   {
-    field: "balance",
-    headerName: "Balance",
+    field: "displayBalance",
+    headerName: "displayBalance",
     align: 'center', 
     type: "number",
     flex: 2
