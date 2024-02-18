@@ -25,7 +25,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
     async function fetchMinipoolDetails() {
       const details = await Promise.all(MinipoolDetails);
       setMinipoolDetails(details);
-      console.log("MinipoolDetails after set:", details);
+      //console.log("MinipoolDetails after set:", details);
     }
     fetchMinipoolDetails();
   }, [nodeAddress]);

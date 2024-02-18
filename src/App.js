@@ -38,15 +38,21 @@ function App() {
   //let nodeAddress3 = "0x20a3aba3c6851dd3b4f3c8cd73911cfb0a5e38a4";
   //let nodeAddress5 = "0xd9c2d5c041ad53b8b0d70968da88ecbf5e973cd3"; // more than 20 validators
 
+
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={
           <>
+            <NodePeriodicRewardsTable
+              sx={{ mb: 5, border: 0 }}
+              nodeAddress={nodeAddress}
+              header={"header"}
+            />
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
             <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
             <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
-            <NodePeriodicRewardsTable />
           </>
         } />
       </Routes>
