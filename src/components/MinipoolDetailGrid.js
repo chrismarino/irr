@@ -2,65 +2,67 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 const APR_COLS = [
   {
-    field: "minipoolIndex",
-    headerName: "Index",
-    align: 'left', 
-    flex: 2
+    field: "minipoolAddress",
+    headerName: "Address",
+    align: 'left',
+    flex: 1
   },
   {
     field: "status",
     headerName: "Status",
     type: "number",
     renderCell: (params) => (params.value ? 'Active' : 'Exited'),
-    align: 'center', 
-    flex: 2
+    align: 'center',
+    flex: 1
+  }, 
+  {
+    field: "displayBalance",
+    headerName: "Balance",
+    align: 'center',
+    type: "number",
+    flex: 3
+
   },
   {
-    field: "displayNodeDepositBalance",
-    headerName: "displayNodeDepositBalance",
+    field: "displayNodeBalance",
+    headerName: "Operators Balance",
+    align: 'center',
+    flex: 3
+  },
+  {
+    field: "displayProtocolBalance",
+    headerName: "Protocols Balance",
     type: "number",
-    align: 'center', 
+    align: 'right',
+    flex: 3
+
+  },
+  {
+    field: "displayTotalDeposits",
+    headerName: "Deposits",
+    type: "number",
+    align: 'center',
     flex: 1
   },
 
   {
-    field: "displayNodeRefundBalance",
-    headerName: "displayNodeRefundBalance",
+    field: "displayTotalWithdrawals",
+    headerName: "Withdrawals",
     type: "number",
-    align: 'center', 
-    flex: 3
+    align: 'center',
+    flex: 1
 
   },
   {
     field: "displayCalculatedNodeShare",
     headerName: "displayCalculatedNodeShare",
     type: "number",
-    align: 'right', 
-    flex: 3
+    align: 'right',
+    flex: 1
 
   },
-  {
-    field: "displayNodeBalance",
-    headerName: "displayNodeBalance",
-    align: 'center', 
-    flex: 4
-  },
-  {
-    field: "displayProtocolBalance",
-    headerName: "displayProtocolBalance",
-    type: "number",
-    align: 'right', 
-    flex: 3
 
-  },
-  {
-    field: "displayBalance",
-    headerName: "displayBalance",
-    align: 'center', 
-    type: "number",
-    flex: 2
 
-  },
 
 ];
 function MinipoolDetailGrid({ rows }) {

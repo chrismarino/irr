@@ -13,6 +13,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
   const [minipoolEvents, setMinipoolEvents] = useState(null);
   const [minipoolDetails, setMinipoolDetails] = useState([]);
+  const [minipoolRewards, setMinipoolRewards] = useState([]);
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
 
@@ -45,12 +46,9 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   } else {
     return (
       <div className="NodeAPRs">
-        {/* <section>
-          <p></p><h3>Minipool Events</h3>
-          {<MinipoolEventsGrid rows={(MinipoolEvents || [])} />}
-        </section> */}
         <section>
           <p></p><h3>Minipool Details</h3>
+
           {<MinipoolDetailGrid rows={(MinipoolDetails || [])} />}
         </section>
         <section>
