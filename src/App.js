@@ -17,9 +17,11 @@ function Router({ children }) {
 function App() {
 
   const { priceNow: ethPrice, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
-  const [ethPriceNow, setEthPriceNow] = useState(ethPrice);
+  //const [ethPriceNow, setEthPriceNow] = useState();
+  //setEthPriceNow(ethPrice);
   const { priceNow: rplPrice, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
-  const [rplPriceNow, setRplPriceNow] = useState(rplPrice);
+  //const [rplPriceNow, setRplPriceNow] = useState();
+  //setRplPriceNow(rplPrice);
   const [nodeAddress, setNodeAddress] = useState("0x635d06a61a36566003d71428f1895e146cdbd54e");
 
 
@@ -42,7 +44,8 @@ function App() {
         <Route path="/" element={
           <>
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
-            <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPriceNow} rplPriceNowplPriceNow={rplPriceNow} />
+            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+            <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
             <NodePeriodicRewardsTable />
           </>
         } />
