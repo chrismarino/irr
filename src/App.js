@@ -44,16 +44,17 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>Minipool APRs</h1>
+            <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
+            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
             <NodePeriodicRewardsTable
               sx={{ mb: 5, border: 0 }}
               nodeAddress={nodeAddress}
               header={"header"}
             />
-            <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
-            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
             <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
-          </>
+          </div>
         } />
       </Routes>
     </Router>

@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 function CurrentCoinPrices({ ethPriceNow, rplPriceNow }) {
   const rows = [
     { id: 1, coin: 'Ethereum', price: (ethPriceNow[0].price_usd || 0)},
-    { id: 2, coin: 'Rocketpool', price: (ethPriceNow[0].price_usd || 0)},
+    { id: 2, coin: 'Rocketpool', price: (rplPriceNow[0].price_usd || 0)},
   ];
 
   const columns = [
