@@ -5,8 +5,6 @@ import { ethers } from "ethers";
 import contracts from "../contracts";
 import { useQueries } from "react-query";
 import { useEffect, useState } from 'react';
-import RocketMinipoolDelegate from '../generated/contracts/RocketMinipoolDelegate.json'; // Replace with the path to your ABI
-//const [events, setEvents] = useState({ EtherWithdrawn: [], EtherDeposited: [] });
 
 export default function useMinipoolDetails(nodeAddress) {
   let { data: minipools } = useK.RocketMinipoolManager.Find.MinipoolCreated({
@@ -51,12 +49,10 @@ export default function useMinipoolDetails(nodeAddress) {
         // Note: we don't Promise.all these reads to be gentler on the rate-limit.
         // TODO: issue a multi-read call instead.
         // get the events for the minipool
-        const contract = new ethers.Contract(minipoolAddress, RocketMinipoolDelegate.abi, provider);
-        //const iface = new ethers.utils.Interface(contract.interface);
-        const filterWithdrawn = contract.filters.EtherWithdrawn(null, null);
-        const filterDeposited = contract.filters.EtherDeposited(null, null);
-        const etherWithdrawnEvents = await contract.queryFilter(filterWithdrawn);
-        const etherDepositedEvents = await contract.queryFilter(filterDeposited);
+        const filterWithdrawn = mp.filters.EtherWithdrawn(null, null);
+        const filterDeposited = mp.filters.EtherDeposited(null, null);
+        const etherWithdrawnEvents = await mp.queryFilter(filterWithdrawn);
+        const etherDepositedEvents = await mp.queryFilter(filterDeposited);
         const decodedWithdrawnEvents = etherWithdrawnEvents.map(log => {
           const { name, args } = mpDelegateInterface.parseLog(log);
 
