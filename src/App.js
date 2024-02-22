@@ -4,6 +4,7 @@ import './App.css';
 import NodeAPRs from "./components/NodeAPRs";
 import NodeAddressForm from "./components/NodeAddressForm";
 import NodePeriodicRewardsTable from "./components/NodePeriodicRewardsTable";
+import NodePerformanceTable from "./components/NodePerformanceTable";
 import CurrentCoinPrices from './components/CurrentCoinPrices';
 import usePriceNow from './hooks/usePriceNow';
 import { useState, useEffect, useRef } from 'react';
@@ -49,6 +50,19 @@ function App() {
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
             <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
             <NodePeriodicRewardsTable
+              sx={{ mb: 5, border: 0 }}
+              nodeAddress={nodeAddress}
+              header={"header"}
+            />
+            <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+          </div>
+        } />
+                <Route path="/performance" element={
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>Minipool APRs</h1>
+            <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
+            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+            <NodePerformanceTable
               sx={{ mb: 5, border: 0 }}
               nodeAddress={nodeAddress}
               header={"header"}
