@@ -61,7 +61,7 @@ export default function useNodeDetails(nodeAddress) {
     nodeInterface,
     provider?.signer || provider
   );
-  
+
   useEffect(() => {
 
     const fetchNodeDetails = async () => {
@@ -71,8 +71,13 @@ export default function useNodeDetails(nodeAddress) {
 
     fetchNodeDetails();
   }, [nodeAddress]);
-  
+return  nodeDetails
 
-  return  nodeDetails
-  
+  // if(!nodeDetails) return [
+  //   { name: 'balanceRPL', value: (nodeDetails.balanceRPL || 0)},
+  //   { name: 'balanceETH', value: (nodeDetails.balanceETH  || 0)},
+  //   { name: 'effectiveRPLStake', value: (nodeDetails.effectiveRPLStake || 0) },
+  //   { name: 'rplStake', value: (nodeDetails.rplStake  || 0)},
+  // ];
+
 }

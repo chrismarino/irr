@@ -19,7 +19,10 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
   const nodeDetails = useNodeDetails(nodeAddress);
-  console.log("NodeDetails after set:", nodeDetails);
+  console.log("registrationTime:", (nodeDetails.registrationTime || 0));
+  console.log("Eth Balance:", (nodeDetails.balanceETH || 0));
+  console.log("RPL Balance:", (nodeDetails.balanceRPL || 0));
+  console.log("effectiveRPLStake:", (nodeDetails.effectiveRPLStake || 0));
   
   useEffect(() => {
     setPrevNodeAddress(nodeAddress);
