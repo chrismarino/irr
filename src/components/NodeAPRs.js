@@ -4,10 +4,12 @@ import MinipoolDetailGrid from "./MinipoolDetailGrid";
 import MinipoolEventsGrid from "./MinipoolEventsGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import useMinipoolDetails from '../hooks/useMinipoolDetails';
+import useNodeDetails from '../hooks/useNodeDetails';
 
 function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
   const MinipoolDetails = useMinipoolDetails(nodeAddress);
+  const NodeDetails = useNodeDetails(nodeAddress);
   var MinipoolEvents = []
   //console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
@@ -16,16 +18,20 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const [minipoolRewards, setMinipoolRewards] = useState([]);
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
-
+  const nodeDetails = useNodeDetails(nodeAddress);
+  console.log("NodeDetails after set:", nodeDetails);
+  
   useEffect(() => {
     setPrevNodeAddress(nodeAddress);
   }, [nodeAddress]);
 
   useEffect(() => {
     async function fetchMinipoolDetails() {
-      const details = await Promise.all(MinipoolDetails);
-      setMinipoolDetails(details);
-      //console.log("MinipoolDetails after set:", details);
+      const mpDetails = await Promise.all(MinipoolDetails);
+      setMinipoolDetails(mpDetails);
+
+      console.log("MinipoolDetails after set:", minipoolDetails);
+
     }
     fetchMinipoolDetails();
   }, [nodeAddress]);
