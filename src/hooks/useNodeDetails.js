@@ -10,31 +10,31 @@ import RocketNodeManager from '../generated/contracts/RocketNodeManager.json';
 // A React hook that finds the Creation Event for each minipool on a Node and also fetches the 
 // details of a node. Returns an array of minipool addresses and the node details
 // struct NodeDetails {
-//     bool exists;
-//     uint256 registrationTime;
-//     string timezoneLocation;
-//     bool feeDistributorInitialised;
-//     address feeDistributorAddress;
-//     uint256 rewardNetwork;
-//     uint256 rplStake;
-//     uint256 effectiveRPLStake;
-//     uint256 minimumRPLStake;
-//     uint256 maximumRPLStake;
-//     uint256 ethMatched;
-//     uint256 ethMatchedLimit;
-//     uint256 minipoolCount;
-//     uint256 balanceETH;
-//     uint256 balanceRETH;
-//     uint256 balanceRPL;
-//     uint256 balanceOldRPL;
-//     uint256 depositCreditBalance;
-//     uint256 distributorBalanceUserETH;
-//     uint256 distributorBalanceNodeETH;
-//     address withdrawalAddress;
-//     address pendingWithdrawalAddress;
-//     bool smoothingPoolRegistrationState;
-//     uint256 smoothingPoolRegistrationChanged;
-//     address nodeAddress;
+//     bool* exists;
+//     uint256* registrationTime;
+//     string* timezoneLocation;
+//     bool* feeDistributorInitialised;
+//     address* feeDistributorAddress;
+//     uint256* rewardNetwork;
+//     uint256* rplStake;
+//     uint256* effectiveRPLStake;
+//     uint256* minimumRPLStake;
+//     uint256* maximumRPLStake;
+//     uint256* ethMatched;
+//     uint256* ethMatchedLimit;
+//     uint256* minipoolCount;
+//     uint256* balanceETH;
+//     uint256* balanceRETH;
+//     uint256* balanceRPL;
+//     uint256* balanceOldRPL;
+//     uint256* depositCreditBalance;
+//     uint256* distributorBalanceUserETH;
+//     uint256* distributorBalanceNodeETH;
+//     address* withdrawalAddress;
+//     address* pendingWithdrawalAddress;
+//     bool* smoothingPoolRegistrationState;
+//     uint256* smoothingPoolRegistrationChanged;
+//     address* nodeAddress;
 // }
 
 
@@ -56,6 +56,8 @@ export default function useNodeDetails(nodeAddress) {
   let nodeInterface = new ethers.utils.Interface(
     contracts.RocketNodeManager.abi
   );
+
+  // Create a new contract instance for the node. Uses the Nodemanager Contract Address, not the node address.
   const node = new ethers.Contract(
     contracts.RocketNodeManager.address,
     nodeInterface,
@@ -71,13 +73,16 @@ export default function useNodeDetails(nodeAddress) {
 
     fetchNodeDetails();
   }, [nodeAddress]);
-return  nodeDetails
-
-  // if(!nodeDetails) return [
-  //   { name: 'balanceRPL', value: (nodeDetails.balanceRPL || 0)},
-  //   { name: 'balanceETH', value: (nodeDetails.balanceETH  || 0)},
-  //   { name: 'effectiveRPLStake', value: (nodeDetails.effectiveRPLStake || 0) },
-  //   { name: 'rplStake', value: (nodeDetails.rplStake  || 0)},
-  // ];
-
+  if (!nodeDetails) {
+    return { isLoading: true };
+  } else {
+    return {
+      balanceRPL: nodeDetails.balanceRPL,
+      balanceETH: nodeDetails.balanceETH,
+      effectiveRPLStake: nodeDetails.effectiveRPLStake,
+      rplStake: nodeDetails.rplStake,
+    }
+  };
 }
+
+
