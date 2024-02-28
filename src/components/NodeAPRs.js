@@ -27,6 +27,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   console.log("Eth Balance:", nodeDetails.balanceETH);
   console.log("RPL Balance:", nodeDetails.balanceRPL);
   console.log("effectiveRPLStake:", nodeDetails.effectiveRPLStake);
+  console.log("ethMatched:", nodeDetails.ethMatched);
   }
   
   useEffect(() => {

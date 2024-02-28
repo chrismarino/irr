@@ -77,12 +77,15 @@ export default function useNodeDetails(nodeAddress) {
     return { isLoading: true };
   } else {
     return {
-      balanceRPL: nodeDetails.balanceRPL,
-      balanceETH: nodeDetails.balanceETH,
-      effectiveRPLStake: nodeDetails.effectiveRPLStake,
-      rplStake: nodeDetails.rplStake,
+      balanceRPL: parseFloat(ethers.utils.formatEther(nodeDetails.balanceRPL || 0)).toFixed(4),
+      balanceETH: parseFloat(ethers.utils.formatEther(nodeDetails.balanceETH || 0)).toFixed(4),
+      effectiveRPLStake: parseFloat(ethers.utils.formatEther(nodeDetails.effectiveRPLStake || 0)).toFixed(4),
+      rplStake: parseFloat(ethers.utils.formatEther(nodeDetails.rplStake || 0)).toFixed(4),
+      ethMatched: parseFloat(ethers.utils.formatEther(nodeDetails.ethMatched || 0)).toFixed(4),
     }
   };
 }
+
+
 
 

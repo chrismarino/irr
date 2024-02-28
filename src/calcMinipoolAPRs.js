@@ -73,7 +73,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
       console.log("Error in getPriceData gettimg ethPriceHistor:", error);
     }
     let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
-
+// totalEthEarned can be found directly from 'nodeBalance' in minipooldetails this _.sumBy not needed.
     // Total fiat deposited is amount deposited * price of eth at the time of deposit
     let totalNOFiatDeposited = totalNOEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the node operator
     let totalProtocolFiatDeposited = totalProtocolEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the protocol
