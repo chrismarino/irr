@@ -5,11 +5,13 @@ import MinipoolEventsGrid from "./MinipoolEventsGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import useMinipoolDetails from '../hooks/useMinipoolDetails';
 import useNodeDetails from '../hooks/useNodeDetails';
+import useNodeDeposits from '../hooks/useNodeDeposits';
 
 function NodeAPRs({ nodeAddress, ethPriceNow }) {
   const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
   const MinipoolDetails = useMinipoolDetails(nodeAddress);
   const NodeDetails = useNodeDetails(nodeAddress);
+  const NodeDeposits = useNodeDeposits(nodeAddress);
   var MinipoolEvents = []
   //console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
@@ -28,6 +30,14 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   console.log("RPL Balance:", nodeDetails.balanceRPL);
   console.log("effectiveRPLStake:", nodeDetails.effectiveRPLStake);
   console.log("ethMatched:", nodeDetails.ethMatched);
+  }
+
+  const nodeDeposits = useNodeDeposits(nodeAddress);
+  if (nodeDeposits.isLoading) {
+    // The data is still loading
+    console.log('Data is loading...');
+  } else {
+  console.log("nodeDeposits:", nodeDeposits);
   }
   
   useEffect(() => {
