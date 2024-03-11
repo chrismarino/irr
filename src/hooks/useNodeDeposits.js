@@ -11,7 +11,8 @@ import RocketNodeDeposit from '../generated/contracts/RocketNodeDeposit.json';
 // Returns an object with the following properties:{
 //     isLoading: boolean;
 // }
-
+// Not sure I need this, or can use it. I think the events are the deposit events from the deposit pool to the minipool
+// contract. Not deposits to the node wallet.
 
 export default function useNodeDeposits(nodeAddress) {
   const [nodeDeposits, setNodeDeposits] = useState(null);

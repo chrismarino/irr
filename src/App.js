@@ -57,7 +57,7 @@ function App() {
             <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
           </div>
         } />
-                <Route path="/performance" element={
+        <Route path="/performance" element={
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h1>Minipool APRs</h1>
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />

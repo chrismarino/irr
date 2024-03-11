@@ -1,60 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
+import _ from "lodash";
 import MinipoolDetailGrid from "./MinipoolDetailGrid";
-import MinipoolEventsGrid from "./MinipoolEventsGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import useMinipoolDetails from '../hooks/useMinipoolDetails';
 import useNodeDetails from '../hooks/useNodeDetails';
 import useNodeDeposits from '../hooks/useNodeDeposits';
 
 function NodeAPRs({ nodeAddress, ethPriceNow }) {
-  const { nodeAPRs } = useMinipoolAPRs(nodeAddress, ethPriceNow);
-  const MinipoolDetails = useMinipoolDetails(nodeAddress);
-  const NodeDetails = useNodeDetails(nodeAddress);
-  const NodeDeposits = useNodeDeposits(nodeAddress);
+
+
   var MinipoolEvents = []
   //console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
   const [minipoolEvents, setMinipoolEvents] = useState(null);
   const [minipoolDetails, setMinipoolDetails] = useState([]);
+  const [gotMinipoolDetails, setGotMinipoolDetails] = useState(false);
   const [minipoolRewards, setMinipoolRewards] = useState([]);
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
   const nodeDetails = useNodeDetails(nodeAddress);
   if (nodeDetails.isLoading) {
     // The data is still loading
-    console.log('Data is loading...');
+    //console.log('Data is loading...');
   } else {
-  console.log("registrationTime:", nodeDetails.registrationTime);
-  console.log("Eth Balance:", nodeDetails.balanceETH);
-  console.log("RPL Balance:", nodeDetails.balanceRPL);
-  console.log("effectiveRPLStake:", nodeDetails.effectiveRPLStake);
-  console.log("ethMatched:", nodeDetails.ethMatched);
+    //console.log("registrationTime:", nodeDetails.registrationTime);
+    //console.log("Eth Balance:", nodeDetails.balanceETH);
+    //console.log("RPL Balance:", nodeDetails.balanceRPL);
+    //console.log("effectiveRPLStake:", nodeDetails.effectiveRPLStake);
+    //console.log("ethMatched:", nodeDetails.ethMatched);
   }
 
   const nodeDeposits = useNodeDeposits(nodeAddress);
   if (nodeDeposits.isLoading) {
     // The data is still loading
-    console.log('Data is loading...');
+    //console.log('Data is loading...');
   } else {
-  console.log("nodeDeposits:", nodeDeposits);
+    //console.log("nodeDeposits:", nodeDeposits);
   }
-  
+
   useEffect(() => {
     setPrevNodeAddress(nodeAddress);
   }, [nodeAddress]);
 
+  let MinipoolDetails = useMinipoolDetails(nodeAddress);
+  const stringifiedMinipoolDetails = JSON.stringify(MinipoolDetails);
   useEffect(() => {
     async function fetchMinipoolDetails() {
-      const mpDetails = await Promise.all(MinipoolDetails);
-      setMinipoolDetails(mpDetails);
-
-      console.log("MinipoolDetails after set:", minipoolDetails);
-
+      //if (gotMinipoolDetails) {
+      //  return;
+      //}
+      let newMpDetails = await Promise.all(MinipoolDetails);
+      if (MinipoolDetails.every(element => !element.isLoading)) {
+        setMinipoolDetails(newMpDetails);
+        //setGotMinipoolDetails(true);
+        console.log("Node Address", nodeAddress, "MinipoolDetails after set:", newMpDetails);
+      }
     }
     fetchMinipoolDetails();
-  }, [nodeAddress]);
+  }, [stringifiedMinipoolDetails]); // will this work?
 
+  const { nodeAPRs } = useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow);
   if (nodeAddress === "") {
     return <div>Enter a node address and hit Enter...</div>;
   }

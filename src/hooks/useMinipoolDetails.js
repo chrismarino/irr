@@ -4,8 +4,15 @@ import _ from "lodash";
 import { ethers } from "ethers";
 import contracts from "../contracts";
 import { useQueries } from "react-query";
+import getPriceOnDate from '../getPriceOnDate';
 import { useEffect, useState } from 'react';
 
+// Need to throttle the requests to coingecko
+const Bottleneck = require('bottleneck');
+// Create a new limiter that allows 1 request per second
+const limiter = new Bottleneck({
+  minTime: 250, // 1 request per 1000ms
+})
 export default function useMinipoolDetails(nodeAddress) {
   let { data: minipools } = useK.RocketMinipoolManager.Find.MinipoolCreated({
     args: [null, nodeAddress],
@@ -53,22 +60,30 @@ export default function useMinipoolDetails(nodeAddress) {
         const filterDeposited = mp.filters.EtherDeposited(null, null);
         const etherWithdrawnEvents = await mp.queryFilter(filterWithdrawn);
         const etherDepositedEvents = await mp.queryFilter(filterDeposited);
-        const decodedWithdrawnEvents = etherWithdrawnEvents.map(log => {
+        const withdrawals = await Promise.all(etherWithdrawnEvents.map(async (log) => {
           const { name, args } = mpDelegateInterface.parseLog(log);
 
           // Convert args
-          const amount = args.amount;
-          const timestamp = new Date(args.time * 1000);
-          return { name, amount, timestamp };
-        });
-        const decodedDepositedEvents = etherDepositedEvents.map(log => {
+          const amount = Number(args.amount)/1E18;
+          let date = new Date(args.time * 1000);
+          date = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+          // Need YYYY-MM-DD format for getPriceOnDate
+          let price_usd = await limiter.schedule(() => getPriceOnDate(date, "ethereum"));
+          //let price_usd = await getPriceOnDate(date, "ethereum");
+          return { name, date, amount, price_usd };
+        }));
+        const deposits = await Promise.all(etherDepositedEvents.map(async (log) => {
           const { name, args } = mpDelegateInterface.parseLog(log);
 
           // Convert args
-          const amount = args.amount;
-          const timestamp = new Date(args.time * 1000);
-          return { name, amount, timestamp };
-        });
+          const amount = Number(args.amount)/1E18;
+          let date = new Date(args.time * 1000);
+          date = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+          // Need YYYY-MM-DD format for getPriceOnDate
+          let price_usd = await limiter.schedule(() => getPriceOnDate(date, "ethereum"));
+          //let price_usd = await getPriceOnDate(date, "ethereum");
+          return { name, date, amount, price_usd };
+        }));
         // get the details for the minipool
         let isFinalized = await mp.getFinalised();
         let nodeRefundBalance = await mp.getNodeRefundBalance();
@@ -76,9 +91,9 @@ export default function useMinipoolDetails(nodeAddress) {
         let status = await mp.getStatus();
         //let minipoolIndex = await mp._index;
         let nodeDepositBalance = await mp.getNodeDepositBalance();
-        let balance = await provider.getBalance(minipoolAddress);
+        let mpBalance = await provider.getBalance(minipoolAddress);
 
-        let balanceLessRefund = balance.sub(nodeRefundBalance);
+        let balanceLessRefund = mpBalance.sub(nodeRefundBalance);
         let calculatedNodeShare = ethers.constants.Zero;
         if (balanceLessRefund.gt(ethers.constants.Zero)) {
           calculatedNodeShare = await mp.calculateNodeShare(balanceLessRefund);
@@ -86,36 +101,40 @@ export default function useMinipoolDetails(nodeAddress) {
         let nodeBalance = ethers.BigNumber.from(nodeRefundBalance || "0").add(
           ethers.BigNumber.from(calculatedNodeShare || "0")
         );
-        let protocolBalance = balance.sub(nodeBalance);
-        balance = balance.toHexString();
+        let protocolBalance = mpBalance.sub(nodeBalance);
+        mpBalance = mpBalance.toHexString();
         nodeDepositBalance = nodeDepositBalance.toHexString();
         nodeRefundBalance = nodeRefundBalance.toHexString();
         calculatedNodeShare = calculatedNodeShare.toHexString();
         nodeBalance = nodeBalance.toHexString();
         protocolBalance = protocolBalance.toHexString();
-        let displayTotalWithdrawals = _.sumBy(decodedWithdrawnEvents, event => Number(event.amount))/1E18;
-        let displayTotalDeposits = _.sumBy(decodedDepositedEvents, event => Number(event.amount))/1E18;
-        let displayBalance = parseFloat(ethers.utils.formatEther(balance || 0)).toFixed(4);
-        let displayNodeDepositBalance = parseFloat(ethers.utils.formatEther(nodeDepositBalance || 0)).toFixed(4);
-        let displayNodeRefundBalance = parseFloat(ethers.utils.formatEther(nodeRefundBalance || 0)).toFixed(4);
-        let displayCalculatedNodeShare = parseFloat(ethers.utils.formatEther(calculatedNodeShare || 0)).toFixed(4);
-        let displayNodeBalance = parseFloat(ethers.utils.formatEther(nodeBalance || 0)).toFixed(4);
-        let displayProtocolBalance = parseFloat(ethers.utils.formatEther(protocolBalance || 0)).toFixed(4);
+        let totalWithdrawals = _.sumBy(withdrawals, 'amount');
+        let totalDeposits = _.sumBy(deposits, 'amount');
+        //console.log("minipool", minipoolAddress, "withdrawals", withdrawals, "deposits", deposits);
+// parse the events so we can display them in the UI
+        mpBalance = parseFloat(ethers.utils.formatEther(mpBalance || 0)).toFixed(6);
+        nodeDepositBalance = parseFloat(ethers.utils.formatEther(nodeDepositBalance || 0)).toFixed(6);
+        nodeRefundBalance = parseFloat(ethers.utils.formatEther(nodeRefundBalance || 0)).toFixed(6);
+        calculatedNodeShare = parseFloat(ethers.utils.formatEther(calculatedNodeShare || 0)).toFixed(6);
+        nodeBalance = parseFloat(ethers.utils.formatEther(nodeBalance || 0)).toFixed(6);
+        protocolBalance = parseFloat(ethers.utils.formatEther(protocolBalance || 0)).toFixed(6);
         let upgraded = version > 2;
 
         return {
           minipoolAddress,
-          displayBalance,
-          displayNodeDepositBalance,
-          displayNodeRefundBalance,
-          displayCalculatedNodeShare,
-          displayNodeBalance,
-          displayProtocolBalance,
+          mpBalance,
+          nodeDepositBalance,
+          nodeRefundBalance,
+          calculatedNodeShare,
+          nodeBalance,
+          protocolBalance,
           status,
           isFinalized,
           upgraded,
-          displayTotalDeposits,
-          displayTotalWithdrawals,
+          deposits,
+          totalDeposits,
+          withdrawals,
+          totalWithdrawals,
         };
       },
     }))
