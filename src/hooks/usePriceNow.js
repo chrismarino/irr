@@ -1,4 +1,4 @@
-import getPriceData from "../getPriceData";
+import getPriceOnDate from "../getPriceOnDate";
 import { useEffect, useState } from 'react';
 export default function usePriceNow(coinID) {
     const [gotEthPriceNow, setGotEthPriceNow] = useState(false);
@@ -16,8 +16,9 @@ export default function usePriceNow(coinID) {
             let today = new Date();
             let formattedDate = today.toISOString().split('T')[0];
             //date must be in the format of YYYY-MM-DD for getPriceData
-            let dateArray = [formattedDate];
-            const priceNow = await getPriceData(dateArray, coinID); //fetch the price of eth. No date returns the current price.
+            //let dateArray = [formattedDate];
+            const priceNow = await getPriceOnDate(formattedDate, coinID); //fetch the price of eth. No date returns the current price.
+            //const priceNow = 0
             if (coinID === "ethereum") {
                 setEthPriceNow(priceNow);
                 setGotEthPriceNow(true);

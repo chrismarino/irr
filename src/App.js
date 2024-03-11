@@ -1,16 +1,30 @@
+import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
 import React from "react";
 import './App.css';
 import NodeAPRs from "./components/NodeAPRs";
 import NodeAddressForm from "./components/NodeAddressForm";
+import NodePeriodicRewardsTable from "./components/NodePeriodicRewardsTable";
+import NodePerformanceTable from "./components/NodePerformanceTable";
 import CurrentCoinPrices from './components/CurrentCoinPrices';
 import usePriceNow from './hooks/usePriceNow';
 import { useState, useEffect, useRef } from 'react';
 
-
+function Router({ children }) {
+  if (process.env.REACT_APP_ROUTER === "hash") {
+    return <HashRouter>{children}</HashRouter>;
+  }
+  return <BrowserRouter>{children}</BrowserRouter>;
+}
 function App() {
-  const [nodeAddress, setNodeAddress] = useState("");
-  const { priceNow: ethPriceNow, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
-  const { priceNow: rplPriceNow, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
+
+  const { priceNow: ethPrice, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
+  //const [ethPriceNow, setEthPriceNow] = useState();
+  //setEthPriceNow(ethPrice);
+  const { priceNow: rplPrice, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
+  //const [rplPriceNow, setRplPriceNow] = useState();
+  //setRplPriceNow(rplPrice);
+  const [nodeAddress, setNodeAddress] = useState("0x635d06a61a36566003d71428f1895e146cdbd54e");
+
 
   if (!gotEthPriceNow || !gotRplPriceNow) {
     return <div>Loading current Eth and RPL prices...</div>;
@@ -25,15 +39,39 @@ function App() {
   //let nodeAddress3 = "0x20a3aba3c6851dd3b4f3c8cd73911cfb0a5e38a4";
   //let nodeAddress5 = "0xd9c2d5c041ad53b8b0d70968da88ecbf5e973cd3"; // more than 20 validators
 
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Minipool APRs</h1>
-        <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
-        <CurrentCoinPrices ethPriceNow={ethPriceNow} rplPriceNow={rplPriceNow} />
-        <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPriceNow} rplPriceNow={rplPriceNow} />
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>Minipool APRs</h1>
+            <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
+            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+            <NodePeriodicRewardsTable
+              sx={{ mb: 5, border: 0 }}
+              nodeAddress={nodeAddress}
+              header={"header"}
+            />
+            <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+          </div>
+        } />
+        <Route path="/performance" element={
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>Minipool APRs</h1>
+            <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
+            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+            <NodePerformanceTable
+              sx={{ mb: 5, border: 0 }}
+              nodeAddress={nodeAddress}
+              header={"header"}
+            />
+            <NodeAPRs nodeAddress={nodeAddress} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+          </div>
+        } />
+      </Routes>
+    </Router>
   );
 }
 

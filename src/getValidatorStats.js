@@ -14,7 +14,7 @@ export default async function getValidatorStats(validatorIndex) {
   try {
     let payouts = [];
     payouts = await axios(statsUrl);
-    var nodeDepositsAndWithdrawals = payouts.data.data.map(item => ({
+    var mpDepositsAndWithdrawals = payouts.data.data.map(item => ({
       day: item.day, // The day in the life of the chain
       date: item.day_start, // day of the deposit or withdrawl. Don't reformat this date needed as Date later
       deposits: item.deposits,
@@ -25,7 +25,7 @@ export default async function getValidatorStats(validatorIndex) {
       status: true
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Set the minipool status to false if the minipool has exited. Do this before another async call.
-    nodeDepositsAndWithdrawals = nodeDepositsAndWithdrawals.map(item => {
+    mpDepositsAndWithdrawals = mpDepositsAndWithdrawals.map(item => {
       if (item.withdrawals_amount === 32000000000) {
         status = false; // set the status for this minipool to false
         return { ...item, status: false }; //set it in the data array as well.
@@ -34,10 +34,10 @@ export default async function getValidatorStats(validatorIndex) {
       }
     });
     // Create an array of deposit dates so we can look up the eth price at the time of the deposit
-    let depositDays = await Promise.all(nodeDepositsAndWithdrawals.filter(item => item.deposits_amount > 0));
+    let depositDays = await Promise.all(mpDepositsAndWithdrawals.filter(item => item.deposits_amount > 0));
     depositDaysArray.push(depositDays.date);
     //console.log("Node Deposits and Withdrawals dates:", depositDaysArray);
-    return { nodeDepositsAndWithdrawals, depositDaysArray, status };
+    return { mpDepositsAndWithdrawals, depositDaysArray, status };
   } catch (error) {
     console.log("Axios Error on Deposit Fetch:", error);
   }

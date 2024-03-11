@@ -1,7 +1,7 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, ethPriceToday, ethPriceHistory) {
+export default function calcMinipoolAPRs(minipools, minpipoolDetails, mpDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -16,7 +16,7 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   //var minipools = minipools;
 
   //combine the despots and withdrawls into a single array for the IRR calculation
-  totalArray = formatArray(nodeDepositsAndWithdrawals);
+  totalArray = formatArray(mpDepositsAndWithdrawals);
   //totalArray.sort() //make sure they are sorted by date
   totalArray = _.sortBy(totalArray, function (item) {
     return new Date(item.date);
@@ -30,7 +30,8 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
   var nodeOperatorAPR = [];
   var protocolAPR = [];
   //console.log("ethPriceToday from calc minipools:", ethPriceToday);
-  const ethPriceNow = ethPriceToday[0].price_usd; // ethPriceToday is an array of objects with a single object.
+  //const ethPriceNow = (ethPriceToday[0].price_usd  || 0); // ethPriceToday is an array of objects with a single object.
+  const ethPriceNow = 0; //
   uniqueValidatorIndexes.forEach(minipool => {
     const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
     // console.log("Filtered Array:", filteredArray);
@@ -63,20 +64,13 @@ export default function calcMinipoolAPRs(minipools, nodeDepositsAndWithdrawals, 
     totalProtocolEthDeposited = (totalProtocolEthDeposited / 1E18)
     totalEthDeposited = (totalEthDeposited / 1E18)
 
-    // Get the historical price of eth on the days of deposits and withdrawals.
-    //console.log("ethPriceHistory:", ethPriceHistory);
-    try {
-      var ethDepositPrice = ethPriceHistory.find(item => item.date === startDateString);
-      var ethWithdrawalPrice = ethPriceHistory.find(item => item.date === endDateString);
-    }
-    catch (error) {
-      console.log("Error in getPriceData gettimg ethPriceHistor:", error);
-    }
     let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
-
+// totalEthEarned can be found directly from 'nodeBalance' in minipooldetails this _.sumBy not needed.
     // Total fiat deposited is amount deposited * price of eth at the time of deposit
-    let totalNOFiatDeposited = totalNOEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the node operator
-    let totalProtocolFiatDeposited = totalProtocolEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the protocol
+    //let totalNOFiatDeposited = totalNOEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the node operator
+    //let totalProtocolFiatDeposited = totalProtocolEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the protocol
+    let totalNOFiatDeposited = 0;
+    let totalProtocolFiatDeposited = 0;
     let totalFiatDeposited = totalProtocolFiatDeposited + totalNOFiatDeposited; //total fiat deposited
     if (totalEthEarned < 0) { totalEthEarned = totalEthEarned + 32000000000 } //back out the 32 eth deposit
     totalEthEarned = (totalEthEarned / 1000000000)

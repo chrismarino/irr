@@ -25,9 +25,11 @@ export default async function getPriceData(dateArray, coinID) {
       let date = item
       let price_usd = payouts.data.market_data.current_price.usd;
       return { date, price_usd };
-
     } catch (error) {
+      let date = "error";
+      let price_usd = 0;
       console.log("Error setting the historical price:", error);
+      return { date, price_usd };
     }
   }); // end of map
   try {
