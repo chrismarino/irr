@@ -45,7 +45,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 1200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h1>Minipool APRs</h1>
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
             <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />

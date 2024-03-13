@@ -5,65 +5,58 @@ const APR_COLS = [
     field: "minipoolAddress",
     headerName: "Address",
     align: 'left',
-    flex: 1
+    headerAlign: 'center',
+    flex: 2,
   },
   {
     field: "status",
     headerName: "Status",
     type: "number",
     renderCell: (params) => (params.value ? 'Active' : 'Exited'),
+    headerAlign: 'center',
     align: 'center',
-    flex: 1
-  }, 
-  {
-    field: "displayBalance",
-    headerName: "Balance",
-    align: 'center',
-    type: "number",
-    flex: 3
-
+    flex: 1,
   },
   {
-    field: "displayNodeBalance",
+    field: "mpBalance",
+    headerName: "MP Balance",
+    align: 'center',
+    headerAlign: 'center',
+    type: "number",
+    flex: 2,
+  },
+  {
+    field: "nodeBalance",
     headerName: "Operators Balance",
     align: 'center',
-    flex: 3
+    headerAlign: 'center',
+    flex: 2,
   },
   {
-    field: "displayProtocolBalance",
-    headerName: "Protocols Balance",
+    field: "protocolBalance",
+    headerName: "RPLs Balance",
     type: "number",
-    align: 'right',
-    flex: 3
-
+    align: 'center',
+    headerAlign: 'center',
+    flex: 2,
   },
   {
-    field: "displayTotalDeposits",
+    field: "totalDeposits",
     headerName: "Deposits",
     type: "number",
     align: 'center',
-    flex: 1
+    headerAlign: 'center',
+    flex: 1,
   },
 
   {
-    field: "displayTotalWithdrawals",
+    field: "totalWithdrawals",
     headerName: "Withdrawals",
     type: "number",
     align: 'center',
-    flex: 1
-
+    headerAlign: 'center',
+    flex: 2,
   },
-  {
-    field: "displayCalculatedNodeShare",
-    headerName: "displayCalculatedNodeShare",
-    type: "number",
-    align: 'right',
-    flex: 1
-
-  },
-
-
-
 ];
 function MinipoolDetailGrid({ rows }) {
   if (rows === undefined) {
@@ -72,22 +65,22 @@ function MinipoolDetailGrid({ rows }) {
   const columns = APR_COLS;
   //console.log("APRGrid rows:", rows);
   return (
-    <div style={{ height: 400, width: 800 }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={10}
-        getRowId={(row) => row.minipoolAddress} // Use minipool property as unique id
-        pageSizeOptions={[5, 10, 20, 50, 100]}
-        style={{ color: 'white' }} // Change font color to red
-        rowSelection={false}
-        autoHeight
-        pagination
-        initialState={{
-          pagination: { paginationModel: { pageSize: 5 } },
-        }}
-      />
-    </div>
+
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      pageSize={10}
+      getRowId={(row) => row.minipoolAddress} // Use minipool property as unique id
+      pageSizeOptions={[5, 10, 20, 50, 100]}
+      style={{ color: 'white' }} // Change font color to red
+      rowSelection={false}
+      autoHeight
+      pagination
+      initialState={{
+        pagination: { paginationModel: { pageSize: 5 } },
+      }}
+    />
+
   );
 }
 

@@ -122,14 +122,14 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
 
   useEffect(() => {
     console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats )
-    if (gotDepositsAndWithdrawals && gotValidatorStats) {
+    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails.length > 0) {
       const calculatedNodeAPRs = calcMinipoolAPRs(minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
 
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats]);
+  }, [gotDepositsAndWithdrawals, gotValidatorStats, minipoolDetails]);
 
 
   useEffect(() => {
