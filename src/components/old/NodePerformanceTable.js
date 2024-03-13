@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { ethers } from "ethers";
 import moment from "moment";
 
-import CurrencyValue from "./CurrencyValue";
-import useNodeFinalizedRewardSnapshots from "../hooks/useNodeFinalizedRewardSnapshots";
-import useNodePendingRewardSnapshot from "../hooks/useNodePendingRewardSnapshot";
-import useNodeOngoingRewardSnapshot from "../hooks/useNodeOngoingRewardSnapshot";
+import CurrencyValue from "../CurrencyValue";
+import useNodeFinalizedRewardSnapshots from "../../hooks/useNodeFinalizedRewardSnapshots";
+import useNodePendingRewardSnapshot from "../../hooks/useNodePendingRewardSnapshot";
+import useNodeOngoingRewardSnapshot from "../../hooks/useNodeOngoingRewardSnapshot";
 
 //import DataToolbar from "./DataToolbar";
 import _ from "lodash";
