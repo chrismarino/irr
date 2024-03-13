@@ -22,7 +22,7 @@ function App() {
   const { priceNow: rplPrice, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
   //const [rplPriceNow, setRplPriceNow] = useState();
   //setRplPriceNow(rplPrice);
-  const [nodeAddress, setNodeAddress] = useState("0x635d06a61a36566003d71428f1895e146cdbd54e");
+  const [nodeAddress, setNodeAddress] = useState("0xfc49f773756eabb2680fd505916c2a93b65b465b");
 
 
   if (!gotEthPriceNow || !gotRplPriceNow) {
