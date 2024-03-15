@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
 import _ from "lodash";
-import MinipoolDetailGrid from "./MinipoolDetailGrid";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import useMinipoolDetails from '../hooks/useMinipoolDetails';
 import useNodeDetails from '../hooks/useNodeDetails';
@@ -78,22 +77,17 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
     return (
       <div className="NodeAPRs">
         <section>
-          <p></p><h3>Minipool Details</h3>
-
-          {<MinipoolDetailGrid rows={(MinipoolDetails || [])} />}
-        </section>
-        <section>
           <p></p><h3>Total Node Returns</h3>
           {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
         </section>
-        <section>
+        {/* <section>
           <p></p><h3>Total Node Operator Returns</h3>
           {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
         </section>
         <section>
           <p></p><h3>Total Protocol Returns</h3>
           {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
-        </section>
+        </section> */}
       </div>
     );
   }
