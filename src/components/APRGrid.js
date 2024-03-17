@@ -2,54 +2,10 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 const APR_COLS = [
   {
-    field: 'ethPriceNow',
-    headerName: 'Eth Price Today',
-    flex: 1,
-    align: 'left',
-    headerAlign: 'left'
-  },
-  {
-    field: 'rpPriceNow',
-    headerName: 'RPL Prcie Today',
-    flex: 1,
-    align: 'right',
-    headerAlign: 'right',
-    //valueFormatter: (params) => params.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-  },
-  {
-    field: "nodeAddress",
-    headerName: "Node Address",
-    align: 'left', 
-    flex: 2
-  },
-  {
-    field: "ethDeposited",
-    headerName: "Wallet Eth Deposited",
-    align: 'left', 
-    flex: 2
-  },
-  {
-    field: "rplDeposited",
-    headerName: "Wallet RPL Deposited",
-    align: 'left', 
-    flex: 2
-  },
-  {
-    field: "walletEthWithdrawn",
-    headerName: "Wallet Eth Withdrawn",
-    align: 'left', 
-    flex: 2
-  },
-  {
-    field: "walletRPLWithdrawn",
-    headerName: "Wallet RPL Withdrawn",
-    align: 'left', 
-    flex: 2
-  },
-  {
     field: "minipool",
     headerName: "Minipool",
-    align: 'left', 
+    align: 'left',
+    type: "number",
     flex: 2
   },
   {
@@ -57,36 +13,87 @@ const APR_COLS = [
     headerName: "Status",
     type: "number",
     renderCell: (params) => (params.value ? 'Active' : 'Exited'),
-    align: 'center', 
+    align: 'center',
     flex: 2
   },
   {
     field: "activated",
     headerName: "Activated",
     type: "date",
-    align: 'center', 
+    align: 'center',
     flex: 1
   },
   {
     field: "exited",
     headerName: "Exited",
     type: "date",
-    align: 'center', 
+    align: 'center',
     flex: 1
   },
   {
     field: "age",
     headerName: "Age",
     type: "number",
-    align: 'center', 
+    align: 'center',
     flex: 1
   },
-
+  // {
+  //   field: 'ethPriceNow',
+  //   headerName: 'Eth Price Today',
+  //   flex: 1,
+  //   align: 'left',
+  //   type: "number",
+  //   headerAlign: 'left'
+  // },
+  // {
+  //   field: 'rpPriceNow',
+  //   headerName: 'RPL Prcie Today',
+  //   flex: 1,
+  //   align: 'right',
+  //   type: "number",
+  //   headerAlign: 'right',
+  //   //valueFormatter: (params) => params.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+  // },
+  {
+    field: "nodeAddress",
+    headerName: "Node Address",
+    align: 'left',
+    type: "number",
+    flex: 2
+  },
+  {
+    field: "ethDeposited",
+    headerName: "Wallet Eth Deposited",
+    align: 'left',
+    type: "number",
+    flex: 2
+  },
+  {
+    field: "rplDeposited",
+    headerName: "Wallet RPL Deposited",
+    align: 'left',
+    type: "number",
+    flex: 2
+  },
+  {
+    field: "walletEthWithdrawn",
+    headerName: "Wallet Eth Withdrawn",
+    align: 'left',
+    type: "number",
+    flex: 2
+  },
+  {
+    field: "walletRPLWithdrawn",
+    headerName: "Wallet RPL Withdrawn",
+    align: 'left',
+    type: "number",
+    flex: 2
+  },
   {
     field: "eth_deposited",
     headerName: "Eth Deposits to Minipools",
     type: "number",
-    align: 'center', 
+    align: 'center',
     flex: 3
 
   },
@@ -94,7 +101,7 @@ const APR_COLS = [
     field: "eth_withdrawals",
     headerName: "Eth Withdrawals from Minipools",
     type: "number",
-    align: 'center', 
+    align: 'center',
     flex: 3
 
   },
@@ -102,28 +109,29 @@ const APR_COLS = [
     field: "eth_earned",
     headerName: "Continious Rewards Earned",
     type: "number",
-    align: 'right', 
+    align: 'right',
     flex: 3
 
   },
   {
     field: "eth_apr",
     headerName: "Continuous Rewards Eth IRR",
-    align: 'center', 
+    type: "number",
+    align: 'center',
     flex: 2
   },
   {
     field: "fiat_gain",
     headerName: "Fiat Eth Gain",
     type: "number",
-    align: 'right', 
+    align: 'right',
     flex: 3
 
   },
   {
     field: "fiat_apr",
     headerName: "Continuous Rewards Fiat IRR",
-    align: 'center', 
+    align: 'center',
     type: "percent",
     flex: 2
 
@@ -131,7 +139,7 @@ const APR_COLS = [
   {
     field: "smoothingPool",
     headerName: "Periodic Rewards/Smoothing Pool Eth Rewards to Node",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -139,7 +147,7 @@ const APR_COLS = [
   {
     field: "smoothingPoolShare",
     headerName: "Periodic Rewards/Smoothing Pool Eth Share to Minipool",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -147,7 +155,7 @@ const APR_COLS = [
   {
     field: "totalEthIRR",
     headerName: "Total Eth IRR",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -155,7 +163,7 @@ const APR_COLS = [
   {
     field: "totalFiatGains",
     headerName: "Total Fiat Eth Gains",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -163,7 +171,7 @@ const APR_COLS = [
   {
     field: "totalFiatIRR",
     headerName: "Total Fiat Eth IRR",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -171,35 +179,35 @@ const APR_COLS = [
   {
     field: "RPLbalance",
     headerName: "RPL Staked",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
   },
   {
     field: "effectiveBalance",
     headerName: "Effective RPL Balance",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
   },
   {
     field: "effectiveBalanceShare",
     headerName: "Effective RPL Share",
-    align: 'center', 
+    align: 'center',
     type: "percent",
     flex: 2
   },
   {
     field: "collateralRPL",
     headerName: "RPL Collateral",
-    align: 'center', 
+    align: 'center',
     type: "percent",
     flex: 2
   },
   {
     field: "inflation",
     headerName: "Periodic Rewards/Smoothing Pool RPL Rewards to Node",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -207,14 +215,14 @@ const APR_COLS = [
   {
     field: "inflationShare",
     headerName: "Periodic Rewards/Smoothing Pool RPL Share to Minipool",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
   },
   {
     field: "totalRPLIRR",
     headerName: "Total RPL IRR",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -222,7 +230,7 @@ const APR_COLS = [
   {
     field: "totalFiatRPLGains",
     headerName: "Total Fiat RPL Gains",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
 
@@ -230,14 +238,14 @@ const APR_COLS = [
   {
     field: "totalFiatRPLIRR",
     headerName: "Total Fiat RPL IRR",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
   },
   {
     field: "totalMinipoolFiatIRR",
     headerName: "Total Minipool Fiat IRR",
-    align: 'center', 
+    align: 'center',
     type: "number",
     flex: 2
   },
@@ -252,18 +260,20 @@ function APRGrid({ rows }) {
   //console.log("APRGrid rows:", rows);
 
   // Transform the rows to match the new column structure
-const transposedRows = APR_COLS.map((col, index) => {
-  const newRow = { id: index, headerName: col.headerName};
-  rows.forEach((row, rowIndex) => {
-    newRow[`value${rowIndex}`] = row[col.field];
+  const transposedRows = APR_COLS.map((col, index) => {
+    const newRow = { id: index, headerName: col.headerName };
+    rows.forEach((row, rowIndex) => {
+      newRow[`value${rowIndex}`] = row[col.field];
+    });
+    return newRow;
   });
-  return newRow;
-});
-// Create new column definitions
-const transposedColumns = [
-  { field: 'headerName', headerName: 'Performance Metric', width: 150 },
-  ...rows.map((_, index) => ({ field: `value${index}`, headerName: `Minipool ${index + 1}`, width: 150 })),
-];
+  // Create new column definitions
+  const transposedColumns = [
+    { field: 'headerName', headerName: 'Performance Metric', width: 150 },
+    //  ...rows.map((_, index) => ({ field: `value${index}`, headerName: `Minipool ${index + 1}`, width: 150 })),
+    ...rows.filter((_, index) => transposedRows.some(row => row[`value${index}`] !== undefined)).map((_, index) => ({ field: `value${index}`, headerName: `Minipool ${index + 1}`, width: 150 })),
+    //rows.filter((_, index) => transposedRows.some(row => row[`value${index}`] !== undefined)).map((_, index) => ({ field: `value${index}`, headerName: `Minipool ${index + 1}`, width: 150 })),
+  ];
 
   return (
     <div style={{ height: 400, width: 800 }}>
@@ -277,9 +287,9 @@ const transposedColumns = [
         rowSelection={false}
         autoHeight
         pagination
-        //initialState={{
-        //  pagination: { paginationModel: { pageSize: rows.length } },
-        //}}
+      //initialState={{
+      //  pagination: { paginationModel: { pageSize: rows.length } },
+      //}}
       />
     </div>
   );
