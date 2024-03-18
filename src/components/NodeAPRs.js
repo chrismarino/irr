@@ -14,23 +14,27 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
   const [minipoolEvents, setMinipoolEvents] = useState(null);
   const [minipoolDetails, setMinipoolDetails] = useState([]);
-  const [gotMinipoolDetails, setGotMinipoolDetails] = useState(false);
+  const [nodeDetails, setNodeDetails] = useState([]);
+  const [gotNodeDetails, setGotNodeDetails] = useState(false);
   const [minipoolRewards, setMinipoolRewards] = useState([]);
   const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
-  const nodeDetails = useNodeDetails(nodeAddress);
-  if (nodeDetails.isLoading) {
-    // The data is still loading
-    //console.log('Data is loading...');
-  } else {
-    //console.log("registrationTime:", nodeDetails.registrationTime);
-    //console.log("Eth Balance:", nodeDetails.balanceETH);
-    //console.log("RPL Balance:", nodeDetails.balanceRPL);
-    //console.log("effectiveRPLStake:", nodeDetails.effectiveRPLStake);
-    //console.log("ethMatched:", nodeDetails.ethMatched);
-  }
+  const NodeDetails = useNodeDetails(nodeAddress);
+  //const stringifiedMinipoolDetails = JSON.stringify(MinipoolDetails);
+  useEffect(() => {
+    async function fetchNodeDetails() {
+      //let newNodeDetails = await Promise(NodeDetails);
+      if(!gotNodeDetails)
+      if (!NodeDetails.isLoading) {
+        setNodeDetails(NodeDetails);
+        setGotNodeDetails(true);
+        console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
+      }
+    }
+    fetchNodeDetails();
+  }, [NodeDetails]);
 
-  const nodeDeposits = useNodeDeposits(nodeAddress);
+  const nodeDeposits = useNodeDeposits(nodeAddress); //these are the deposits from the node to minipools.
   if (nodeDeposits.isLoading) {
     // The data is still loading
     //console.log('Data is loading...');
@@ -59,7 +63,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
     fetchMinipoolDetails();
   }, [stringifiedMinipoolDetails]); // will this work?
 
-  const { nodeAPRs } = useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow);
+  const { nodeAPRs } = useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow);
   if (nodeAddress === "") {
     return <div>Enter a node address and hit Enter...</div>;
   }
@@ -76,15 +80,15 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   } else {
     return (
       <div className="NodeAPRs">
-        <section>
+        {/* <section>
           <p></p><h3>Total Node Returns</h3>
           {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
-        </section>
-        {/* <section>
+        </section> */}
+        <section>
           <p></p><h3>Total Node Operator Returns</h3>
           {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
         </section>
-        <section>
+        {/*<section>
           <p></p><h3>Total Protocol Returns</h3>
           {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
         </section> */}

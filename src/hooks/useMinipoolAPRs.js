@@ -11,7 +11,8 @@ let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
+function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
+  const nodeAddress = nodeDetails.nodeAddress;
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
@@ -19,7 +20,6 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
   const [nodeAPRs, setNodeAPRs] = useState([]);
   // Some state variables to keep track of the status of the fetches    
   const [gotValidators, setGotValidators] = useState(false);
-
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
   const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState(false);
@@ -28,8 +28,7 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
       // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
       // stats for each validator. 
       var validatorArray = []; // reset the validator array
-
-      if (nodeAddress === "") return; //don't run if the node address is empty
+      if (nodeAddress === "" || typeof nodeAddress === "undefined") return; //don't run if the node address is empty
       setMinipools([]); //reset the minipools
       setNodeAPRs([]); //reset the nodeAPRs
 
@@ -87,7 +86,7 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
 
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
-    async function fetchDepositsAndWithdrawals() {
+    async function fetchMinipoolStats() {
       if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
       for (const index of minipools) {
         try {
@@ -110,9 +109,9 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
         }
       }
       setGotDepositsAndWithdrawals(true);
-      console.log("All Depostis and Withdrawals set from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
+      console.log("All Depostis and Withdrawals set from fetchMinipoolStats", allDepositsAndWithdrawals)
     }
-    fetchDepositsAndWithdrawals();
+    fetchMinipoolStats();
   }, [gotRocketpoolDetails]);
 
  
@@ -123,7 +122,7 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
   useEffect(() => {
     console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats )
     if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails.length > 0) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
+      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
 

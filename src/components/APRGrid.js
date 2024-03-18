@@ -2,59 +2,6 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 const APR_COLS = [
   {
-    field: "minipool",
-    headerName: "Minipool",
-    align: 'left',
-    type: "number",
-    flex: 2
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    type: "number",
-    renderCell: (params) => (params.value ? 'Active' : 'Exited'),
-    align: 'center',
-    flex: 2
-  },
-  {
-    field: "activated",
-    headerName: "Activated",
-    type: "date",
-    align: 'center',
-    flex: 1
-  },
-  {
-    field: "exited",
-    headerName: "Exited",
-    type: "date",
-    align: 'center',
-    flex: 1
-  },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    align: 'center',
-    flex: 1
-  },
-  // {
-  //   field: 'ethPriceNow',
-  //   headerName: 'Eth Price Today',
-  //   flex: 1,
-  //   align: 'left',
-  //   type: "number",
-  //   headerAlign: 'left'
-  // },
-  // {
-  //   field: 'rpPriceNow',
-  //   headerName: 'RPL Prcie Today',
-  //   flex: 1,
-  //   align: 'right',
-  //   type: "number",
-  //   headerAlign: 'right',
-  //   //valueFormatter: (params) => params.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-  // },
-  {
     field: "nodeAddress",
     headerName: "Node Address",
     align: 'left',
@@ -62,14 +9,14 @@ const APR_COLS = [
     flex: 2
   },
   {
-    field: "ethDeposited",
+    field: "walletEthDeposited",
     headerName: "Wallet Eth Deposited",
     align: 'left',
     type: "number",
     flex: 2
   },
   {
-    field: "rplDeposited",
+    field: "walletRPLDeposited",
     headerName: "Wallet RPL Deposited",
     align: 'left',
     type: "number",
@@ -90,7 +37,14 @@ const APR_COLS = [
     flex: 2
   },
   {
-    field: "eth_deposited",
+    field: "minipool",
+    headerName: "Minipool",
+    align: 'left',
+    type: "number",
+    flex: 2
+  },
+  {
+    field: "minipoolEthDeposited",
     headerName: "Eth Deposits to Minipools",
     type: "number",
     align: 'center',
@@ -98,16 +52,62 @@ const APR_COLS = [
 
   },
   {
-    field: "eth_withdrawals",
+    field: "activated",
+    headerName: "Activated",
+    type: "date",
+    align: 'center',
+    flex: 1
+  },
+  {
+    field: "status",
+    headerName: "Status",
+    type: "number",
+    renderCell: (params) => (params.value ? 'Active' : 'Exited'),
+    align: 'center',
+    flex: 2
+  },
+  {
+    field: "exited",
+    headerName: "Exited",
+    type: "date",
+    align: 'center',
+    flex: 1
+  },
+  {
+    field: "age",
+    headerName: "Age",
+    type: "number",
+    align: 'center',
+    flex: 1
+  },
+  {
+    field: "minipoolEthWithdrawn",
     headerName: "Eth Withdrawals from Minipools",
     type: "number",
     align: 'center',
     flex: 3
 
   },
+  // {
+  //   field: 'ethPriceNow',
+  //   headerName: 'Eth Price Today',
+  //   flex: 1,
+  //   align: 'left',
+  //   type: "number",
+  //   headerAlign: 'left'
+  // },
+  // {
+  //   field: 'rpPriceNow',
+  //   headerName: 'RPL Prcie Today',
+  //   flex: 1,
+  //   align: 'right',
+  //   type: "number",
+  //   headerAlign: 'right',
+  //   //valueFormatter: (params) => params.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+  // },
   {
     field: "eth_earned",
-    headerName: "Continious Rewards Earned",
+    headerName: "Eth Continious Rewards Earned",
     type: "number",
     align: 'right',
     flex: 3
@@ -115,14 +115,14 @@ const APR_COLS = [
   },
   {
     field: "eth_apr",
-    headerName: "Continuous Rewards Eth IRR",
+    headerName: "Eth Continuous Rewards APR",
     type: "number",
     align: 'center',
     flex: 2
   },
   {
     field: "fiat_gain",
-    headerName: "Fiat Eth Gain",
+    headerName: "Fiat Gain",
     type: "number",
     align: 'right',
     flex: 3
@@ -130,7 +130,7 @@ const APR_COLS = [
   },
   {
     field: "fiat_apr",
-    headerName: "Continuous Rewards Fiat IRR",
+    headerName: "Fiat Continuous Rewards APR",
     align: 'center',
     type: "percent",
     flex: 2
@@ -138,7 +138,7 @@ const APR_COLS = [
   },
   {
     field: "smoothingPool",
-    headerName: "Periodic Rewards/Smoothing Pool Eth Rewards to Node",
+    headerName: "Eth Periodic/Smoothing Pool Rewards to Node",
     align: 'center',
     type: "number",
     flex: 2
@@ -146,7 +146,7 @@ const APR_COLS = [
   },
   {
     field: "smoothingPoolShare",
-    headerName: "Periodic Rewards/Smoothing Pool Eth Share to Minipool",
+    headerName: "Eth Periodic/Smoothing Pool Share to Minipool",
     align: 'center',
     type: "number",
     flex: 2
@@ -154,7 +154,7 @@ const APR_COLS = [
   },
   {
     field: "totalEthIRR",
-    headerName: "Total Eth IRR",
+    headerName: "Eth Total IRR",
     align: 'center',
     type: "number",
     flex: 2
@@ -162,7 +162,7 @@ const APR_COLS = [
   },
   {
     field: "totalFiatGains",
-    headerName: "Total Fiat Eth Gains",
+    headerName: "Eth Total Fiat Gains",
     align: 'center',
     type: "number",
     flex: 2
@@ -170,7 +170,7 @@ const APR_COLS = [
   },
   {
     field: "totalFiatIRR",
-    headerName: "Total Fiat Eth IRR",
+    headerName: "Fiat Total IRR",
     align: 'center',
     type: "number",
     flex: 2

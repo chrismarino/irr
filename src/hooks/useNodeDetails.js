@@ -77,6 +77,7 @@ export default function useNodeDetails(nodeAddress) {
     return { isLoading: true };
   } else {
     return {
+      nodeAddress: nodeAddress,
       balanceRPL: parseFloat(ethers.utils.formatEther(nodeDetails.balanceRPL || 0)).toFixed(4),
       balanceETH: parseFloat(ethers.utils.formatEther(nodeDetails.balanceETH || 0)).toFixed(4),
       effectiveRPLStake: parseFloat(ethers.utils.formatEther(nodeDetails.effectiveRPLStake || 0)).toFixed(4),
