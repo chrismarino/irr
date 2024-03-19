@@ -20,6 +20,7 @@
 .env.production.local
 # script to test rated.network API
 nodeset.sh 
+sampleAddresses.js 
 
 npm-debug.log*
 yarn-debug.log*
