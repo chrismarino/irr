@@ -11,7 +11,7 @@ let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
+function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   const nodeAddress = nodeDetails.nodeAddress;
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
@@ -71,7 +71,7 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
             prococolBalance: minipoolDetails.protocolBalance,
             calulatedNodeShare: minipoolDetails.calculatedNodeShare,
             deposits: minipoolDetails.deposits,
-            withdrawals: minipoolDetails.withdrawals,
+            minipoolEthWithdrawn: minipoolDetails.totalWithdrawals,
             validatorIndex: minipools[index].validatorIndex,
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
@@ -87,7 +87,7 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
       }
     }
     fetchRocketpoolValidatorStatsArray();
-  }, [gotValidators]);
+  }, [gotValidators, minipoolDetails]);
 
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
@@ -119,14 +119,14 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
     fetchMinipoolStats();
   }, [gotRocketpoolDetails]);
 
- 
+
 
   // only calculate the IRR when the withdrawls and deposits have been fetched
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats )
-    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails.length > 0) {
+    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats)
+    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails !== null) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);

@@ -13,7 +13,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   //console.log("MinipoolDetails from nodeAPRs:", MinipoolDetails);
   //console.log("MinipoolEvent from nodeAPRs:", MinipoolEvents);
   const [minipoolEvents, setMinipoolEvents] = useState(null);
-  const [minipoolDetails, setMinipoolDetails] = useState([]);
+  const [minipoolDetails, setMinipoolDetails] = useState();
   const [nodeDetails, setNodeDetails] = useState([]);
   const [gotNodeDetails, setGotNodeDetails] = useState(false);
   const [minipoolRewards, setMinipoolRewards] = useState([]);
@@ -80,18 +80,18 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
   } else {
     return (
       <div className="NodeAPRs">
-        {/* <section>
+         <section>
           <p></p><h3>Total Node Returns</h3>
           {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
-        </section> */}
+        </section> 
         <section>
           <p></p><h3>Total Node Operator Returns</h3>
           {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
         </section>
-        {/*<section>
+        <section>
           <p></p><h3>Total Protocol Returns</h3>
           {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
-        </section> */}
+        </section> 
       </div>
     );
   }

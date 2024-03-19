@@ -276,7 +276,7 @@ function APRGrid({ rows }) {
   ];
 
   return (
-    <div style={{ height: 400, width: 800 }}>
+    <div style={{ height: 'auto', width: 800 }}>
       <DataGrid
         rows={transposedRows}
         columns={transposedColumns}
