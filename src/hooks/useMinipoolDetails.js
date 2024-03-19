@@ -119,7 +119,7 @@ export default function useMinipoolDetails(nodeAddress) {
         nodeBalance = parseFloat(ethers.utils.formatEther(nodeBalance || 0)).toFixed(6);
         protocolBalance = parseFloat(ethers.utils.formatEther(protocolBalance || 0)).toFixed(6);
         let upgraded = version > 2;
-
+        minipoolAddress = String(minipoolAddress).toLowerCase();
         return {
           minipoolAddress,
           mpBalance,

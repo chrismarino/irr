@@ -11,7 +11,8 @@ let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
+function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
+  const nodeAddress = nodeDetails.nodeAddress;
   const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
@@ -19,7 +20,6 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
   const [nodeAPRs, setNodeAPRs] = useState([]);
   // Some state variables to keep track of the status of the fetches    
   const [gotValidators, setGotValidators] = useState(false);
-
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
   const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState(false);
@@ -28,8 +28,7 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
       // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
       // stats for each validator. 
       var validatorArray = []; // reset the validator array
-
-      if (nodeAddress === "") return; //don't run if the node address is empty
+      if (nodeAddress === "" || typeof nodeAddress === "undefined") return; //don't run if the node address is empty
       setMinipools([]); //reset the minipools
       setNodeAPRs([]); //reset the nodeAPRs
 
@@ -41,9 +40,10 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
       //console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
       try {
         validatorArray = await getValidators(nodeAddress);
-        minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
-        minipoolIndexArray = (minipoolIndexArray || []).map(item => ({
-          validatorIndex: item,
+        //Don't really need to .map this. Could go back to remove later...
+        minipoolIndexArray = (validatorArray || []).map(item => ({
+          validatorIndex: item.validatorindex,
+          publicKey: item.publickey.toLowerCase(),
           status: true  //set the status of the minipool to active
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
@@ -66,8 +66,12 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
           let updatedMinipoolIndexArray = minipools;
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
+            balance: minipoolDetails.mpbalance,
+            nodeBalance: minipoolDetails.nodeBalance,
+            prococolBalance: minipoolDetails.protocolBalance,
+            calulatedNodeShare: minipoolDetails.calculatedNodeShare,
             deposits: minipoolDetails.deposits,
-            withdrawals: minipoolDetails.withdrawals,
+            minipoolEthWithdrawn: minipoolDetails.totalWithdrawals,
             validatorIndex: minipools[index].validatorIndex,
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
@@ -83,11 +87,11 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
       }
     }
     fetchRocketpoolValidatorStatsArray();
-  }, [gotValidators]);
+  }, [gotValidators, minipoolDetails]);
 
   useEffect(() => {
     let allDepositsAndWithdrawals = [];
-    async function fetchDepositsAndWithdrawals() {
+    async function fetchMinipoolStats() {
       if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
       for (const index of minipools) {
         try {
@@ -110,26 +114,26 @@ function useMinipoolAPRs(nodeAddress, minipoolDetails, ethPriceNow) {
         }
       }
       setGotDepositsAndWithdrawals(true);
-      console.log("All Depostis and Withdrawals set from fetchDepositsAndWithdrawals", allDepositsAndWithdrawals)
+      console.log("All Depostis and Withdrawals set from fetchMinipoolStats", allDepositsAndWithdrawals)
     }
-    fetchDepositsAndWithdrawals();
+    fetchMinipoolStats();
   }, [gotRocketpoolDetails]);
 
- 
+
 
   // only calculate the IRR when the withdrawls and deposits have been fetched
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats )
-    if (gotDepositsAndWithdrawals && gotValidatorStats) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
+    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats)
+    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails !== null) {
+      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
 
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats]);
+  }, [gotDepositsAndWithdrawals, gotValidatorStats, minipoolDetails]);
 
 
   useEffect(() => {

@@ -5,7 +5,8 @@ export default async function getWalletHistory(address, coinID) {
   // takes an array of dates in the format of YYYY-MM-DD and returns an array of price objects
 
   // https://api.etherscan.io/api?module=account&action=txlist&address=0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=YourApiKeyToken
-  // https://api.etherscan.io/api?module=account&action=txlist&address=0x635d06a61a36566003d71428f1895e146cdbd54e&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=SXQC9UWX4J4CHGDX3V4HJ7YXHSCI7QTY2U
+  // https://api.etherscan.io/api?module=account&action=txlist&address=0xfc49f773756eabb2680fd505916c2a93b65b465b&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=SXQC9UWX4J4CHGDX3V4HJ7YXHSCI7QTY2U
+  if( address === undefined || coinID === undefined) return "Address or CoinID is undefined";
   let walletHistory = [];
   let appUrl = process.env.REACT_APP_ETHERSCAN_URL
   let action = "/api?module=account&action=txlist" // default action for CoinID = ethereum
@@ -28,7 +29,7 @@ export default async function getWalletHistory(address, coinID) {
         return {
           coin: coinID,
           date: formattedDate,
-          amount: transaction.value,
+          amount: Number(transaction.value),
           price_usd: price_usd,
           from: transaction.from,
           to: transaction.to
@@ -44,7 +45,7 @@ export default async function getWalletHistory(address, coinID) {
         return {
           coin: coinID,
           date: formattedDate,
-          amount: transaction.value,
+          amount: Number(transaction.value),
           price_usd: price_usd,
           from: transaction.from,
           to: transaction.to
