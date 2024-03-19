@@ -1,7 +1,7 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minpipoolDetails, mpDepositsAndWithdrawals, ethPriceToday) {
+export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, mpDepositsAndWithdrawals, ethPriceToday) {
   // A utility function used to calculate the irr of a given set of in and out cash flows from a 
   // set of minipools. It takes 
   // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
@@ -13,7 +13,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
   // 'timestamp' field. It returns 
   // an annay of day counts and irr per minpool. paymentArray is typically the result of a query to the etherscan API.
   var totalArray = [];
-  var details = minpipoolDetails;
+
   var walletEthDeposited = _.sumBy(walletEthHistory.deposits, "amount")/1E18;
   var walletRPLDeposited = _.sumBy(walletRPLHistory.deposits, "amount")/1E18;
   var walletEthWithdrawn = _.sumBy(walletEthHistory.withdrawals, "amount")/1E18;
@@ -41,6 +41,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     // console.log("Filtered Array:", filteredArray);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
+    let mpDetail = minipoolDetails.find(mpDetails => mpDetails.minipoolAddress === minipoolData.minipoolStats.minipool_address);
     if (minipoolData.minipoolStats === undefined) {
       throw new Error("Minipool data is undefined. Minipool: " + minipool);
     }
@@ -69,6 +70,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     totalEthDeposited = (totalEthDeposited / 1E18)
 
     let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
+    let NewTotalEthEarned = mpDetail.nodeBalance;
     // totalEthEarned can be found directly from 'nodeBalance' in minipooldetails this _.sumBy not needed.
     // Total fiat deposited is amount deposited * price of eth at the time of deposit
     //let totalNOFiatDeposited = totalNOEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the node operator
@@ -134,7 +136,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
       fiat_apr: no_fiat_apr
     }; //Total node operator's apr
-    const newprotocolAPR = {
+    const newProtocolAPR = {
       nodeAddress: minipoolData.minipoolStats.node_address,
       walletEthDeposited: walletEthDeposited.toFixed(4),
       walletRPLDeposited: walletRPLDeposited.toFixed(4),
@@ -154,7 +156,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     //console.log("Added minipool to node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
     nodeAPR.push(newNodeAPR);
     nodeOperatorAPR.push(newNodeOperatorAPR);
-    protocolAPR.push(newprotocolAPR);
+    protocolAPR.push(newProtocolAPR);
   });
 
   return { nodeAPR, nodeOperatorAPR, protocolAPR };

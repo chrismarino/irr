@@ -40,9 +40,10 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
       //console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
       try {
         validatorArray = await getValidators(nodeAddress);
-        minipoolIndexArray = (validatorArray || []).map(item => item.validatorindex);  //get the minipool addresses  || [])
-        minipoolIndexArray = (minipoolIndexArray || []).map(item => ({
-          validatorIndex: item,
+        //Don't really need to .map this. Could go back to remove later...
+        minipoolIndexArray = (validatorArray || []).map(item => ({
+          validatorIndex: item.validatorindex,
+          publicKey: item.publickey.toLowerCase(),
           status: true  //set the status of the minipool to active
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
@@ -65,6 +66,10 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow ) {
           let updatedMinipoolIndexArray = minipools;
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
+            balance: minipoolDetails.mpbalance,
+            nodeBalance: minipoolDetails.nodeBalance,
+            prococolBalance: minipoolDetails.protocolBalance,
+            calulatedNodeShare: minipoolDetails.calculatedNodeShare,
             deposits: minipoolDetails.deposits,
             withdrawals: minipoolDetails.withdrawals,
             validatorIndex: minipools[index].validatorIndex,
