@@ -127,7 +127,7 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   useEffect(() => {
     console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats)
     if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails.length > 0 ) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
+      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
 
