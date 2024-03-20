@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import getValidators from "../getValidators";
-import getPriceData from "../getPriceData";
-//import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
-import _ from "lodash";
 import getWalletHistory from '../getWalletHistory';
 let minipoolIndexArray = [];
 
@@ -13,7 +10,6 @@ let minipoolIndexArray = [];
 
 function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   const nodeAddress = nodeDetails.nodeAddress;
-  const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
   const [walletRPLHistory, setWalletRPLHistory] = useState([]);
@@ -22,7 +18,6 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   const [gotValidators, setGotValidators] = useState(false);
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
-  const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState(false);
   useEffect(() => {
     async function fetchValidatorArray() {
       // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
@@ -34,8 +29,6 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
 
       setGotValidators(false); // will be reset, unless there is an error or empty node address
       setGotValidatorStats(false);
-      setDepositsAndWithdrawals([]);
-      setGotDepositsAndWithdrawals(false); // new node address, so reset the HasRun flags
       setGotRocketpoolDetails(false);
       //console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
       try {
@@ -90,14 +83,11 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   }, [gotValidators, minipoolDetails]);
 
   useEffect(() => {
-    let allDepositsAndWithdrawals = [];
     async function fetchMinipoolStats() {
       if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
       for (const index of minipools) {
         try {
           const oneIndex = await getValidatorStats(index.validatorIndex);
-          allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.mpDepositsAndWithdrawals); //response structure is different for deposits
-          setDepositsAndWithdrawals(allDepositsAndWithdrawals);
           //see if the minipool has exited. Set it to false if it has.
           if (oneIndex.status === false) {
             let exitedMinipools = minipools.map(minipool =>
@@ -113,8 +103,6 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
           console.log("Error creating deposit array:", error);
         }
       }
-      setGotDepositsAndWithdrawals(true);
-      console.log("All Depostis and Withdrawals set from fetchMinipoolStats", allDepositsAndWithdrawals)
     }
     fetchMinipoolStats();
   }, [gotRocketpoolDetails]);
@@ -125,15 +113,15 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats)
-    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails.length > 0 ) {
+    console.log("gotValidatorStats:", gotValidatorStats)
+    if (gotValidatorStats && minipoolDetails.length > 0) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
 
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats, minipoolDetails]);
+  }, [gotValidatorStats, minipoolDetails]);
 
 
   useEffect(() => {
