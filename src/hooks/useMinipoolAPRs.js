@@ -71,7 +71,7 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
           }));  //get the minipool addresses
           setMinipools(updatedMinipoolIndexArray);
           setGotRocketpoolDetails(true);
-          console.log("Minipools set from fetchRocketpoolValidatorStatsArray:", updatedMinipoolIndexArray);
+          //console.log("Minipools set from fetchRocketpoolValidatorStatsArray:", updatedMinipoolIndexArray);
         }
         catch (error) {
           console.log("Error fetching Rocketpool stats:", error);
@@ -113,7 +113,7 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    console.log("gotValidatorStats:", gotValidatorStats)
+    //console.log("gotValidatorStats:", gotValidatorStats)
     if (gotValidatorStats && minipoolDetails.length > 0) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, ethPriceNow);
       //const calculatedNodeAPRs = [];

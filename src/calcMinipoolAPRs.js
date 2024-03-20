@@ -55,9 +55,20 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     let totalProtocolFiatDeposited = totalFiatDeposited * (totalProtocolEthDeposited / totalEthDeposited);
 
     // Set the eth earned...
-    var nodeOperatorEthEarned = mpDetail.nodeBalance;
-    var protocolEthEarned = mpDetail.protocolBalance;
-    var totalEthEarned = Number(nodeOperatorEthEarned) + Number(protocolEthEarned);
+    var nodeOperatorEthEarned = 0;
+    var protocolEthEarned = 0;
+    var totalEthEarned = 0;
+    if (minipoolData.status === true) {
+      nodeOperatorEthEarned = Number(mpDetail.nodeBalance);
+      protocolEthEarned = Number(mpDetail.protocolBalance);
+      totalEthEarned = nodeOperatorEthEarned + protocolEthEarned;
+    } else {
+      nodeOperatorEthEarned = mpDetail.totalWithdrawals - mpDetail.nodeDepositBalance;
+      //don't have these values, so calulate them...
+      let commissionRate = Number(minipoolData.minipoolStats.minipool_node_fee);
+      protocolEthEarned = (nodeOperatorEthEarned*(1 - commissionRate))*(totalProtocolEthDeposited/totalNOEthDeposited);
+      totalEthEarned = nodeOperatorEthEarned + protocolEthEarned;
+    }
     // Fiat gains are the eth earned - eth deposited, times the current price of eth
     const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceNow) - totalFiatDeposited;
     const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceNow) - totalProtocolFiatDeposited;
@@ -87,7 +98,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       minipoolEthDeposited: totalEthDeposited.toFixed(4), //Total eth deposited
       minipoolEthWithdrawn: totalEthWithdrawn.toFixed(4), //Total eth withdrawn
       fiat_deposited: totalFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total fiat deposited
-      eth_earned: totalEthEarned, //total eth earned by the minipool
+      eth_earned: totalEthEarned.toFixed(4), //total eth earned by the minipool
       eth_apr: eth_apr,
       fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
       fiat_apr: fiat_apr
@@ -106,7 +117,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       minipoolEthDeposited: totalNOEthDeposited.toFixed(4), //node operators eth deposited
       minipoolEthWithdrawn: totalNOEthWithdrawn.toFixed(4), //node operators eth withdrawn
       fiat_deposited: totalNOFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators fiat deposited
-      eth_earned: nodeOperatorEthEarned, //node operators eth earned
+      eth_earned: nodeOperatorEthEarned.toFixed(4), //node operators eth earned
       eth_apr: no_eth_apr, //node operator apr
       fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
       fiat_apr: no_fiat_apr
@@ -125,7 +136,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       minipoolEthDeposited: totalProtocolEthDeposited.toFixed(4), //Protocol eth deposited
       minipoolEthWithdrawn: totalProtocolEthWithdrawn.toFixed(4), //Protocol eth withdrawn
       fiat_deposited: totalProtocolFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators fiat deposited
-      eth_earned: protocolEthEarned, //protocol eth earned
+      eth_earned: protocolEthEarned.toFixed(4), //protocol eth earned
       eth_apr: p_eth_apr, //protocol apr
       fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
       fiat_apr: p_fiat_apr

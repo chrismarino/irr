@@ -28,7 +28,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
       if (!NodeDetails.isLoading) {
         setNodeDetails(NodeDetails);
         setGotNodeDetails(true);
-        console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
+        //console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
       }
     }
     fetchNodeDetails();
@@ -57,7 +57,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
       if (MinipoolDetails.every(element => !element.isLoading)) {
         setMinipoolDetails(newMpDetails);
         //setGotMinipoolDetails(true);
-        console.log("Node Address", nodeAddress, "MinipoolDetails after set:", newMpDetails);
+        //console.log("Node Address", nodeAddress, "MinipoolDetails after set:", newMpDetails);
       }
     }
     fetchMinipoolDetails();
