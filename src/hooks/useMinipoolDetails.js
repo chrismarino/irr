@@ -108,8 +108,8 @@ export default function useMinipoolDetails(nodeAddress) {
         calculatedNodeShare = calculatedNodeShare.toHexString();
         nodeBalance = nodeBalance.toHexString();
         protocolBalance = protocolBalance.toHexString();
-        let totalWithdrawals = _.sumBy(withdrawals, 'amount');
-        let totalDeposits = _.sumBy(deposits, 'amount');
+        let totalWithdrawals = withdrawals ? _.sumBy(withdrawals, 'amount') : 0;
+        let totalDeposits = deposits ? _.sumBy(deposits, 'amount') : 0;
         //console.log("minipool", minipoolAddress, "withdrawals", withdrawals, "deposits", deposits);
 // parse the events so we can display them in the UI
         mpBalance = parseFloat(ethers.utils.formatEther(mpBalance || 0)).toFixed(6);

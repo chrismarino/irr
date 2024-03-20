@@ -66,12 +66,12 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
           let updatedMinipoolIndexArray = minipools;
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
-            balance: minipoolDetails.mpbalance,
-            nodeBalance: minipoolDetails.nodeBalance,
-            prococolBalance: minipoolDetails.protocolBalance,
-            calulatedNodeShare: minipoolDetails.calculatedNodeShare,
-            deposits: minipoolDetails.deposits,
-            minipoolEthWithdrawn: minipoolDetails.totalWithdrawals,
+            balance: minipoolDetails.mpbalance ? minipoolDetails.mpbalance : 0,
+            nodeBalance: minipoolDetails.nodeBalance ? minipoolDetails.nodeBalance : 0,
+            prococolBalance: minipoolDetails.protocolBalance ? minipoolDetails.protocolBalance : 0,
+            calulatedNodeShare: minipoolDetails.calculatedNodeShare ? minipoolDetails.calculatedNodeShare : 0,
+            deposits: minipoolDetails.deposits ? minipoolDetails.deposits : 0,
+            minipoolEthWithdrawn: minipoolDetails.totalWithdrawals ? minipoolDetails.totalWithdrawals : 0,
             validatorIndex: minipools[index].validatorIndex,
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
@@ -126,7 +126,7 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
 
   useEffect(() => {
     console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats)
-    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails !== null) {
+    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails.length > 0 ) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
