@@ -62,6 +62,8 @@ export default function calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDe
         }, 0);
         intervalsWithTotalDepositWeightedDays.push({
             interval: intervalElement.interval,
+            totalInflationRPLRewards: intervalElement.inflationRPLRewards,
+            totalSmootingPoolEthRewards: intervalElement.smootingPoolEthRewards,
             totalDepositWeightedDays
         });
     });
@@ -75,6 +77,8 @@ export default function calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDe
                     return {
                         ...activeInterval,
                         minipoolShare: activeInterval.depositWeightedDays / matchingInterval.totalDepositWeightedDays,
+                        inflationRPLShare: activeInterval.depositWeightedDays / matchingInterval.totalDepositWeightedDays * matchingInterval.totalInflationRPLRewards,
+                        smoothingPoolEthShare: activeInterval.depositWeightedDays / matchingInterval.totalDepositWeightedDays * matchingInterval.totalSmootingPoolEthRewards,
                         totalDepositWeightedDays: matchingInterval.totalDepositWeightedDays
                     };
                 }
@@ -83,5 +87,20 @@ export default function calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDe
         });
 
     }
-    return rewards;
+    // Add up the minipool's share of the rewards across the intervals.
+    rewards = rewards.map(reward => {
+        let smoothingPoolEthRewards = reward.activeIntervals.reduce((sum, activeInterval) => sum + activeInterval.smoothingPoolEthShare, 0);
+        let inflationRPLRewards = reward.activeIntervals.reduce((sum, activeInterval) => sum + activeInterval.inflationRPLShare, 0);
+
+        return {
+            ...reward,
+            smoothingPoolEthRewards,
+            inflationRPLRewards
+        };
+    });
+    return ({
+        minipoolAddress: rewards.minipoolAddress,
+        smoothingPoolEthRewards: rewards.smoothingPoolEthRewards,
+        inflationRPLRewards: rewards.inflationRPLRewards,
+    });
 }
