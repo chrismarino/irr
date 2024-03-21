@@ -6,7 +6,7 @@ import useMinipoolDetails from '../hooks/useMinipoolDetails';
 import useNodeDetails from '../hooks/useNodeDetails';
 import useNodeDeposits from '../hooks/useNodeDeposits';
 
-function NodeAPRs({ nodeAddress, ethPriceNow }) {
+function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }) {
 
 
   var MinipoolEvents = []
@@ -28,7 +28,7 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
       if (!NodeDetails.isLoading) {
         setNodeDetails(NodeDetails);
         setGotNodeDetails(true);
-        console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
+        //console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
       }
     }
     fetchNodeDetails();
@@ -57,13 +57,13 @@ function NodeAPRs({ nodeAddress, ethPriceNow }) {
       if (MinipoolDetails.every(element => !element.isLoading)) {
         setMinipoolDetails(newMpDetails);
         //setGotMinipoolDetails(true);
-        console.log("Node Address", nodeAddress, "MinipoolDetails after set:", newMpDetails);
+        //console.log("Node Address", nodeAddress, "MinipoolDetails after set:", newMpDetails);
       }
     }
     fetchMinipoolDetails();
   }, [stringifiedMinipoolDetails]); // will this work?
 
-  const { nodeAPRs } = useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow);
+  const { nodeAPRs } = useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceNow);
   if (nodeAddress === "") {
     return <div>Enter a node address and hit Enter...</div>;
   }

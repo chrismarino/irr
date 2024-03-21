@@ -1,33 +1,14 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, mpDepositsAndWithdrawals, ethPriceToday) {
-  // A utility function used to calculate the irr of a given set of in and out cash flows from a 
-  // set of minipools. It takes 
-  // a depositArray for deposits into the minipool, including both the node operators and the protocol's. 
-  // The withdrawlArray requires the same feils and  includes only periodic execution layer rewards.
-  // and the repayment of the deposit. Input arrays are objects 
-  // with 'ValidatorIndex' field, an 'amount' feild as well as a 'timestamp' field. It returns an object with the irr and days.
-  // It returns an object with the irr and days.
-  // paymentArray is not actually an Array, but an Object that incldues a 'amount' feild as well as a
-  // 'timestamp' field. It returns 
-  // an annay of day counts and irr per minpool. paymentArray is typically the result of a query to the etherscan API.
-  var totalArray = [];
+export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceToday) {
+  var walletEthDeposited = _.sumBy(walletEthHistory.deposits, "amount") / 1E18;
+  var walletRPLDeposited = _.sumBy(walletRPLHistory.deposits, "amount") / 1E18;
+  var walletEthWithdrawn = _.sumBy(walletEthHistory.withdrawals, "amount") / 1E18;
+  var walletRPLWithdrawn = _.sumBy(walletRPLHistory.withdrawals, "amount") / 1E18;
 
-  var walletEthDeposited = _.sumBy(walletEthHistory.deposits, "amount")/1E18;
-  var walletRPLDeposited = _.sumBy(walletRPLHistory.deposits, "amount")/1E18;
-  var walletEthWithdrawn = _.sumBy(walletEthHistory.withdrawals, "amount")/1E18;
-  var walletRPLWithdrawn = _.sumBy(walletRPLHistory.withdrawals, "amount")/1E18;
-
-  //combine the despots and withdrawls into a single array for the IRR calculation
-  totalArray = formatArray(mpDepositsAndWithdrawals);
-  //totalArray.sort() //make sure they are sorted by date
-  totalArray = _.sortBy(totalArray, function (item) {
-    return new Date(item.date);
-  });
   //find the minipool indices...
-  // write the code that creates an array containg unique ValidatorIndex values in totalArray
-  const uniqueValidatorIndexes = [...new Set(totalArray.map(item => item.validatorIndex))];
+  const uniqueValidatorIndexes = [...new Set(minipools.map(item => item.validatorIndex))];
   // don't think I need this since I saved the list of validators in the from the node API
   //filter the array for each minipool and calculate the IRR
   var nodeAPR = [];
@@ -35,32 +16,27 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
   var protocolAPR = [];
   //console.log("ethPriceToday from calc minipools:", ethPriceToday);
   //const ethPriceNow = (ethPriceToday[0].price_usd  || 0); // ethPriceToday is an array of objects with a single object.
-  const ethPriceNow = ethPriceToday; 
+  const ethPriceNow = ethPriceToday;
   uniqueValidatorIndexes.forEach(minipool => {
-    const filteredArray = totalArray.filter(item => item.validatorIndex === minipool);
-    // console.log("Filtered Array:", filteredArray);
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     let mpDetail = minipoolDetails.find(mpDetails => mpDetails.minipoolAddress === minipoolData.minipoolStats.minipool_address);
+    let rewards = periodicRewardsShare.find(reward => reward.minipoolAddress === minipoolData.minipoolStats.minipool_address);
     if (minipoolData.minipoolStats === undefined) {
       throw new Error("Minipool data is undefined. Minipool: " + minipool);
     }
 
     // Calculate the age of active and exited minipools
-    let minDay = _.minBy(filteredArray, 'days').days;
-    let maxDay = _.maxBy(filteredArray, 'days').days; //day of most recent deposit or withdrawal. Not the current day.
-    let today = new Date();
-    let startDateString = _.minBy(filteredArray, 'date').date;  // actual dates
-    let endDateString = _.maxBy(filteredArray, 'date').date;
+    // Use the date of the earliest deposit and the date of the latest withdrawal to calculate the age of the minipool.
+    // maxDate does not consider sweapt rewards. Need to rework this to include the sweapt rewards.
+    let startDateString = _.minBy(mpDetail.deposits, 'date').date;
+    let endDateString = (_.maxBy(mpDetail.withdrawals, 'date') || {}).date || new Date(); // If no withdrawals, use today's date.
     let startDate = new Date(startDateString);  // actual dates
     let endDate = new Date(endDateString);
-    let days = (maxDay - minDay);
-    let age = (today - startDate) / (1000 * 60 * 60 * 24); // age from dates
-    age = Math.floor(age); // Just use the whole days...
+    let ageInSec = Math.abs(endDate - startDate);
+    let days = Math.ceil(ageInSec / (1000 * 60 * 60 * 24)); // age from dates
+    //age = Math.floor(age); // Just use the whole days...
 
-    if (minipoolData.status === false) { days = days } //if the minipool has exited, use the age from the dates
-    else { days = age } //if the minipool is active, use the days from the deposits until today.
-    //console.log("ethPriceHistory from calc minipools:", ethPriceHistory);
     // Set the deposits...
     var totalNOEthDeposited = minipoolData.minipoolStats.node_deposit_balance || 0;
     var totalProtocolEthDeposited = minipoolData.minipoolStats.user_deposit_balance || 0;
@@ -73,22 +49,27 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     var totalProtocolEthWithdrawn = 0;  // Don't have this data yet. Would need to sum over history.
     var totalEthWithdrawn = totalNOEthWithdrawn + totalProtocolEthWithdrawn;
 
-    let totalEthEarned = -(_.sumBy(filteredArray, 'eth_amount')); //total eth earned by the minipool. Negative because it is a withdrawal
+    // Calculate the fiat values of the deposits and withdrawals
 
-    // nodeOperatorEthEarned can be found directly from 'nodeBalance' in minipooldetails this _.sumBy not needed for that.
-    // But the exited minipools don't have a nodeBalance so need to infer that from the withdrawals, TBD.
-    
-    // Total fiat deposited is amount deposited * price of eth at the time of deposit
-    //let totalNOFiatDeposited = totalNOEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the node operator
-    //let totalProtocolFiatDeposited = totalProtocolEthDeposited * ethDepositPrice.price_usd; //total fiat deposited bu the protocol
-    let totalNOFiatDeposited = 0;
-    let totalProtocolFiatDeposited = 0;
-    let totalFiatDeposited = totalProtocolFiatDeposited + totalNOFiatDeposited; //total fiat deposited
-    if (totalEthEarned < 0) { totalEthEarned = totalEthEarned + 32000000000 } //back out the 32 eth deposit
-    totalEthEarned = (totalEthEarned / 1000000000)
+    let totalFiatDeposited = mpDetail.deposits.reduce((total, item) => total + (item.amount * item.price_usd), 0) || 0;
+    let totalNOFiatDeposited = totalFiatDeposited * (totalNOEthDeposited / totalEthDeposited);
+    let totalProtocolFiatDeposited = totalFiatDeposited * (totalProtocolEthDeposited / totalEthDeposited);
 
-    var nodeOperatorEthEarned = mpDetail.nodeBalance;
-    var protocolEthEarned = mpDetail.protocolBalance;
+    // Set the eth earned...
+    var nodeOperatorEthEarned = 0;
+    var protocolEthEarned = 0;
+    var totalEthEarned = 0;
+    if (minipoolData.status === true) {
+      nodeOperatorEthEarned = Number(mpDetail.nodeBalance);
+      protocolEthEarned = Number(mpDetail.protocolBalance);
+      totalEthEarned = nodeOperatorEthEarned + protocolEthEarned;
+    } else {
+      nodeOperatorEthEarned = mpDetail.totalWithdrawals - mpDetail.nodeDepositBalance;
+      //don't have these values, so calulate them...
+      let commissionRate = Number(minipoolData.minipoolStats.minipool_node_fee);
+      protocolEthEarned = (nodeOperatorEthEarned*(1 - commissionRate))*(totalProtocolEthDeposited/totalNOEthDeposited);
+      totalEthEarned = nodeOperatorEthEarned + protocolEthEarned;
+    }
     // Fiat gains are the eth earned - eth deposited, times the current price of eth
     const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceNow) - totalFiatDeposited;
     const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceNow) - totalProtocolFiatDeposited;
@@ -117,10 +98,13 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       exited: (status ? "N/A" : endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })),
       minipoolEthDeposited: totalEthDeposited.toFixed(4), //Total eth deposited
       minipoolEthWithdrawn: totalEthWithdrawn.toFixed(4), //Total eth withdrawn
-      eth_earned: totalEthEarned, //total eth earned by the minipool
+      fiat_deposited: totalFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total fiat deposited
+      eth_earned: totalEthEarned.toFixed(4), //total eth earned by the minipool
       eth_apr: eth_apr,
       fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
-      fiat_apr: fiat_apr
+      fiat_apr: fiat_apr,
+      inflation: 0,
+      smoothingPool: 0
     }; //Total node's apr
     const newNodeOperatorAPR = {
       nodeAddress: minipoolData.minipoolStats.node_address,
@@ -135,10 +119,13 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       exited: (status ? "N/A" : endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })),
       minipoolEthDeposited: totalNOEthDeposited.toFixed(4), //node operators eth deposited
       minipoolEthWithdrawn: totalNOEthWithdrawn.toFixed(4), //node operators eth withdrawn
-      eth_earned: nodeOperatorEthEarned, //node operators eth earned
+      fiat_deposited: totalNOFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators fiat deposited
+      eth_earned: nodeOperatorEthEarned.toFixed(4), //node operators eth earned
       eth_apr: no_eth_apr, //node operator apr
       fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
-      fiat_apr: no_fiat_apr
+      fiat_apr: no_fiat_apr,
+      inflation: (rewards.inflationRPLRewards/ 1E18).toFixed(4),
+      smoothingPool: (rewards.smoothingPoolEthRewards/ 1E18).toFixed(4)
     }; //Total node operator's apr
     const newProtocolAPR = {
       nodeAddress: minipoolData.minipoolStats.node_address,
@@ -153,10 +140,13 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       exited: (status ? "N/A" : endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })),
       minipoolEthDeposited: totalProtocolEthDeposited.toFixed(4), //Protocol eth deposited
       minipoolEthWithdrawn: totalProtocolEthWithdrawn.toFixed(4), //Protocol eth withdrawn
-      eth_earned: protocolEthEarned, //protocol eth earned
+      fiat_deposited: totalProtocolFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators fiat deposited
+      eth_earned: protocolEthEarned.toFixed(4), //protocol eth earned
       eth_apr: p_eth_apr, //protocol apr
       fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
-      fiat_apr: p_fiat_apr
+      fiat_apr: p_fiat_apr,
+      inflation: 0,
+      smoothingPool: 0
     }; ////protocol apr in SD
     //console.log("Added minipool to node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
     nodeAPR.push(newNodeAPR);
@@ -165,18 +155,4 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
   });
 
   return { nodeAPR, nodeOperatorAPR, protocolAPR };
-}
-
-function formatArray(array) {
-  return (array || []).map(function (element) {
-    //date must be in the format of YYYY-MM-DD for getPriceData
-    const dateObject = new Date(element.date);
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
-    const day = String(dateObject.getDate()).padStart(2, '0');
-
-    const reformattedDate = `${year}-${month}-${day}`;
-    const dailyEthFlow = element.deposits_amount - element.withdrawals_amount;
-    return { validatorIndex: element.validatorIndex, eth_amount: dailyEthFlow, days: element.day, date: reformattedDate };
-  });
 }

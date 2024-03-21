@@ -121,6 +121,14 @@ const APR_COLS = [
     flex: 2
   },
   {
+    field: "fiat_deposited",
+    headerName: "Fiat Deposited",
+    type: "number",
+    align: 'right',
+    flex: 3
+
+  },
+  {
     field: "fiat_gain",
     headerName: "Fiat Gain",
     type: "number",

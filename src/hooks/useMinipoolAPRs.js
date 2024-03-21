@@ -1,28 +1,26 @@
 import { useState, useEffect } from 'react';
 import getValidators from "../getValidators";
-import getPriceData from "../getPriceData";
-//import getPriceDataFromCoinbase from "../getPriceDataFromCoinbase";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
-import _ from "lodash";
+import calcPeriodicRewardsShare from "../calcPeriodicRewardsShare";
 import getWalletHistory from '../getWalletHistory';
+import { min } from 'moment';
 let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
+function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceNow) {
   const nodeAddress = nodeDetails.nodeAddress;
-  const [depositsAndWithdrawals, setDepositsAndWithdrawals] = useState([]);
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
   const [walletRPLHistory, setWalletRPLHistory] = useState([]);
+  const [periodicRewardsShare, setPeriodicRewardsShare] = useState([]);
   const [nodeAPRs, setNodeAPRs] = useState([]);
   // Some state variables to keep track of the status of the fetches    
   const [gotValidators, setGotValidators] = useState(false);
   const [gotValidatorStats, setGotValidatorStats] = useState(false);
   const [gotRocketpoolDetails, setGotRocketpoolDetails] = useState(false);
-  const [gotDepositsAndWithdrawals, setGotDepositsAndWithdrawals] = useState(false);
   useEffect(() => {
     async function fetchValidatorArray() {
       // Fetch the list of validators indexed by the eth addresses of the node. From the list of validators, get the minipool 
@@ -34,8 +32,6 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
 
       setGotValidators(false); // will be reset, unless there is an error or empty node address
       setGotValidatorStats(false);
-      setDepositsAndWithdrawals([]);
-      setGotDepositsAndWithdrawals(false); // new node address, so reset the HasRun flags
       setGotRocketpoolDetails(false);
       //console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
       try {
@@ -66,19 +62,19 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
           let updatedMinipoolIndexArray = minipools;
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
-            balance: minipoolDetails.mpbalance,
-            nodeBalance: minipoolDetails.nodeBalance,
-            prococolBalance: minipoolDetails.protocolBalance,
-            calulatedNodeShare: minipoolDetails.calculatedNodeShare,
-            deposits: minipoolDetails.deposits,
-            minipoolEthWithdrawn: minipoolDetails.totalWithdrawals,
+            balance: minipoolDetails.mpbalance ? minipoolDetails.mpbalance : 0,
+            nodeBalance: minipoolDetails.nodeBalance ? minipoolDetails.nodeBalance : 0,
+            prococolBalance: minipoolDetails.protocolBalance ? minipoolDetails.protocolBalance : 0,
+            calulatedNodeShare: minipoolDetails.calculatedNodeShare ? minipoolDetails.calculatedNodeShare : 0,
+            deposits: minipoolDetails.deposits ? minipoolDetails.deposits : 0,
+            minipoolEthWithdrawn: minipoolDetails.totalWithdrawals ? minipoolDetails.totalWithdrawals : 0,
             validatorIndex: minipools[index].validatorIndex,
             bond: item.node_deposit_balance, //convert to eth
             status: minipools[index].status
           }));  //get the minipool addresses
           setMinipools(updatedMinipoolIndexArray);
           setGotRocketpoolDetails(true);
-          console.log("Minipools set from fetchRocketpoolValidatorStatsArray:", updatedMinipoolIndexArray);
+          //console.log("Minipools set from fetchRocketpoolValidatorStatsArray:", updatedMinipoolIndexArray);
         }
         catch (error) {
           console.log("Error fetching Rocketpool stats:", error);
@@ -90,14 +86,11 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
   }, [gotValidators, minipoolDetails]);
 
   useEffect(() => {
-    let allDepositsAndWithdrawals = [];
     async function fetchMinipoolStats() {
       if (gotRocketpoolDetails === false) return; //only run if the rocketpool details have run
       for (const index of minipools) {
         try {
           const oneIndex = await getValidatorStats(index.validatorIndex);
-          allDepositsAndWithdrawals = allDepositsAndWithdrawals.concat(oneIndex.mpDepositsAndWithdrawals); //response structure is different for deposits
-          setDepositsAndWithdrawals(allDepositsAndWithdrawals);
           //see if the minipool has exited. Set it to false if it has.
           if (oneIndex.status === false) {
             let exitedMinipools = minipools.map(minipool =>
@@ -113,27 +106,22 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
           console.log("Error creating deposit array:", error);
         }
       }
-      setGotDepositsAndWithdrawals(true);
-      console.log("All Depostis and Withdrawals set from fetchMinipoolStats", allDepositsAndWithdrawals)
     }
     fetchMinipoolStats();
   }, [gotRocketpoolDetails]);
-
-
 
   // only calculate the IRR when the withdrawls and deposits have been fetched
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
-    console.log("gotDepostsAndWithdrawals:", gotDepositsAndWithdrawals, "gotValidatorStats:", gotValidatorStats)
-    if (gotDepositsAndWithdrawals && gotValidatorStats && minipoolDetails !== null) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, depositsAndWithdrawals, ethPriceNow);
+    //console.log("gotValidatorStats:", gotValidatorStats)
+    if (gotValidatorStats && minipoolDetails.length > 0 && periodicRewardsShare.length > 0) {
+      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
-
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotDepositsAndWithdrawals, gotValidatorStats, minipoolDetails]);
+  }, [gotValidatorStats, minipoolDetails, periodicRewardsShare]);
 
 
   useEffect(() => {
@@ -145,6 +133,14 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
     }
     nodeWalletHistory();
   }, [nodeAddress]);
+
+  // Calculate the share of periodic rewards for each minipool
+  const stringifiedMinipoolDetails = JSON.stringify(minipoolDetails);
+  useEffect(() => {
+    let periodicRewardsShare = calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDetails); {
+      setPeriodicRewardsShare(periodicRewardsShare);
+    }
+  }, [nodePeriodicRewards, stringifiedMinipoolDetails]);
 
   return { nodeAPRs };
 }

@@ -3,7 +3,7 @@ import { Button, Stack, Tooltip, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { ethers } from "ethers";
 import moment from "moment";
-
+import React, { useState, useEffect } from 'react';
 import CurrencyValue from "./CurrencyValue";
 import useNodeFinalizedRewardSnapshots from "../hooks/useNodeFinalizedRewardSnapshots";
 import useNodePendingRewardSnapshot from "../hooks/useNodePendingRewardSnapshot";
@@ -149,8 +149,7 @@ const INTERVAL_COLS = [
   },
 ];
 
-export default function NodePeriodicRewardsTable({ sx, nodeAddress, header }) {
-
+export default function NodePeriodicRewardsTable({ sx, nodeAddress, header, setRewardsOnChange }) {
   let finalized = useNodeFinalizedRewardSnapshots({ nodeAddress });
   let pending = useNodePendingRewardSnapshot({ nodeAddress });
   //let ongoing = useNodeOngoingRewardSnapshot({ nodeAddress });
@@ -163,6 +162,12 @@ export default function NodePeriodicRewardsTable({ sx, nodeAddress, header }) {
     .concat(pending ? [pending] : [])
     // The finished and finalized intervals ready for claiming
     .concat(finalized);
+    const stringifiedRewards = JSON.stringify(rows);
+    useEffect(() => {
+      // Call the callback function with the values
+      setRewardsOnChange(rows);
+    }, [stringifiedRewards]);
+
   return (
     <div style={{ display: "flex", maxWidth }}>
       <div style={{ flexGrow: 1, width: "100%" }}>

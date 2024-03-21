@@ -65,30 +65,33 @@ export default function useMinipoolDetails(nodeAddress) {
 
           // Convert args
           const amount = Number(args.amount)/1E18;
+          let timeStamp = args.time.toNumber();
           let date = new Date(args.time * 1000);
           date = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
           // Need YYYY-MM-DD format for getPriceOnDate
           let price_usd = await limiter.schedule(() => getPriceOnDate(date, "ethereum"));
           //let price_usd = await getPriceOnDate(date, "ethereum");
-          return { name, date, amount, price_usd };
+          return { name, timeStamp, date, amount, price_usd };
         }));
         const deposits = await Promise.all(etherDepositedEvents.map(async (log) => {
           const { name, args } = mpDelegateInterface.parseLog(log);
 
           // Convert args
           const amount = Number(args.amount)/1E18;
+          let timeStamp = args.time.toNumber();
           let date = new Date(args.time * 1000);
           date = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
           // Need YYYY-MM-DD format for getPriceOnDate
           let price_usd = await limiter.schedule(() => getPriceOnDate(date, "ethereum"));
           //let price_usd = await getPriceOnDate(date, "ethereum");
-          return { name, date, amount, price_usd };
+          return { name, timeStamp, date, amount, price_usd };
         }));
         // get the details for the minipool
         let isFinalized = await mp.getFinalised();
         let nodeRefundBalance = await mp.getNodeRefundBalance();
         let version = await mp.version();
         let status = await mp.getStatus();
+        let statusTime = await mp.getStatusTime();
         //let minipoolIndex = await mp._index;
         let nodeDepositBalance = await mp.getNodeDepositBalance();
         let mpBalance = await provider.getBalance(minipoolAddress);
@@ -108,8 +111,8 @@ export default function useMinipoolDetails(nodeAddress) {
         calculatedNodeShare = calculatedNodeShare.toHexString();
         nodeBalance = nodeBalance.toHexString();
         protocolBalance = protocolBalance.toHexString();
-        let totalWithdrawals = _.sumBy(withdrawals, 'amount');
-        let totalDeposits = _.sumBy(deposits, 'amount');
+        let totalWithdrawals = withdrawals ? _.sumBy(withdrawals, 'amount') : 0;
+        let totalDeposits = deposits ? _.sumBy(deposits, 'amount') : 0;
         //console.log("minipool", minipoolAddress, "withdrawals", withdrawals, "deposits", deposits);
 // parse the events so we can display them in the UI
         mpBalance = parseFloat(ethers.utils.formatEther(mpBalance || 0)).toFixed(6);
@@ -129,6 +132,7 @@ export default function useMinipoolDetails(nodeAddress) {
           nodeBalance,
           protocolBalance,
           status,
+          statusTime,
           isFinalized,
           upgraded,
           deposits,
