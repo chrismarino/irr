@@ -93,14 +93,10 @@ export default function calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDe
         let inflationRPLRewards = reward.activeIntervals.reduce((sum, activeInterval) => sum + activeInterval.inflationRPLShare, 0);
 
         return {
-            ...reward,
+            minipoolAddress: reward.minipoolAddress,
             smoothingPoolEthRewards,
             inflationRPLRewards
         };
     });
-    return ({
-        minipoolAddress: rewards.minipoolAddress,
-        smoothingPoolEthRewards: rewards.smoothingPoolEthRewards,
-        inflationRPLRewards: rewards.inflationRPLRewards,
-    });
+    return rewards;
 }

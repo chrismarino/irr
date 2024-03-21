@@ -115,13 +115,13 @@ function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethP
 
   useEffect(() => {
     //console.log("gotValidatorStats:", gotValidatorStats)
-    if (gotValidatorStats && minipoolDetails.length > 0) {
+    if (gotValidatorStats && minipoolDetails.length > 0 && periodicRewardsShare.length > 0) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotValidatorStats, minipoolDetails]);
+  }, [gotValidatorStats, minipoolDetails, periodicRewardsShare]);
 
 
   useEffect(() => {

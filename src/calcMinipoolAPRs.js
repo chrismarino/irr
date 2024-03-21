@@ -21,6 +21,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     // need to know what minipool we're working with to fetch the details. 
     let minipoolData = minipools.find(pool => pool.validatorIndex === minipool);
     let mpDetail = minipoolDetails.find(mpDetails => mpDetails.minipoolAddress === minipoolData.minipoolStats.minipool_address);
+    let rewards = periodicRewardsShare.find(reward => reward.minipoolAddress === minipoolData.minipoolStats.minipool_address);
     if (minipoolData.minipoolStats === undefined) {
       throw new Error("Minipool data is undefined. Minipool: " + minipool);
     }
@@ -101,7 +102,9 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       eth_earned: totalEthEarned.toFixed(4), //total eth earned by the minipool
       eth_apr: eth_apr,
       fiat_gain: totalFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //Total node's gain
-      fiat_apr: fiat_apr
+      fiat_apr: fiat_apr,
+      inflation: 0,
+      smoothingPool: 0
     }; //Total node's apr
     const newNodeOperatorAPR = {
       nodeAddress: minipoolData.minipoolStats.node_address,
@@ -120,7 +123,9 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       eth_earned: nodeOperatorEthEarned.toFixed(4), //node operators eth earned
       eth_apr: no_eth_apr, //node operator apr
       fiat_gain: nodeOperatorFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //node operators gain
-      fiat_apr: no_fiat_apr
+      fiat_apr: no_fiat_apr,
+      inflation: (rewards.inflationRPLRewards/ 1E18).toFixed(4),
+      smoothingPool: (rewards.smoothingPoolEthRewards/ 1E18).toFixed(4)
     }; //Total node operator's apr
     const newProtocolAPR = {
       nodeAddress: minipoolData.minipoolStats.node_address,
@@ -139,7 +144,9 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       eth_earned: protocolEthEarned.toFixed(4), //protocol eth earned
       eth_apr: p_eth_apr, //protocol apr
       fiat_gain: protocolFiatGain.toLocaleString('en-US', { style: 'currency', currency: 'USD' }), //protocol gain
-      fiat_apr: p_fiat_apr
+      fiat_apr: p_fiat_apr,
+      inflation: 0,
+      smoothingPool: 0
     }; ////protocol apr in SD
     //console.log("Added minipool to node APRs:", nodeAPR, nodeOperatorAPR, protocolAPR);
     nodeAPR.push(newNodeAPR);
