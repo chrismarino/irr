@@ -13,13 +13,31 @@ export default function calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDe
         smootingPoolRewards: interval.smoothingPoolEth,
         inflationRewards: interval.collateralRpl,
     }));
-    let minipoolsX = minipoolDetails.map(minipool => ({
+    let minipools = minipoolDetails.map(minipool => ({
         minipoolAddress: minipool.minipoolAddress,
         startTime: minipool.statusTime.toNumber(),
         endTime: (_.maxBy(minipool.withdrawals, 'timeStamp') || {}).timeStamp || Math.floor(Date.now() / 1000), // If no withdrawals, use today's date.
         nodeDeposit: minipool.nodeDepositBalance,
     }));
+    // Find which minipools were active during the reward period interval.
+    minipools = minipools.map(minipool => {
+        let activeDays = 0;
+        let intervalDays = 0;
+        let includedInteval = [];
+        interval.forEach(interval => {
+            if(minipool.startTime < interval.endTime && minipool.endTime > interval.startTime) {
+                intervalDays = Math.min(minipool.endTime, interval.endTime) - Math.max(minipool.startTime, interval.startTime);
+                activeDays += intervalDays;
+                includedInteval.push({interval: interval.interval, days: intervalDays/86400});
+            }
+        });
+        return {
+            ...minipool,
+            includedInteval,
+            activeDays,
+        };
+    });
     console.log("Interval:", interval, "Minipools:",  minipoolDetails);
 
-    return interval, minipoolsX;
+    return interval, minipools;
 }
