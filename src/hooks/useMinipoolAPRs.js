@@ -3,16 +3,19 @@ import getValidators from "../getValidators";
 import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
+import calcPeriodicRewardsShare from "../calcPeriodicRewardsShare";
 import getWalletHistory from '../getWalletHistory';
+import { min } from 'moment';
 let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
+function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceNow) {
   const nodeAddress = nodeDetails.nodeAddress;
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
   const [walletRPLHistory, setWalletRPLHistory] = useState([]);
+  const [periodicRewardsShare, setPeriodicRewardsShare] = useState([]);
   const [nodeAPRs, setNodeAPRs] = useState([]);
   // Some state variables to keep track of the status of the fetches    
   const [gotValidators, setGotValidators] = useState(false);
@@ -107,18 +110,15 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
     fetchMinipoolStats();
   }, [gotRocketpoolDetails]);
 
-
-
   // only calculate the IRR when the withdrawls and deposits have been fetched
   // only render when the all the stats. withdrawls and deposits have been fetched
 
   useEffect(() => {
     //console.log("gotValidatorStats:", gotValidatorStats)
     if (gotValidatorStats && minipoolDetails.length > 0) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, ethPriceNow);
+      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
-
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
   }, [gotValidatorStats, minipoolDetails]);
@@ -133,6 +133,14 @@ function useMinipoolAPRs(nodeDetails, minipoolDetails, ethPriceNow) {
     }
     nodeWalletHistory();
   }, [nodeAddress]);
+
+  // Calculate the share of periodic rewards for each minipool
+  const stringifiedMinipoolDetails = JSON.stringify(minipoolDetails);
+  useEffect(() => {
+    let periodicRewardsShare = calcPeriodicRewardsShare(nodePeriodicRewards, minipoolDetails); {
+      setPeriodicRewardsShare(periodicRewardsShare);
+    }
+  }, [nodePeriodicRewards, stringifiedMinipoolDetails]);
 
   return { nodeAPRs };
 }

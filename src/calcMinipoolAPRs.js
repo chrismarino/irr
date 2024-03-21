@@ -1,7 +1,7 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, ethPriceToday) {
+export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceToday) {
   var walletEthDeposited = _.sumBy(walletEthHistory.deposits, "amount") / 1E18;
   var walletRPLDeposited = _.sumBy(walletRPLHistory.deposits, "amount") / 1E18;
   var walletEthWithdrawn = _.sumBy(walletEthHistory.withdrawals, "amount") / 1E18;
