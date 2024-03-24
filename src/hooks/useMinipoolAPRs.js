@@ -4,7 +4,8 @@ import getRocketpoolValidatorStats from "../getRocketpoolValidatorStats";
 import getValidatorStats from "../getValidatorStats";
 import calcMinipoolAPRs from "../calcMinipoolAPRs";
 import calcPeriodicRewardsShare from "../calcPeriodicRewardsShare";
-import getWalletHistory from '../getWalletHistory';
+import getWalletEthHistory from '../getWalletEthHistory';
+import getWalletRPLHistory from '../getWalletRPLHistory';
 import { min } from 'moment';
 let minipoolIndexArray = [];
 
@@ -115,7 +116,7 @@ function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethP
 
   useEffect(() => {
     //console.log("gotValidatorStats:", gotValidatorStats)
-    if (gotValidatorStats && minipoolDetails.length > 0 && periodicRewardsShare.length > 0) {
+    if (gotValidatorStats && gotRocketpoolDetails && minipoolDetails.length > 0 && periodicRewardsShare.length > 0) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceNow);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
@@ -126,9 +127,9 @@ function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethP
 
   useEffect(() => {
     async function nodeWalletHistory() {
-      const walletEthHistory = await getWalletHistory(nodeAddress, "ethereum");
+      const walletEthHistory = await getWalletEthHistory(nodeAddress);
       setWalletEthHistory(walletEthHistory);
-      const walletRPLHistory = await getWalletHistory(nodeAddress, "rocket-pool");
+      const walletRPLHistory = await getWalletRPLHistory(nodeAddress);
       setWalletRPLHistory(walletRPLHistory);
     }
     nodeWalletHistory();

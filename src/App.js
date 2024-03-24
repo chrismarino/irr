@@ -1,7 +1,7 @@
 import { BrowserRouter, HashRouter, Route, Routes, Link } from "react-router-dom";
 import React from "react";
 import './App.css';
-import {defaultAddress} from "./sampleAddresses";
+import { defaultAddress } from "./sampleAddresses";
 import NodeAPRs from "./components/NodeAPRs";
 import NodeAddressForm from "./components/NodeAddressForm";
 import NodePeriodicRewardsTable from "./components/NodePeriodicRewardsTable";
@@ -27,7 +27,7 @@ function App() {
   const [nodeAddress, setNodeAddress] = useState(defaultAddress);
   const handleRewardsChange = (newRewards) => {
     setNodePeriodicRewards(newRewards);
-    console.log("New Rewards:" , newRewards); // Do something with the values
+    //console.log("New Rewards:" , newRewards); // Do something with the values
   };
 
   if (!gotEthPriceNow || !gotRplPriceNow) {
@@ -45,23 +45,25 @@ function App() {
             <h1>Minipool Returns Calculator</h1>
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
             <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+
+            <h1>Minipool APRs</h1>
+            {nodePeriodicRewards.some(reward => !reward.isLoading) &&
+              <NodeAPRs nodeAddress={nodeAddress} nodePeriodicRewards={nodePeriodicRewards} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+            }
             <h1>Periodic Rewards</h1>
-            <NodePeriodicRewardsTable 
+            <NodePeriodicRewardsTable
               sx={{ mb: 5, border: 0 }}
               nodeAddress={nodeAddress}
               header={"header"}
               setRewardsOnChange={handleRewardsChange}
             />
-            <h1>Minipool APRs</h1>
-            {nodePeriodicRewards.some(reward => !reward.isLoading) &&
-              <NodeAPRs nodeAddress={nodeAddress} nodePeriodicRewards = {nodePeriodicRewards} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
-            }
           </div>
+
         } />
         <Route path="/performance" element={
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h1>Periodic Rewards</h1>
-            <NodePeriodicRewardsTable 
+            <NodePeriodicRewardsTable
               sx={{ mb: 5, border: 0 }}
               nodeAddress={nodeAddress}
               header={"header"}

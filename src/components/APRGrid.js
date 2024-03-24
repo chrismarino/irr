@@ -2,41 +2,6 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 const APR_COLS = [
   {
-    field: "nodeAddress",
-    headerName: "Node Address",
-    align: 'left',
-    type: "number",
-    flex: 2
-  },
-  {
-    field: "walletEthDeposited",
-    headerName: "Wallet Eth Deposited",
-    align: 'left',
-    type: "number",
-    flex: 2
-  },
-  {
-    field: "walletRPLDeposited",
-    headerName: "Wallet RPL Deposited",
-    align: 'left',
-    type: "number",
-    flex: 2
-  },
-  {
-    field: "walletEthWithdrawn",
-    headerName: "Wallet Eth Withdrawn",
-    align: 'left',
-    type: "number",
-    flex: 2
-  },
-  {
-    field: "walletRPLWithdrawn",
-    headerName: "Wallet RPL Withdrawn",
-    align: 'left',
-    type: "number",
-    flex: 2
-  },
-  {
     field: "minipool",
     headerName: "Minipool",
     align: 'left',

@@ -1,9 +1,16 @@
 // Desc: This hook will calculate the IRR of a given set of cash flows.
-import axios  from 'axios';
+import axios from 'axios'; 
 
 export default async function getRocketpoolValidatorStats(validatorArray) {
   // Fetch the minipool stats from Beaconcha.in from an arry of validator indexes. Return an array of objects with the
   // Rocketpool values. This should be updated whenever the Node address feild is changed on the page. 
+  validatorArray = validatorArray.filter(validator => {
+    if (validator.validatorIndex === null) {
+      console.warn("Warning: Null validator found.");
+      return false;
+    }
+    return true;
+  });
   let appUrl = process.env.REACT_APP_BEACONCHAIN_URL
   let apiEndpoint = appUrl + "/api/v1"
   let apikey = process.env.REACT_APP_BEACONCHAIN_KEY

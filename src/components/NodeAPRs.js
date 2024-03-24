@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
+import WalletGrid from "./WalletGrid";
+import WalletGridTransposedCols from "./WalletGridTransposedCols";
 import _ from "lodash";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import useMinipoolDetails from '../hooks/useMinipoolDetails';
@@ -17,34 +19,34 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }
   const [nodeDetails, setNodeDetails] = useState([]);
   const [gotNodeDetails, setGotNodeDetails] = useState(false);
   const [minipoolRewards, setMinipoolRewards] = useState([]);
-  const [prevNodeAddress, setPrevNodeAddress] = useState(nodeAddress);
   //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
+
   const NodeDetails = useNodeDetails(nodeAddress);
-  //const stringifiedMinipoolDetails = JSON.stringify(MinipoolDetails);
+  const stringifiedNodeDetails = JSON.stringify(NodeDetails);
+
   useEffect(() => {
     async function fetchNodeDetails() {
-      //let newNodeDetails = await Promise(NodeDetails);
-      if(!gotNodeDetails)
-      if (!NodeDetails.isLoading) {
-        setNodeDetails(NodeDetails);
-        setGotNodeDetails(true);
+      if (!gotNodeDetails && !NodeDetails.isLoading) {
+        setNodeDetails({ ...NodeDetails }); // new object to trigger re-render
         //console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
+        setGotNodeDetails(true);
       }
     }
     fetchNodeDetails();
-  }, [NodeDetails]);
-
-  const nodeDeposits = useNodeDeposits(nodeAddress); //these are the deposits from the node to minipools.
-  if (nodeDeposits.isLoading) {
-    // The data is still loading
-    //console.log('Data is loading...');
-  } else {
-    //console.log("nodeDeposits:", nodeDeposits);
-  }
+  }, [NodeDetails, gotNodeDetails, nodeAddress, stringifiedNodeDetails]);
 
   useEffect(() => {
-    setPrevNodeAddress(nodeAddress);
-  }, [nodeAddress]);
+    setGotNodeDetails(false);
+  }, [minipoolDetails]);
+  
+// do I need this? Not used anywhere, but will keep it for now.
+  //const nodeDeposits = useNodeDeposits(nodeAddress); //these are the deposits from the node to minipools.
+  //if (nodeDeposits.isLoading) {
+    // The data is still loading
+    //console.log('Data is loading...');
+  //} else {
+    //console.log("nodeDeposits:", nodeDeposits);
+  //}
 
   let MinipoolDetails = useMinipoolDetails(nodeAddress);
   const stringifiedMinipoolDetails = JSON.stringify(MinipoolDetails);
@@ -57,7 +59,9 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }
       if (MinipoolDetails.every(element => !element.isLoading)) {
         setMinipoolDetails(newMpDetails);
         //setGotMinipoolDetails(true);
-        //console.log("Node Address", nodeAddress, "MinipoolDetails after set:", newMpDetails);
+        //console.log("Node Address", nodeAddress );
+        //console.log("MinipoolDetails after set:", MinipoolDetails);
+        //console.log("newMpDetails after set:", newMpDetails);
       }
     }
     fetchMinipoolDetails();
@@ -68,33 +72,33 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }
     return <div>Enter a node address and hit Enter...</div>;
   }
 
-  if (nodeAddress !== prevNodeAddress) {
-    return <div>Node address changed, calculating APRs...</div>;
-  }
+
 
   if (!nodeAPRs.nodeAPR || !nodeAPRs.nodeOperatorAPR || !nodeAPRs.protocolAPR || nodeAPRs.length === 0) {
     return <div>Fetching Price History and Calculating APRs...</div>;
   }
-  if (nodeAddress !== prevNodeAddress) {
-    return <div>Node address changed, calculating APRs...</div>;
-  } else {
-    return (
-      <div className="NodeAPRs">
-         <section>
-          <p></p><h3>Total Node Returns</h3>
-          {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
-        </section> 
-        <section>
-          <p></p><h3>Total Node Operator Returns</h3>
-          {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
-        </section>
-        <section>
-          <p></p><h3>Total Protocol Returns</h3>
-          {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
-        </section> 
-      </div>
-    );
-  }
+
+  return (
+    <div className="NodeAPRs">
+      <section>
+        <p></p><h3>Wallet Details</h3>
+        {<WalletGridTransposedCols rows={nodeAPRs.walletAPR} />}
+      </section>
+      <section>
+        <p></p><h3>Total Node Returns</h3>
+        {<APRGrid rows={(nodeAPRs.nodeAPR || [])} />}
+      </section>
+      <section>
+        <p></p><h3>Total Node Operator Returns</h3>
+        {<APRGrid rows={(nodeAPRs.nodeOperatorAPR || [])} />}
+      </section>
+      <section>
+        <p></p><h3>Total Protocol Returns</h3>
+        {<APRGrid rows={(nodeAPRs.protocolAPR || [])} />}
+      </section>
+    </div>
+  );
 }
+
 
 export default NodeAPRs;

@@ -68,7 +68,7 @@ export default function useNodeDetails(nodeAddress) {
 
     const fetchNodeDetails = async () => {
       const details = await node.getNodeDetails(nodeAddress);
-      setNodeDetails(details);
+      setNodeDetails(details); // create a new object to trigger re-render
     };
 
     fetchNodeDetails();
