@@ -11,7 +11,7 @@ let minipoolIndexArray = [];
 
 
 
-function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceNow) {
+function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceToday, rplPriceToday) {
   const nodeAddress = nodeDetails.nodeAddress;
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
@@ -117,7 +117,7 @@ function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethP
   useEffect(() => {
     //console.log("gotValidatorStats:", gotValidatorStats)
     if (gotValidatorStats && gotRocketpoolDetails && minipoolDetails.length > 0 && periodicRewardsShare.length > 0) {
-      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceNow);
+      const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceToday, rplPriceToday);
       //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);

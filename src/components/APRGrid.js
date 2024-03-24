@@ -54,7 +54,7 @@ const APR_COLS = [
 
   },
   // {
-  //   field: 'ethPriceNow',
+  //   field: 'ethPriceToday',
   //   headerName: 'Eth Price Today',
   //   flex: 1,
   //   align: 'left',

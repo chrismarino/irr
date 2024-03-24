@@ -8,7 +8,7 @@ import useMinipoolDetails from '../hooks/useMinipoolDetails';
 import useNodeDetails from '../hooks/useNodeDetails';
 import useNodeDeposits from '../hooks/useNodeDeposits';
 
-function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }) {
+function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceToday, rplPriceToday }) {
 
 
   var MinipoolEvents = []
@@ -19,7 +19,7 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }
   const [nodeDetails, setNodeDetails] = useState([]);
   const [gotNodeDetails, setGotNodeDetails] = useState(false);
   const [minipoolRewards, setMinipoolRewards] = useState([]);
-  //console.log("nodeAddress, ethPriceNow in NodeAPRs:", nodeAddress, ethPriceNow)
+  //console.log("nodeAddress, ethPriceToday in NodeAPRs:", nodeAddress, ethPriceToday)
 
   const NodeDetails = useNodeDetails(nodeAddress);
   const stringifiedNodeDetails = JSON.stringify(NodeDetails);
@@ -67,7 +67,7 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceNow, rplPriceNow }
     fetchMinipoolDetails();
   }, [stringifiedMinipoolDetails]); // will this work?
 
-  const { nodeAPRs } = useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceNow);
+  const { nodeAPRs } = useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethPriceToday, rplPriceToday);
   if (nodeAddress === "") {
     return <div>Enter a node address and hit Enter...</div>;
   }

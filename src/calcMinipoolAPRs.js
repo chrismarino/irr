@@ -1,7 +1,7 @@
 // Pulling out the caliculation of the APRs from the main app.js file to make it easier to read and maintain.
 import _ from "lodash";
 
-export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceToday) {
+export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceToday, rplPriceToday) {
   var walletEthDeposited = _.sumBy(walletEthHistory.deposits, "amount") / 1E18;
   var walletEthFiatDeposited = walletEthHistory.deposits.reduce((sum, deposit) => sum + deposit.amount * deposit.price_usd/ 1E18, 0);
   var walletRPLDeposited = _.sumBy(walletRPLHistory.deposits, "amount") / 1E18;
@@ -10,6 +10,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
   var walletEthtoMinipools = _.sumBy(minipools, "bond") / 1E18;
   var walletEthBalance = walletEthDeposited - walletEthtoMinipools;
   var walletRPLFiatDeposited = walletRPLHistory.deposits.reduce((sum, deposit) => sum + deposit.amount * deposit.price_usd/ 1E18, 0);
+  var walletRPLFistValue = walletRPLFiatDeposited - walletRPLStaked * rplPriceToday;
   var walletEthWithdrawn = _.sumBy(walletEthHistory.withdrawals, "amount") / 1E18;
   var walletEthFiatWithdrawn = walletEthHistory.withdrawals.reduce((sum, withdrawals) => sum + withdrawals.amount * withdrawals.price_usd/ 1E18, 0);
   var walletRPLWithdrawn = _.sumBy(walletRPLHistory.withdrawals, "amount") / 1E18;
@@ -23,9 +24,7 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
   var nodeAPR = [];
   var nodeOperatorAPR = [];
   var protocolAPR = [];
-  //console.log("ethPriceToday from calc minipools:", ethPriceToday);
-  //const ethPriceNow = (ethPriceToday[0].price_usd  || 0); // ethPriceToday is an array of objects with a single object.
-  const ethPriceNow = ethPriceToday;
+
   uniqueValidatorIndexes.forEach(minipool => {
     // need to know what minipool we're working with to fetch the details. 
 
@@ -93,9 +92,9 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       totalEthEarned = nodeOperatorEthEarned + protocolEthEarned;
     }
     // Fiat gains are the eth earned - eth deposited, times the current price of eth
-    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceNow) - totalFiatDeposited;
-    const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceNow) - totalProtocolFiatDeposited;
-    const nodeOperatorFiatGain = ((nodeOperatorEthEarned + totalNOEthDeposited) * ethPriceNow) - totalNOFiatDeposited;
+    const totalFiatGain = ((totalEthEarned + totalEthDeposited) * ethPriceToday) - totalFiatDeposited;
+    const protocolFiatGain = ((protocolEthEarned + totalProtocolEthDeposited) * ethPriceToday) - totalProtocolFiatDeposited;
+    const nodeOperatorFiatGain = ((nodeOperatorEthEarned + totalNOEthDeposited) * ethPriceToday) - totalNOFiatDeposited;
 
     //if (totalFiatDeposited > 0) { totalFiatDeposited = totalFiatDeposited - 32000000000 * 2350 } //back out the 32 eth deposit
     let minipoolIndex = minipools.find(pool => pool.validatorIndex === minipool);

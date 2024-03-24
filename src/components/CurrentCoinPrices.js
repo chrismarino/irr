@@ -2,10 +2,10 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
-function CurrentCoinPrices({ ethPriceNow, rplPriceNow }) {
+function CurrentCoinPrices({ ethPriceToday, rplPriceToday }) {
   const rows = [
-    { id: 1, coin: 'Ethereum', price: (ethPriceNow || 0)},
-    { id: 2, coin: 'Rocketpool', price: (rplPriceNow || 0)},
+    { id: 1, coin: 'Ethereum', price: (ethPriceToday || 0)},
+    { id: 2, coin: 'Rocketpool', price: (rplPriceToday || 0)},
   ];
 
   const columns = [

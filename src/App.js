@@ -17,12 +17,12 @@ function Router({ children }) {
 }
 function App() {
 
-  const { priceNow: ethPrice, gotPriceNow: gotEthPriceNow } = usePriceNow("ethereum");
-  //const [ethPriceNow, setEthPriceNow] = useState();
-  //setEthPriceNow(ethPrice);
-  const { priceNow: rplPrice, gotPriceNow: gotRplPriceNow } = usePriceNow("rocket-pool");
-  //const [rplPriceNow, setRplPriceNow] = useState();
-  //setRplPriceNow(rplPrice);
+  const { priceNow: ethPrice, gotPriceNow: gotethPriceToday } = usePriceNow("ethereum");
+  //const [ethPriceToday, setethPriceToday] = useState();
+  //setethPriceToday(ethPrice);
+  const { priceNow: rplPrice, gotPriceNow: gotrplPriceToday } = usePriceNow("rocket-pool");
+  //const [rplPriceToday, setrplPriceToday] = useState();
+  //setrplPriceToday(rplPrice);
   const [nodePeriodicRewards, setNodePeriodicRewards] = useState([]);
   const [nodeAddress, setNodeAddress] = useState(defaultAddress);
   const handleRewardsChange = (newRewards) => {
@@ -30,7 +30,7 @@ function App() {
     //console.log("New Rewards:" , newRewards); // Do something with the values
   };
 
-  if (!gotEthPriceNow || !gotRplPriceNow) {
+  if (!gotethPriceToday || !gotrplPriceToday) {
     return <div>Loading current Eth and RPL prices...</div>;
   }
   return (
@@ -44,11 +44,11 @@ function App() {
           <div style={{ width: 1200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h1>Minipool Returns Calculator</h1>
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
-            <CurrentCoinPrices ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+            <CurrentCoinPrices ethPriceToday={ethPrice} rplPriceToday={rplPrice} />
 
             <h1>Minipool APRs</h1>
             {nodePeriodicRewards.some(reward => !reward.isLoading) &&
-              <NodeAPRs nodeAddress={nodeAddress} nodePeriodicRewards={nodePeriodicRewards} ethPriceNow={ethPrice} rplPriceNow={rplPrice} />
+              <NodeAPRs nodeAddress={nodeAddress} nodePeriodicRewards={nodePeriodicRewards} ethPriceToday={ethPrice} rplPriceToday={rplPrice} />
             }
             <h1>Periodic Rewards</h1>
             <NodePeriodicRewardsTable
