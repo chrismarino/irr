@@ -10,12 +10,12 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
   var walletEthtoMinipools = _.sumBy(minipools, "bond") / 1E18;
   var walletEthBalance = walletEthDeposited - walletEthtoMinipools;
   var walletRPLFiatDeposited = walletRPLHistory.deposits.reduce((sum, deposit) => sum + deposit.amount * deposit.price_usd/ 1E18, 0);
-  var walletRPLFistValue = walletRPLFiatDeposited - walletRPLStaked * rplPriceToday;
   var walletEthWithdrawn = _.sumBy(walletEthHistory.withdrawals, "amount") / 1E18;
   var walletEthFiatWithdrawn = walletEthHistory.withdrawals.reduce((sum, withdrawals) => sum + withdrawals.amount * withdrawals.price_usd/ 1E18, 0);
   var walletRPLWithdrawn = _.sumBy(walletRPLHistory.withdrawals, "amount") / 1E18;
   var walletRPLFiatWithdrawn = walletRPLHistory.withdrawals.reduce((sum, withdrawals) => sum + withdrawals.amount * withdrawals.price_usd/ 1E18, 0);
-
+  var walletRPLCurrentFiatValue = (walletRPLBalance + walletRPLStaked) * rplPriceToday;
+  var walletEthCurrentFiatValue = (walletEthBalance + walletEthtoMinipools) * ethPriceToday;
   //find the minipool indices...
   const uniqueValidatorIndexes = [...new Set(minipools.map(item => item.validatorIndex))];
   // don't think I need this since I saved the list of validators in the from the node API
@@ -121,7 +121,10 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
       walletRPLStaked: walletRPLStaked.toFixed(4),
       walletRPLBalance: walletRPLBalance.toFixed(4),
       walletRPLFiatDeposited: walletRPLFiatDeposited.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
-      walletRPLFiatWithdrawn: walletRPLFiatWithdrawn.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      walletRPLFiatWithdrawn: walletRPLFiatWithdrawn.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
+
+      walletRPLCurrentFiatValue: walletRPLCurrentFiatValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
+      walletEthCurrentFiatValue: walletEthCurrentFiatValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
     }
     const newNodeAPR = {
       minipool: minipool,

@@ -51,6 +51,13 @@ const WALLET_COLS = [
       flex: 2
     },
     {
+      field: "walletEthCurrentFiatValue",
+      headerName: "Current Value of all Eth",
+      align: 'left',
+      type: "number",
+      flex: 2
+    },
+    {
       field: "walletRPLDeposited",
       headerName: "RPL Deposited",
       align: 'left',
@@ -93,7 +100,13 @@ const WALLET_COLS = [
       type: "number",
       flex: 2
     },
-
+    {
+      field: "walletRPLCurrentFiatValue",
+      headerName: "Current Value of all RPL",
+      align: 'left',
+      type: "number",
+      flex: 2
+    },
   ];
 
 function WalletGridTransposedCols({ rows }) {

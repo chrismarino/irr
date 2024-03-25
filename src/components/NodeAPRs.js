@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import APRGrid from "./APRGrid";
 import WalletGrid from "./WalletGrid";
 import WalletGridTransposedCols from "./WalletGridTransposedCols";
+import WalletTable from './WalletTable';
 import _ from "lodash";
 import useMinipoolAPRs from '../hooks/useMinipoolAPRs';
 import useMinipoolDetails from '../hooks/useMinipoolDetails';
@@ -81,8 +82,8 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceToday, rplPriceTod
   return (
     <div className="NodeAPRs">
       <section>
-        <p></p><h3>Wallet Details</h3>
-        {<WalletGridTransposedCols rows={nodeAPRs.walletAPR} />}
+        <p></p><h3>Node {nodeAddress} wallet details</h3>
+        {<WalletTable gridRows={nodeAPRs.walletAPR} />}
       </section>
       <section>
         <p></p><h3>Total Node Returns</h3>
