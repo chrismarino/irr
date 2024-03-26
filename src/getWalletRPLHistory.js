@@ -9,7 +9,7 @@ export default async function getWalletRPLHistory(address) {
     const Bottleneck = require('bottleneck');
     // Create a new limiter that allows 2 request per second
     const limiter = new Bottleneck({
-      minTime: 500, // 1 request per 1000ms
+      minTime: 100, // 1 request per 1000ms
     })
     if( address === undefined) return "Address or CoinID is undefined";
     let coinID = "rocket-pool";

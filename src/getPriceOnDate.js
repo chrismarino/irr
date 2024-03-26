@@ -16,7 +16,7 @@ export default async function getPriceOnDate(date, coinID) {
     let lookupDate = date.split('-').reverse().join('-'); // Reformatting the date to DD-MM-YYYY
     let priceUrl = (apiEndpoint + node_action + "?date=" + lookupDate + "?x_cg_demo_api_key=" + apikey)
     const maxRetries = 5;
-    const delay = 1500; // Delay in milliseconds
+    const delay = 1000; // Delay in milliseconds
     for (let i = 0; i < maxRetries; i++) {
         try {
             let price = await axios(priceUrl);
@@ -24,7 +24,7 @@ export default async function getPriceOnDate(date, coinID) {
             return price_usd;
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                console.log('Rate limit hit, retrying...');
+                console.log('Rate limit hit, retrying...Date:', date, "CoinID:", coinID);
                 await new Promise(resolve => setTimeout(resolve, delay));
             } else {
                 throw error; // If the error is not a 429, re-throw it

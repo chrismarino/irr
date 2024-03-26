@@ -10,7 +10,7 @@ export default async function getWalletEthHistory(address) {
   const Bottleneck = require('bottleneck');
   // Create a new limiter that allows 4 request per second
   const limiter = new Bottleneck({
-    minTime: 250, // 1 request per 1000ms
+    minTime: 100, // 1 request per 1000ms
   })
   if (address === undefined) return "Address or CoinID is undefined";
   let coinID = "ethereum";
