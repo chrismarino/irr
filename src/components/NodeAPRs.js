@@ -84,6 +84,7 @@ function NodeAPRs({ nodeAddress, nodePeriodicRewards, ethPriceToday, rplPriceTod
       <section>
         <p></p><h3>Node {nodeAddress} wallet details</h3>
         {<WalletTable gridRows={nodeAPRs.walletAPR} />}
+        {/* {<WalletGridTransposedCols rows={nodeAPRs.walletAPR} />} */}
       </section>
       <section>
         <p></p><h3>Total Node Returns</h3>

@@ -12,6 +12,13 @@ function WalletTable({ gridRows }) {
             flex: 3
         },
         {
+            field: "currentPrice",
+            headerName: "Current Price",
+            align: 'left',
+            type: "number",
+            flex: 2
+        },
+        {
             field: "walletEthDeposited",
             headerName: "Total Deposited",
             align: 'left',
@@ -62,7 +69,8 @@ function WalletTable({ gridRows }) {
         },
 
     ];
-    const FIELDS = ["Total Deposited",
+    const FIELDS = ["Current Price",
+        "Total Deposited",
         "Total Withdrawn",
         "Withdrawn to Minipoools/Staked",
         "Wallet Balance",

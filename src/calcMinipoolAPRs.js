@@ -108,7 +108,8 @@ export default function calcMinipoolAPRs(walletEthHistory, walletRPLHistory, min
     const p_fiat_apr = (((365 / days) * protocolFiatGain) / (totalProtocolFiatDeposited)).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const newWalletAPR = {
       nodeAddress: minipoolData.minipoolStats.node_address,
-
+      currentEthPrice: ethPriceToday.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
+      currentRPLPrice: rplPriceToday.toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
       walletEthDeposited: walletEthDeposited.toFixed(4),
       walletEthWithdrawn: walletEthWithdrawn.toFixed(4),
       walletEthtoMinipools: walletEthtoMinipools.toFixed(4),

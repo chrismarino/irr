@@ -44,9 +44,7 @@ function App() {
           <div style={{ width: 1200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h1>Minipool Returns Calculator</h1>
             <NodeAddressForm setNodeAddress={setNodeAddress} nodeAddress={nodeAddress} />
-            <CurrentCoinPrices ethPriceToday={ethPrice} rplPriceToday={rplPrice} />
-
-            <h1>Minipool APRs</h1>
+            {/* <CurrentCoinPrices ethPriceToday={ethPrice} rplPriceToday={rplPrice} /> */}
             {nodePeriodicRewards.some(reward => !reward.isLoading) &&
               <NodeAPRs nodeAddress={nodeAddress} nodePeriodicRewards={nodePeriodicRewards} ethPriceToday={ethPrice} rplPriceToday={rplPrice} />
             }

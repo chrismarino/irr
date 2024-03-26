@@ -4,6 +4,9 @@ import axios from 'axios';
 export default async function getPriceOnDate(date, coinID) {
     // A utility function used to fetch price from an API. Take a url as an argument.
     // takes an array of dates in the format of YYYY-MM-DD and returns an array of price objects
+    function delay (ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }   
     if (!date) return [];
     let priceHistory = [];
     let appUrl = process.env.REACT_APP_COINGECKO_URL
@@ -15,6 +18,7 @@ export default async function getPriceOnDate(date, coinID) {
     let lookupDate = date.split('-').reverse().join('-'); // Reformatting the date to DD-MM-YYYY
     let priceUrl = (apiEndpoint + node_action + "?date=" + lookupDate + "?x_cg_demo_api_key=" + apikey)
     try {
+        await delay(100);
         let price = await axios(priceUrl);
         let price_usd = price.data.market_data.current_price.usd;
         return price_usd;
