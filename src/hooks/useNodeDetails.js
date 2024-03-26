@@ -45,7 +45,7 @@ export default function useNodeDetails(nodeAddress) {
     let nodeInterface = new ethers.utils.Interface(
       contracts.RocketNodeManager.abi
     );
-    console.log('Creating new Node Interface:', nodeInterface);
+    //console.log('Creating new Node Interface:', nodeInterface);
     // Create a new contract instance for the node. Uses the Nodemanager Contract Address, not the node address.
     return new ethers.Contract(
       contracts.RocketNodeManager.address,
@@ -57,7 +57,7 @@ export default function useNodeDetails(nodeAddress) {
   useEffect(() => {
     const fetchNodeDetails = async () => {
       const maxRetries = 5;
-      const delay = 1000; // Delay in milliseconds
+      const delay = 250; // Delay in milliseconds
       let details
       for (let i = 0; i < maxRetries; i++) {
         try {

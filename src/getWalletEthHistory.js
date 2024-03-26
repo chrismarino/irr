@@ -8,9 +8,9 @@ export default async function getWalletEthHistory(address) {
   // https://api.etherscan.io/api?module=account&action=txlist&address=0xfc49f773756eabb2680fd505916c2a93b65b465b&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=SXQC9UWX4J4CHGDX3V4HJ7YXHSCI7QTY2U
   // Need to throttle the requests to coingecko
   const Bottleneck = require('bottleneck');
-  // Create a new limiter that allows 4 request per second
+  // Create a new limiter that allows x request per second
   const limiter = new Bottleneck({
-    minTime: 100, // 1 request per 1000ms
+    minTime: 100, // 20 request per 1000ms
   })
   if (address === undefined) return "Address or CoinID is undefined";
   let coinID = "ethereum";
