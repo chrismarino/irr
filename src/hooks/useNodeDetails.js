@@ -45,6 +45,7 @@ export default function useNodeDetails(nodeAddress) {
     let nodeInterface = new ethers.utils.Interface(
       contracts.RocketNodeManager.abi
     );
+    console.log('Creating new Node Interface:', nodeInterface);
     // Create a new contract instance for the node. Uses the Nodemanager Contract Address, not the node address.
     return new ethers.Contract(
       contracts.RocketNodeManager.address,
@@ -54,24 +55,43 @@ export default function useNodeDetails(nodeAddress) {
   }, [provider]);
 
   useEffect(() => {
-
     const fetchNodeDetails = async () => {
-      const details = await node.getNodeDetails(nodeAddress);
-      setNodeDetails(details); // create a new object to trigger re-render
-    };
-
-    fetchNodeDetails();
-  }, [nodeAddress]);
-  if (!nodeDetails) {
-    return { isLoading: true };
-  } else {
-    return {
-      nodeAddress: nodeAddress,
-      balanceRPL: parseFloat(ethers.utils.formatEther(nodeDetails.balanceRPL || 0)).toFixed(4),
-      balanceETH: parseFloat(ethers.utils.formatEther(nodeDetails.balanceETH || 0)).toFixed(4),
-      effectiveRPLStake: parseFloat(ethers.utils.formatEther(nodeDetails.effectiveRPLStake || 0)).toFixed(4),
-      rplStake: parseFloat(ethers.utils.formatEther(nodeDetails.rplStake || 0)).toFixed(4),
-      ethMatched: parseFloat(ethers.utils.formatEther(nodeDetails.ethMatched || 0)).toFixed(4),
+      const maxRetries = 5;
+      const delay = 1000; // Delay in milliseconds
+      let details
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          details = await node.getNodeDetails(nodeAddress);
+        } catch (error) {
+          if (error.response && error.response.status === 429) {
+            console.log('Rate limit hit, retrying...');
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+          if (error.code === 'CALL_EXCEPTION') {
+            console.log('Call exception, ignoring...');
+          } else {
+            console.log('Error fetching node details:', error);
+            throw error; // If the error code is not CALL_EXCEPTION, re-throw it
+          }
+        }
+      }
+      setNodeDetails(details);
     }
+    //throw new Error('Failed to fetch node details after retries');
   };
+
+  fetchNodeDetails();
+}, [nodeAddress]);
+if (!nodeDetails) {
+  return { isLoading: true };
+} else {
+  return {
+    nodeAddress: nodeAddress,
+    balanceRPL: parseFloat(ethers.utils.formatEther(nodeDetails.balanceRPL || 0)).toFixed(4),
+    balanceETH: parseFloat(ethers.utils.formatEther(nodeDetails.balanceETH || 0)).toFixed(4),
+    effectiveRPLStake: parseFloat(ethers.utils.formatEther(nodeDetails.effectiveRPLStake || 0)).toFixed(4),
+    rplStake: parseFloat(ethers.utils.formatEther(nodeDetails.rplStake || 0)).toFixed(4),
+    ethMatched: parseFloat(ethers.utils.formatEther(nodeDetails.ethMatched || 0)).toFixed(4),
+  }
+};
 }

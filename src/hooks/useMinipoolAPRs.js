@@ -113,16 +113,20 @@ function useMinipoolAPRs(nodeDetails, nodePeriodicRewards, minipoolDetails, ethP
 
   // only calculate the IRR when the withdrawls and deposits have been fetched
   // only render when the all the stats. withdrawls and deposits have been fetched
+  const ready = gotValidatorStats &&
+    gotRocketpoolDetails &&
+    minipoolDetails.length > 0 &&
+    periodicRewardsShare.length > 0 &&
+    (typeof walletEthHistory !== 'string') &&
+    (typeof walletRPLHistory !== 'string') > 0;
 
   useEffect(() => {
-    //console.log("gotValidatorStats:", gotValidatorStats)
-    if (gotValidatorStats && gotRocketpoolDetails && minipoolDetails.length > 0 && periodicRewardsShare.length > 0) {
+    if (ready) {
       const calculatedNodeAPRs = calcMinipoolAPRs(walletEthHistory, walletRPLHistory, minipools, minipoolDetails, periodicRewardsShare, ethPriceToday, rplPriceToday);
-      //const calculatedNodeAPRs = [];
       setNodeAPRs(calculatedNodeAPRs);
       //console.log("NodeAPRs returned from calcMinipoolAPRs:", calculatedNodeAPRs);
     }
-  }, [gotValidatorStats, minipoolDetails, periodicRewardsShare]);
+  }, [ready]);
 
 
   useEffect(() => {

@@ -6,6 +6,11 @@ export default async function getWalletRPLHistory(address) {
 
     // https://api.etherscan.io/api?module=account&action=txlist&address=0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=YourApiKeyToken
     // https://api.etherscan.io/api?module=account&action=txlist&address=0xfc49f773756eabb2680fd505916c2a93b65b465b&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=SXQC9UWX4J4CHGDX3V4HJ7YXHSCI7QTY2U
+    const Bottleneck = require('bottleneck');
+    // Create a new limiter that allows 2 request per second
+    const limiter = new Bottleneck({
+      minTime: 500, // 1 request per 1000ms
+    })
     if( address === undefined) return "Address or CoinID is undefined";
     let coinID = "rocket-pool";
     let deposits = [];
@@ -26,7 +31,7 @@ export default async function getWalletRPLHistory(address) {
                 let date = new Date(transaction.timeStamp * 1000);
                 let formattedDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
                 // Need YYYY-MM-DD format for getPriceOnDate
-                let price_usd = await getPriceOnDate(formattedDate, coinID);
+                let price_usd = await limiter.schedule(() => getPriceOnDate(formattedDate, coinID));
                 return {
                     coin: coinID,
                     date: formattedDate,
@@ -42,7 +47,7 @@ export default async function getWalletRPLHistory(address) {
                 let date = new Date(transaction.timeStamp * 1000);
                 let formattedDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
                 // Need YYYY-MM-DD format for getPriceOnDate
-                let price_usd = await getPriceOnDate(formattedDate, coinID);
+                let price_usd = await limiter.schedule(() => getPriceOnDate(formattedDate, coinID));
                 return {
                     coin: coinID,
                     date: formattedDate,
@@ -56,7 +61,7 @@ export default async function getWalletRPLHistory(address) {
         // console.log("Wallet Deposits:", deposits, "withdrawals", withdrawals );
         return { deposits, withdrawals }
     } catch (error) {
-        console.log("Error setting the wallet history:", error);
+        console.log("Error setting the wallet RPL history:", error);
         return error;
     }
 

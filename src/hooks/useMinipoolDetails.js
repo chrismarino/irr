@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 const Bottleneck = require('bottleneck');
 // Create a new limiter that allows 1 request per second
 const limiter = new Bottleneck({
-  minTime: 250, // 1 request per 1000ms
+  minTime: 250, // 4 request per 1000ms
 })
 export default function useMinipoolDetails(nodeAddress) {
   let { data: minipools } = useK.RocketMinipoolManager.Find.MinipoolCreated({
