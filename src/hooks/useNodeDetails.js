@@ -1,12 +1,9 @@
-import useK from "./useK";
 import { useWebSocketProvider } from "wagmi";
-import _ from "lodash";
+import React from "react";
 import { ethers } from "ethers";
 import contracts from "../contracts";
-import { useQueries } from "react-query";
 import { useEffect, useState } from 'react';
-import RocketMinipoolDelegate from '../generated/contracts/RocketMinipoolDelegate.json';
-import RocketNodeManager from '../generated/contracts/RocketNodeManager.json';
+
 // A React hook that finds the Creation Event for each minipool on a Node and also fetches the 
 // details of a node. Returns an array of minipool addresses and the node details
 // struct NodeDetails {
@@ -41,28 +38,20 @@ import RocketNodeManager from '../generated/contracts/RocketNodeManager.json';
 export default function useNodeDetails(nodeAddress) {
   const [nodeDetails, setNodeDetails] = useState(null);
 
-  let { data: minipools } = useK.RocketMinipoolManager.Find.MinipoolCreated({
-    args: [null, nodeAddress],
-    from: 0,
-    to: "latest",
-  });
   let provider = useWebSocketProvider();
 
-  // Find the minipool addresses....
-  let minipoolAddresses = _.uniq(
-    (minipools || []).map(({ args: [minipoolAddress] }) => minipoolAddress)
-  );
   // Set the interface for NodeDetails contract
-  let nodeInterface = new ethers.utils.Interface(
-    contracts.RocketNodeManager.abi
-  );
-
-  // Create a new contract instance for the node. Uses the Nodemanager Contract Address, not the node address.
-  const node = new ethers.Contract(
-    contracts.RocketNodeManager.address,
-    nodeInterface,
-    provider?.signer || provider
-  );
+  const node = React.useMemo(() => {
+    let nodeInterface = new ethers.utils.Interface(
+      contracts.RocketNodeManager.abi
+    );
+    // Create a new contract instance for the node. Uses the Nodemanager Contract Address, not the node address.
+    return new ethers.Contract(
+      contracts.RocketNodeManager.address,
+      nodeInterface,
+      provider?.signer || provider
+    );
+  }, [provider]);
 
   useEffect(() => {
 
@@ -86,7 +75,3 @@ export default function useNodeDetails(nodeAddress) {
     }
   };
 }
-
-
-
-
