@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import DataContext from './DataContext';
 
 function NodeAddressForm() {
   const { setNodeAddress, nodeAddress, setNodeDetails, setGotNodeDetails, setNodeNativeIRR, setMinipoolNativeIRR, setMinipoolFiatIRR, setTotalNodeAPR, setDone } = useContext(DataContext);
-  //if(nodeAddress === "") return
+  const prevNodeAddress = useRef(nodeAddress);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <h4>Enter a Rocket Pool node address</h4>
@@ -14,7 +14,7 @@ function NodeAddressForm() {
           event.preventDefault();
           const address = event.target.elements.nodeAddress.value;
           const isValidAddress = /^0x[a-fA-F0-9]{40}$/.test(address);
-          if (isValidAddress) {
+          if (isValidAddress && address !== prevNodeAddress.current) {
             setNodeAddress(address);
             setNodeNativeIRR([]); // Reset the APR table
             setMinipoolNativeIRR([]); // Reset the APR table
@@ -23,6 +23,7 @@ function NodeAddressForm() {
             setNodeDetails([]) // Reset the node details.
             setDone([]) // Reset the node details.
             setGotNodeDetails(false);
+            prevNodeAddress.current = address;
           } else {
             //setNodeAddress("");
             console.error('Invalid address in NodeAddressForm');

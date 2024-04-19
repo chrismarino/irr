@@ -15,7 +15,6 @@ export default async function getWalletRPLHistory(address, rplPriceHistory) {
     const limiter = new Bottleneck({
         minTime: 100, // 1 request per 1000ms
     })
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     if (address === undefined) return [];
     let coinID = "rocket-pool";
     let deposits = [];
@@ -35,8 +34,6 @@ export default async function getWalletRPLHistory(address, rplPriceHistory) {
             console.error(`Failed to fetch RPL history from Etherscan: ${error}`);
             // Handle the error or do something with the error here...
         }
-        await delay(500);
-        //console.log("Wallet RPL History Response:", historyURL, response.data.result);
         history = response.data.result;
         //console.log("Wallet RPL History Response:", historyURL, history);
         //find the deposits to the wallet address

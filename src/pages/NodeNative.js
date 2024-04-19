@@ -33,7 +33,7 @@ function NodeNative() {
         <div style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h1>Rocket Pool Node Native Returns</h1>
           <h4 style={{ textAlign: 'center' }}>
-            Early Alpha Release.<br></br>Known problems for nodes with more than 5 minipools. <br></br>
+          Early Alpha Release. <br></br>
             See open <a href="https://github.com/chrismarino/rocketreturns/issues" style={{ color: '#72d5fa' }}>issues</a> for details.
           </h4>
           <NodeAddressForm />

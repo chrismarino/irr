@@ -163,7 +163,7 @@ export default function calcWalletNativeIRRs(
     walletRPLIRR: walletRPLIRR.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
   }
 
-  //console.log("Added minipool to node APRs:", totalNodeAPR, nodeOperatorAPR, minipoolNativeIRR);
+  //console.log("Added minipool to node APRs");
   nativeIRR.push(newIRR); // Only one wallet for now...
 
   return nativeIRR;

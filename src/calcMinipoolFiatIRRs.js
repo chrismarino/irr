@@ -190,7 +190,7 @@ export default function calcMinipoolFiatIRRs(minipools, minipoolHistory, periodi
 
     }; //node operator apr
 
-    //console.log("Added minipool to node APRs:", totalNodeAPR, fiatAPR, fiatAPR);
+    //console.log("Added minipool to Fiat APRs:");
     minipoolFiatIRR.push(newFiatIRR);
   });
 

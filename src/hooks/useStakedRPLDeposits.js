@@ -29,10 +29,9 @@ export default function useStakedRPLDeposits(nodeAddress, rplPriceHistory) {
   useEffect(() => {
     const fetchStakedRPLDeposits = async () => {
       const maxRetries = 5;
-      const delay = 500; // Delay in milliseconds
       const filterRPLStaked = node.filters.RPLStaked(nodeAddress, null, null);
       const stakedRPLDeposits = await node.queryFilter(filterRPLStaked);
-      //console.log('Staked RPL Deposits:', stakedRPLDeposits);
+      //('Staked RPL Deposits:', stakedRPLDeposits);
       let details
       let deposits = [];
       try {

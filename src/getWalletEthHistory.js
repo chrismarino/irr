@@ -38,10 +38,9 @@ export default async function getWalletEthHistory(address, ethPriceHistory) {
       console.error(`Failed to fetch Eth history from Etherscan: ${error}`);
       // Handle the error or do something with the error here...
     }
-    await delay(500);
+    //await delay(500);
     let responseInternalTx = await axios(historyListInternalURL);
     //console.log("Wallet Eth Tx History Response:", historyListTxURL, responseTx.data.result);
-    //console.log("Wallet Eth Int Tx History Response:", historyListInternalURL, responseInternalTx.data.result);
     history = responseTx.data.result.concat(responseInternalTx.data.result);
     //find the deposits to the wallet address
 

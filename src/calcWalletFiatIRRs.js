@@ -268,7 +268,7 @@ export default function calcWalletFiatIRRs(
     walletRPLIRR: walletRPLIRR.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
   }
 
-  //console.log("Added minipool to node APRs:", totalNodeAPR, nodeOperatorAPR, minipoolNativeIRR);
+  //("Added minipool to node APRs:", minipoolNativeIRR);
   fiatIRR.push(newIRR); // Only one wallet for now...
 
   return fiatIRR;

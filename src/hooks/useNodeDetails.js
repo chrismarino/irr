@@ -49,7 +49,7 @@ export default function useNodeDetails(nodeAddress) {
     let nodeInterface = new ethers.utils.Interface(
       contracts.RocketNodeManager.abi
     );
-    //console.log('Creating new Node Interface:', nodeInterface);
+    //('Creating new Node Interface:', nodeInterface);
     // Create a new contract instance for the node. Uses the Nodemanager Contract Address, not the node address.
     return new ethers.Contract(
       contracts.RocketNodeManager.address,
