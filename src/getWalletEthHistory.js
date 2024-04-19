@@ -40,8 +40,10 @@ export default async function getWalletEthHistory(address, ethPriceHistory) {
     }
     //await delay(500);
     let responseInternalTx = await axios(historyListInternalURL);
+    const result1 = await responseTx.data.result
+    const result2 = await responseInternalTx.data.result;
+    history = await Promise.all(result1.concat(result2));
     //console.log("Wallet Eth Tx History Response:", historyListTxURL, responseTx.data.result);
-    history = responseTx.data.result.concat(responseInternalTx.data.result);
     //find the deposits to the wallet address
 
     deposits = await Promise.all(history

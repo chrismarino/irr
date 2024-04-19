@@ -138,7 +138,16 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
     (periodicRewardsShare && periodicRewardsShare.length > 0) &&
     (typeof walletEthHistory !== 'string') &&
     (typeof walletRPLHistory !== 'string') > 0) || 0; // Some array has no length, so check for string
-  //console.log("Ready:", ready, "stakedRPLDeposits:" , stakedRPLDeposits, "gotValidatorStats:", gotValidatorStats, "gotRocketpoolDetails:", gotRocketpoolDetails, "minipoolHistory:", minipoolHistory, "periodicRewardsShare:", periodicRewardsShare, "walletEthHistory:", walletEthHistory, "walletRPLHistory:", walletRPLHistory);
+  // console.log("Ready:", ready,
+  //   "gotValidatorStats:", gotValidatorStats,
+  //   "gotRocketpoolDetails:", gotRocketpoolDetails,
+  //   "ethPriceHistory check:", (ethPriceHistory && ethPriceHistory.length > 0),
+  //   "rplPriceHistory check:", (rplPriceHistory && rplPriceHistory.length > 0),
+  //   "stakedRPLDeposits:", stakedRPLDeposits,
+  //   "minipoolHistory check:", (minipoolHistory && minipoolHistory.length > 0),
+  //   "periodicRewardsShare check:", (periodicRewardsShare && periodicRewardsShare.length > 0) ,
+  //   "walletEthHistory:", walletEthHistory,
+  //   "walletRPLHistory:", walletRPLHistory);
 
   useEffect(() => {
     if (ready) {
