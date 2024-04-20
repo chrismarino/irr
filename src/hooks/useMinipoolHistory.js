@@ -7,8 +7,8 @@ import { useQuery } from "react-query";
 import { useContext, useRef } from 'react';
 import DataContext from '../components/DataContext';
 
-export default function useMinipoolHistory(nodeAddress, ethPriceHistory) {
-  const { setProgressStatus, setDone } = useContext(DataContext);
+export default function useMinipoolHistory(nodeAddress) {
+  const { setProgressStatus, ethPriceHistory } = useContext(DataContext);
   const prevNodeAddress = useRef(null);
   let { data: minipools } = useK.RocketMinipoolManager.Find.MinipoolCreated({
     args: [null, nodeAddress],

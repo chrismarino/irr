@@ -64,7 +64,7 @@ function CalcNodeIRRs() {
   }, [StakedRPLDeposits, gotStakedRPL, nodeAddress, stringifiedStakedRPLDeposits]);
 
   // get the minipool details for the node as well..
-  let MinipoolHistory = useMinipoolHistory(nodeAddress, ethPriceHistory);
+  let MinipoolHistory = useMinipoolHistory(nodeAddress);
   const stringifiedMinipoolHistory = JSON.stringify(MinipoolHistory);
   useEffect(() => {
 

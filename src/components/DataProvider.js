@@ -9,6 +9,7 @@ function DataProvider({ children }) {
   const [ethPriceHistory, setEthPriceHistory] = useState([{ price_usd: 0 }]);
   const [rplPriceHistory, setRplPriceHistory] = useState([{ price_usd: 0 }]);
   const [minipoolHistory, setMinipoolHistory] = useState();
+  const [minipools, setMinipools] = useState();
   const [show, setShow] = useState(false);
   const [progressStatus, setProgressStatus] = useState([]);
   const [done, setDone] = useState([]);
@@ -48,6 +49,7 @@ function DataProvider({ children }) {
       value={{
         ethPriceHistory, setEthPriceHistory,
         rplPriceHistory, setRplPriceHistory,
+        minipools, setMinipools,
         minipoolHistory, setMinipoolHistory,
         stakedRPLDeposits, setStakedRPLDeposits,
         nodeAddress, setNodeAddress,
