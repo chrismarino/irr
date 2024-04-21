@@ -20,19 +20,19 @@ function MinipoolFiat() {
       <Layout>
         <div style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h1>Minipool Fiat Returns</h1>
-          <label>
-            Display Detail:
+          {/* <NodeAddressForm />
+          <p>Progress Status: {progressStatus}</p> */}
+          <section style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h3>Node <a href={`https://rocketscan.io/node/${nodeAddress}`} style={{ color: '#72d5fa' }}>
+              {nodeAddress}</a></h3>
+              <label>
+            Display Claimed/Distributed Reward Details:
             <input
               type="checkbox"
               checked={displayDetail}
               onChange={() => setDisplayDetail(!displayDetail)}
             />
           </label>
-          {/* <NodeAddressForm />
-          <p>Progress Status: {progressStatus}</p> */}
-          <section style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <h3>Node <a href={`https://rocketscan.io/node/${nodeAddress}`} style={{ color: '#72d5fa' }}>
-              {nodeAddress}</a></h3>
             {minipoolFiatIRR && <APRGrid tableRows={minipoolFiatIRR} />}
           </section>
         </div>
