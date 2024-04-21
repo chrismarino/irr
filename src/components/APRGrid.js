@@ -106,7 +106,7 @@ const APR_COLS = [
   {
     field: "smoothingPoolUnclaimed",
     headerName: "Unclaimed Smoothing Pool Rewards",
-    description: "Allocated share of node's unclained Smoothing Pool rewards to Minipool. Based on the daily weighed average of Minipool bond and total bond across all active Minipools during the interval.",
+    description: "Allocated share of node's unclaimed Smoothing Pool rewards to Minipool. Based on the daily weighed average of Minipool bond and total bond across all active Minipools during the interval.",
     align: 'center',
     type: "number",
     flex: 2
@@ -146,7 +146,7 @@ const APR_COLS = [
   {
     field: "inflationUnclaimed",
     headerName: "Unclaimed RPL Inflation",
-    description: "Allocated share of unclained RPL Inflation rewards to Minipool. Based on daily weighed average of Minipool bond and total bond across all active Minipools during the interval.",
+    description: "Allocated share of unclaimed RPL Inflation rewards to Minipool. Based on daily weighed average of Minipool bond and total bond across all active Minipools during the interval.",
     align: 'center',
     type: "number",
     flex: 2

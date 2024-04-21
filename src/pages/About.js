@@ -16,7 +16,7 @@ function About() {
             <li>Deposits and withdrawals to the node wallet </li>
             <li>Minipool creation and exits</li>
             <li>RPL staking </li>
-            <li>Claimed and unclained periodic reward, </li>
+            <li>Claimed and unclaimed periodic reward, </li>
             <li>Distributed and undistributed continious rewards</li>
           </ol>
           <p>For each of these events, it tracks the amount transfered as well as the price of the asset on that date. With this data the app calculates a number of finacial performance metrics, including the fiat value of claimed and unclaimed rewards, distributed and undistributed rewards, the IRR of the reward flows as well as the overall IRR of the node, for both Ethereum and RPL.</p>
@@ -60,12 +60,12 @@ function About() {
             <li>Total Continuous Rewards: Total claimed and unclaimed rewards for the Minipool over its life.</li>
             <li>Continuous Rewards IRR: IRR of Continuous Rewards Eth. Fiat IRR is not calculated for Continuous Rewards.</li>
             <li>Claimed Smoothing Pool Rewards: Allocated share of node&#39;s claimed Smoothing Pool rewards to Minipool. Based on the daily weighed average of Minipool bond and total bond across all active Minipools during a rewards interval.</li>
-            <li>Unclaimed Smoothing Pool Rewards: Allocated share of node&#39;s unclained Smoothing Pool rewards to Minipool. Based on the daily weighed average of Minipool bond and total bond across all active Minipools during the interval.</li>
+            <li>Unclaimed Smoothing Pool Rewards: Allocated share of node&#39;s unclaimed Smoothing Pool rewards to Minipool. Based on the daily weighed average of Minipool bond and total bond across all active Minipools during the interval.</li>
             <li>Total Smoothing Pool Rewards: Total claimed and unclaimed Smooting Pool rewards to Minipool over its life.</li>
             <li>Smoothing Pool IRR: IRR of Smooting Pool Rewards Eth allocated to Minipool. IRR based on flows of all Smoothing Pool Rewards Eth earned by this Minipool over life of Minipool. Fiat IRR is not calculated for Smoothing Pool Rewards.</li>
             <li>Total Eth Rewards: Total Eth earned by this Minipool. Includes all Continuous and Smoothing Pool Eth rewards.</li>
             <li>Claimed RPL Inflation: Allocated share of claimed RPL Inflation rewards to Minipool. Based on daily weighed average of Minipool bond and total bond across all active Minipools during the interval.</li>
-            <li>Unclaimed RPL Inflation: Allocated share of unclained RPL Inflation rewards to Minipool. Based on daily weighed average of Minipool bond and total bond across all active Minipools during the interval.</li>
+            <li>Unclaimed RPL Inflation: Allocated share of unclaimed RPL Inflation rewards to Minipool. Based on daily weighed average of Minipool bond and total bond across all active Minipools during the interval.</li>
             <li>Total RPL Inflation: Total RPL Inflation rewards to Minipool over its life. Sum of claimed and unclaimed RPL Inflation rewards.</li>
             <li>RPL Inflation IRR: IRR of RPL Inflation rewards. Uses current price of RPL for Active Minipools, price on date of exit for Exited Minipools.</li>
             <li>Total Minipool Gain: Total gain of this Minipool. For native tokens this is the same as Total Eth Rewards. For fiat currency it also includes change in token price.</li>
