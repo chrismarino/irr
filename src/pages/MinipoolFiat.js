@@ -10,7 +10,7 @@ import NodeAddressForm from "../components/NodeAddressForm";
 
 
 function MinipoolFiat() {
-  const { minipoolFiatIRR, progressStatus, nodeAddress, setNodeAddress } = useContext(DataContext);
+  const { minipoolFiatIRR, displayDetail, nodeAddress, setDisplayDetail } = useContext(DataContext);
   const { show, setShow } = useContext(DataContext);
   const handleClose = () => setShow(false);
   // console.log("On Protocl Page and minipoolNativeIRR is:", minipoolFiatIRR);
@@ -20,6 +20,14 @@ function MinipoolFiat() {
       <Layout>
         <div style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h1>Minipool Fiat Returns</h1>
+          <label>
+            Display Detail:
+            <input
+              type="checkbox"
+              checked={displayDetail}
+              onChange={() => setDisplayDetail(!displayDetail)}
+            />
+          </label>
           {/* <NodeAddressForm />
           <p>Progress Status: {progressStatus}</p> */}
           <section style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

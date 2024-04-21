@@ -10,7 +10,7 @@ import NodeAddressForm from "../components/NodeAddressForm";
 
 
 function MinipoolNative() {
-  const { minipoolNativeIRR, progressStatus, nodeAddress, setNodeAddress } = useContext(DataContext);
+  const { minipoolNativeIRR, displayDetail, nodeAddress, setDisplayDetail } = useContext(DataContext);
   const { show, setShow } = useContext(DataContext);
   const handleClose = () => setShow(false);
   //console.log("On Operator Page and minipoolNativeIRR is:", minipoolNativeIRR);
@@ -20,6 +20,14 @@ function MinipoolNative() {
       <Layout>
         <div style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h1>Minipool Native Returns</h1>
+          <label>
+            Display Detail:
+            <input
+              type="checkbox"
+              checked={displayDetail}
+              onChange={() => setDisplayDetail(!displayDetail)}
+            />
+          </label>
           {/* <NodeAddressForm />
           <p>Progress Status: {progressStatus}</p> */}
           <section style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
