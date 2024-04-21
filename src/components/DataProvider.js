@@ -23,7 +23,7 @@ function DataProvider({ children }) {
   const [minipoolFiatIRR, setMinipoolFiatIRR] = useState([]);
   const [gotNodeDetails, setGotNodeDetails] = useState(false);
   const [stakedRPLDeposits, setStakedRPLDeposits] = useState(null);
-
+  const [displayDetail, setDisplayDetail] = useState(false); // Add this line
   const prevNodeAddress = useRef(null);
 
   useEffect(() => {
@@ -63,6 +63,7 @@ function DataProvider({ children }) {
         minipoolFiatIRR, setMinipoolFiatIRR,
         show, setShow,
         progressStatus, setProgressStatus,
+        displayDetail, setDisplayDetail, // Add this line
         done, setDone
       }}>
       {children}

@@ -1,6 +1,8 @@
-import React from 'react';
+
+import React, { useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import Tooltip from '@mui/material/Tooltip';
+import DataContext from '../components/DataContext';
 const APR_COLS = [
   {
     field: "minipool",
@@ -186,11 +188,12 @@ const APR_COLS = [
 
 
 function APRGrid({ tableRows }) {
+  const { displayDetail } = useContext(DataContext);
   const columns = APR_COLS;
   //console.log("APRGrid tableRows:", tableRows);
 
   // Transform the rows to match the new column structure
-  const transposedRows = APR_COLS.map((col, index) => {
+  let transposedRows = APR_COLS.map((col, index) => {
     const newRow = {
       id: index,
       headerName: col.headerName,
@@ -229,6 +232,22 @@ function APRGrid({ tableRows }) {
       ),
     })),
   ];
+  const detailRows = [
+    "Activated", 
+    "Exited",
+    "Age", 
+    "Eth Returned",
+    "Claimed RPL Inflation", 
+    "Unclaimed RPL Inflation",
+    "Unclaimed Smoothing Pool Rewards",
+    "Claimed Smoothing Pool Rewards",
+    "Distributed Continuous Rewards",
+    "Undistributed Continuous Rewards",
+  ];
+  // Display only the detail rows if displayDetail is false
+  if (!displayDetail) {
+    transposedRows = transposedRows.filter(row => !detailRows.includes(row.headerName));
+  }
   return (
     <div style={{ height: 'auto', width: 1000 }}>
       <DataGrid
