@@ -55,7 +55,7 @@ function App() {
         setNodeDetails({ ...NodeDetails }); // new object to trigger re-render
         //console.log("Node Address", nodeAddress, "NodeDetails after set:", NodeDetails);
         setGotNodeDetails(true);
-        setProgressStatus("Got Node Details...still working...")
+        setProgressStatus("Progress Status: Got Node Details...still working...")
       }
     }
     fetchNodeDetails();
@@ -75,7 +75,7 @@ function App() {
       setStakedRPLDeposits(StakedRPLDeposits);
       //console.log("Node Address", nodeAddress, "Stake Details after set:", stakedRPL);
       setGotStakedRPL(true);
-      setProgressStatus("Got Staked RPL Deposits...still working...")
+      setProgressStatus("Progress Status: Got Staked RPL Deposits...still working...")
       // }  
     }
     fetchStakedRPLDeposits();

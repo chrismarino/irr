@@ -6,7 +6,7 @@ import contracts from "../contracts";
 import { useQuery } from "react-query";
 import { useContext, useRef } from 'react';
 import DataContext from '../components/DataContext';
-
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 export default function useMinipoolHistory(nodeAddress) {
   const { setProgressStatus, ethPriceHistory } = useContext(DataContext);
   const prevNodeAddress = useRef(null);
@@ -15,7 +15,7 @@ export default function useMinipoolHistory(nodeAddress) {
     from: 0,
     to: "latest",
   });
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   let provider = useWebSocketProvider();
   let minipoolAddresses = _.uniq(
     (minipools || []).map(({ args: [minipoolAddress] }) => minipoolAddress)
@@ -32,11 +32,10 @@ export default function useMinipoolHistory(nodeAddress) {
 
     const results = [];
     for (let i = 0; i < addresses.length; i++) {
-      console.log("Fetching minipool history for", addresses[i], "Waiting .25 seconds...");
+      //console.log("Fetching minipool history for", addresses[i], "Waiting .25 seconds...");
       const result = await fetchMinipoolHistory(addresses[i], ethPriceHistory, provider);
       await delay(250);
-      setProgressStatus("Working on Minipool History. " + (i+1) + " of " + addresses.length);
-      prevNodeAddress.current = nodeAddress; // set the previous node address
+      setProgressStatus("<div style='text-align: center;'>Progress Status: Working on Minipool History.</div><div style='text-align: center;'>Pauses between each lookup to avoid API throttling.</div><div style='text-align: center;'>Finished " + (i+1) + " out of of " + addresses.length + "</div>");      prevNodeAddress.current = nodeAddress; // set the previous node address
       results.push(result);
     }
 
@@ -83,7 +82,7 @@ const fetchMinipoolHistory = async (minipoolAddress, ethPriceHistory, provider) 
       let price_usd = ethPriceHistory.find(price => price.date === date)?.price_usd;
       return { name, timeStamp, date, amount, price_usd };
     }));
-    //await delay(100);
+    await delay(100);
     deposits = await Promise.all(etherDepositedEvents.map(async (log) => {
       const { name, args } = mpDelegateInterface.parseLog(log);
 

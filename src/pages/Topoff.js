@@ -10,8 +10,6 @@ function RPLvETH() {
     <Layout>
     <div style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h1>Rocket Pool Node Returns</h1>
-          {/* <NodeAddressForm />
-          <p>Progress Status: {progressStatus}</p> */}
           <section style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <h3>Node <a href={`https://rocketscan.io/node/${nodeAddress}`} style={{ color: '#72d5fa' }}>
               {nodeAddress}</a></h3>

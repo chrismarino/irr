@@ -42,7 +42,7 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
       setMinipoolHistory([]);  //reset the minipool history
       setWalletEthHistory([]);  //reset the wallet history
       setWalletRPLHistory([]);
-      setProgressStatus("New Node Address. Getting Validators...")
+      setProgressStatus("Progress Status: New Node Address. Getting Validators...")
       try {
         validatorArray = await getValidators(nodeAddress);
         //Don't really need to .map this. Could go back to remove later...
@@ -73,7 +73,7 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
         try {
           minipoolArray = await getRocketpoolValidatorStats(minipools); //minipools includes an array of validator indexes
           if (!minipoolArray) {
-            setProgressStatus("Not a Rocketpool Node. Try again")
+            setProgressStatus("Progress Status: Not a Rocketpool Node. Try again")
           }
           let updatedMinipoolIndexArray = minipools;
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({

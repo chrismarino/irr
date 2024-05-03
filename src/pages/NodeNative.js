@@ -21,7 +21,7 @@ function NodeNative() {
           </h4>
           <NodeAddressForm />
           {done !== 'Done' && nodeAddress !== '' ? (
-            <p>Progress Status: {progressStatus}</p>
+            <p dangerouslySetInnerHTML={{ __html: progressStatus }} />
           ) : null}
           <section style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             {done === 'Done' ? (
