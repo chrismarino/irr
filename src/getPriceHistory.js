@@ -49,13 +49,13 @@ export default async function getPriceHistory(startDate, coinID) {
     //     }
     //   }
     const maxRetries = 5;
-    const delay = 250; // Delay in milliseconds
     for (let i = 0; i < maxRetries; i++) {
         try {
             let allPriceHistories = [];
 
             allPriceHistories = await Promise.all(priceUrlArray.map(async (priceUrl) => {
                 let price = await axios(priceUrl);
+                //console.log("Getting Another Price History chuck out of:" , priceUrlArray.length);
                 let priceHistory = price.data.map((price) => {
                     let date = new Date(price[0] * 1000).toISOString().slice(0, 10);
                     let price_usd = (price[2] + price[3]) / 2  // average of high and low price;
@@ -64,12 +64,11 @@ export default async function getPriceHistory(startDate, coinID) {
                 return priceHistory;
             }));
             allPriceHistories = [].concat(...allPriceHistories); // flatten the array
-            //console.log('Price History for', coinID, 'from', startDate, 'to', formattedDate, 'is:', allPriceHistories);
+
             return allPriceHistories;
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                console.log('Hit rate limit, retrying in', delay, 'ms. Date:', startDate, "CoinID:", coinID);
-                await new Promise(resolve => setTimeout(resolve, delay));
+                console.log('Hit rate limit, retrying. Date:', startDate, "CoinID:", coinID);
             } else {
                 throw error; // If the error is not a 429, re-throw it
             }

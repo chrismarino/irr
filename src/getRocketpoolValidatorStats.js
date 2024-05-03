@@ -17,7 +17,6 @@ export default async function getRocketpoolValidatorStats(validatorArray) {
   let node_action = "/rocketpool/validator/";
   // URL https://beaconcha.in/api/v1/rocketpool/validator/983397%2C1101573%2C810338
   let validatorIndexString = validatorArray.map(validator => validator.validatorIndex).join(',');
-  // "http://beaconcha.in/api/v1/rocketpool/validator/[object%20Object]%2C[object%20Object]%2C[object%20Object]?apikey=a0ZFaGMxc0FwNTdTZXJaQXdJV3lUd3pHdjNtag"
   let nodeUrl = (apiEndpoint + node_action + validatorIndexString + "?apikey=" + apikey)
   try {
     let rocketpoolValidators = [];

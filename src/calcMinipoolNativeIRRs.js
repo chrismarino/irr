@@ -157,7 +157,7 @@ export default function calcMinipoolNativeIRRs(minipools, minipoolHistory, perio
 
     }; //node operator apr
 
-    //console.log("Added minipool to node APRs:", totalNodeAPR, fiatAPR, fiatAPR);
+    //console.log("Added minipool to node Narive IRR:");
     minipoolNativeIRR.push(newNativeIRR);
   });
 

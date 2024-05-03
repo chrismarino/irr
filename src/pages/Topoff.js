@@ -1,12 +1,11 @@
 import React from 'react';
 import Layout from "../components/Layout";
-import { RpcError } from 'wagmi';
 import TopoffTable from '../components/TopoffTable';
 import DataContext from '../components/DataContext';
-import { useState, useEffect, useContext } from 'react';
+import {useContext } from 'react';
 
 function RPLvETH() {
-  const { totalNodeAPR, progressStatus, nodeAddress, setNodeAddress } = useContext(DataContext);
+  const {nodeAddress } = useContext(DataContext);
   return (
     <Layout>
     <div style={{ width: 'flex', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

@@ -10,18 +10,17 @@ import calcPeriodicRewardsShare from "../calcPeriodicRewardsShare";
 import getWalletEthHistory from '../getWalletEthHistory';
 import getWalletRPLHistory from '../getWalletRPLHistory';
 import DataContext from '../components/DataContext';
-import { min } from 'moment';
 let minipoolIndexArray = [];
 
 
 
 function useMinipoolIRRs(nodeDetails, minipoolHistory) {
   const { ethPriceHistory, rplPriceHistory, nodeAddress, nodePeriodicRewards,
-    setProgressStatus, setDone, minipoolNativeIRR, setNodeFiatIRR,
+    setProgressStatus, setDone, setMinipoolHistory, setNodeFiatIRR,
     setNodeNativeIRR, stakedRPLDeposits, setMinipoolNativeIRR, setMinipoolFiatIRR } = useContext(DataContext);
   //const nodeAddress = nodeDetails.nodeAddress;
-  let ethPriceToday = ethPriceHistory[0].price_usd || 0; //today is the first element in the array
-  let rplPriceToday = rplPriceHistory[0].price_usd || 0; //today is the first element in the array
+  //let ethPriceToday = ethPriceHistory[0].price_usd || 0; //today is the first element in the array
+  //let rplPriceToday = rplPriceHistory[0].price_usd || 0; //today is the first element in the array
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
   const [walletRPLHistory, setWalletRPLHistory] = useState([]);
@@ -40,9 +39,10 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
       setGotValidators(false); // will be reset, unless there is an error or empty node address
       setGotValidatorStats(false);
       setGotRocketpoolDetails(false);
+      setMinipoolHistory([]);  //reset the minipool history
       setWalletEthHistory([]);  //reset the wallet history
       setWalletRPLHistory([]);
-      //console.log("nodeAddress in fetchValidatorArray:", nodeAddress);
+      setProgressStatus("New Node Address. Getting Validators...")
       try {
         validatorArray = await getValidators(nodeAddress);
         //Don't really need to .map this. Could go back to remove later...
@@ -53,6 +53,7 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
         }));  //get the minipool addresses
         setMinipools(minipoolIndexArray);
         setGotValidators(true);
+        //setProgressStatus("Got ", minipoolIndexArray.length, "Validators...still working...")
         //console.log("Minipool Index Array set from fetchValidator Array:", minipoolIndexArray);
       }
       catch (error) {
@@ -64,6 +65,9 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
 
   useEffect(() => {
     async function fetchRocketpoolValidatorStatsArray() {
+      if (minipoolHistory === undefined) {
+        return;
+      }
       var minipoolArray = []; // reset the minipool array
       if (gotValidators === true && gotRocketpoolDetails === false && minipoolHistory !== null) { //only run if the validator array has run, but only once.
         try {
@@ -74,7 +78,7 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
           let updatedMinipoolIndexArray = minipools;
           updatedMinipoolIndexArray = (minipoolArray || []).map((item, index) => ({
             minipoolStats: item,
-            balance: minipoolHistory.mpbalance ? minipoolHistory.mpbalance : 0,
+            balance: minipoolHistory.mpBalance ? minipoolHistory.mpBalance : 0,
             nodeBalance: minipoolHistory.nodeBalance ? minipoolHistory.nodeBalance : 0,
             prococolBalance: minipoolHistory.protocolBalance ? minipoolHistory.protocolBalance : 0,
             calulatedNodeShare: minipoolHistory.calculatedNodeShare ? minipoolHistory.calculatedNodeShare : 0,
@@ -133,7 +137,16 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
     (periodicRewardsShare && periodicRewardsShare.length > 0) &&
     (typeof walletEthHistory !== 'string') &&
     (typeof walletRPLHistory !== 'string') > 0) || 0; // Some array has no length, so check for string
-  //console.log("Ready:", ready, "stakedRPLDeposits:" , stakedRPLDeposits, "gotValidatorStats:", gotValidatorStats, "gotRocketpoolDetails:", gotRocketpoolDetails, "minipoolHistory:", minipoolHistory, "periodicRewardsShare:", periodicRewardsShare, "walletEthHistory:", walletEthHistory, "walletRPLHistory:", walletRPLHistory);
+  // console.log("Ready:", ready,
+  //   "gotValidatorStats:", gotValidatorStats,
+  //   "gotRocketpoolDetails:", gotRocketpoolDetails,
+  //   "ethPriceHistory check:", (ethPriceHistory && ethPriceHistory.length > 0),
+  //   "rplPriceHistory check:", (rplPriceHistory && rplPriceHistory.length > 0),
+  //   "stakedRPLDeposits:", stakedRPLDeposits,
+  //   "minipoolHistory check:", (minipoolHistory && minipoolHistory.length > 0),
+  //   "periodicRewardsShare check:", (periodicRewardsShare && periodicRewardsShare.length > 0) ,
+  //   "walletEthHistory:", walletEthHistory,
+  //   "walletRPLHistory:", walletRPLHistory);
 
   useEffect(() => {
     if (ready) {
@@ -142,7 +155,7 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
       //setTotalNodeAPR(calculatedNodeAPRs.totalNodeAPR);
       setMinipoolNativeIRR(minipoolNativeIRR);
       setMinipoolFiatIRR(minipoolFiatIRR);
-      setProgressStatus("Got Minipool IRRs...still working...")
+      //setProgressStatus("Got Minipool IRRs...still working...")
 
       // Calculate teh wallet APRs
       const walletNativeIRR = calcWalletNativeIRRs(
@@ -173,8 +186,6 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
         nodePeriodicRewards,
         nodeDetails);
       setNodeFiatIRR(walletFiatIRR);
-      //console.log("NodeAPRs returned from calcMinipoolNativeIRRs:", calculatedNodeAPRs.totalNodeAPR, calculatedNodeAPRs.minipoolNativeIRR, calculatedNodeAPRs.nodeNativeIRR, calculatedNodeAPRs.minipoolFiatIRR);
-      //console.log("Set Value of calcMinipooAPRs:", totalNodeAPR, minipoolNativeIRR, nodeNativeIRR, minipoolFiatIRR);
       setDone("Done")
     }
   }, [ready]);
