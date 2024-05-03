@@ -2,8 +2,8 @@ import { useWebSocketProvider } from "wagmi";
 import React from "react";
 import { ethers } from "ethers";
 import contracts from "../contracts";
-import { useEffect, useState , useContext} from 'react';
-import DataContext from '../components/DataContext';
+import { useEffect, useState} from 'react';
+
 
 
 // A React hook that finds the Creation Event for each minipool on a Node and also fetches the 
@@ -39,10 +39,7 @@ import DataContext from '../components/DataContext';
 
 export default function useNodeDetails(nodeAddress) {
 
-  const { show, setShow, setNodeNativeIRR } = useContext(DataContext);
   const [nodeDetails, setNodeDetails] = useState(null);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
   let provider = useWebSocketProvider();
   // Set the interface for NodeDetails contract
   const node = React.useMemo(() => {
@@ -79,7 +76,6 @@ export default function useNodeDetails(nodeAddress) {
           if (error.response && error.response.status === 429) {
             console.log('Rate limit exceeded fetching node details, retrying...');
             await new Promise(resolve => setTimeout(resolve, delay));
-            handleShow();
           } else {
             if (error.code === 'CALL_EXCEPTION') {
               console.log('Call exception in getNodeDetails, most likely getting throttled for CPU consumption. Retrying...');

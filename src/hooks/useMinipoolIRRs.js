@@ -10,7 +10,6 @@ import calcPeriodicRewardsShare from "../calcPeriodicRewardsShare";
 import getWalletEthHistory from '../getWalletEthHistory';
 import getWalletRPLHistory from '../getWalletRPLHistory';
 import DataContext from '../components/DataContext';
-import { min } from 'moment';
 let minipoolIndexArray = [];
 
 
@@ -20,8 +19,8 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
     setProgressStatus, setDone, setMinipoolHistory, setNodeFiatIRR,
     setNodeNativeIRR, stakedRPLDeposits, setMinipoolNativeIRR, setMinipoolFiatIRR } = useContext(DataContext);
   //const nodeAddress = nodeDetails.nodeAddress;
-  let ethPriceToday = ethPriceHistory[0].price_usd || 0; //today is the first element in the array
-  let rplPriceToday = rplPriceHistory[0].price_usd || 0; //today is the first element in the array
+  //let ethPriceToday = ethPriceHistory[0].price_usd || 0; //today is the first element in the array
+  //let rplPriceToday = rplPriceHistory[0].price_usd || 0; //today is the first element in the array
   const [minipools, setMinipools] = useState([]);
   const [walletEthHistory, setWalletEthHistory] = useState([]);
   const [walletRPLHistory, setWalletRPLHistory] = useState([]);

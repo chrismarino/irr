@@ -10,11 +10,7 @@ export default async function getWalletRPLHistory(address, rplPriceHistory) {
         console.log("Invalid address in getWalletRPLHistory");
         return [];
     }
-    const Bottleneck = require('bottleneck');
-    // Create a new limiter that allows 2 request per second
-    const limiter = new Bottleneck({
-        minTime: 100, // 1 request per 1000ms
-    })
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     if (address === undefined) return [];
     let coinID = "rocket-pool";
     let deposits = [];
@@ -29,7 +25,7 @@ export default async function getWalletRPLHistory(address, rplPriceHistory) {
     let success = false;
     let history = [];
     let response;
-
+    while (!success && attempts < maxAttempts) {
     try {
         response = await axios(historyURL);
         // Handle the response or do something with the response here...
@@ -39,14 +35,20 @@ export default async function getWalletRPLHistory(address, rplPriceHistory) {
     }
     const result = await response.data.result;
     history = await Promise.all(result);
+    success = true;
     //console.log("Wallet RPL History Response:", historyURL, history);
     //find the deposits to the wallet address
     //console.log("RPL History from Etherscan:", history);
     //console.log("RPL History from Etherscan URL:", historyURL);
     if (history[0] === 'M' && history[1] === 'a' && history[2] === 'x') {
-        console.log('Etherscan throttled. Trying to recover....');
+        console.log('Etherscan throttled. Attempt:', attempts +1, 'Retrying....');
         history = []; // try to recover....
+        success = false;
+        await delay(500);
       }
+    }
+    attempts = 0;
+    success = false;
     while (!success && attempts < maxAttempts) {
         try {
             deposits = await Promise.all(history

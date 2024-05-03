@@ -12,11 +12,6 @@ export default async function getWalletEthHistory(address, ethPriceHistory) {
     console.log("Invalid address in getWalletEthHistory");
     return [];
   }
-  const Bottleneck = require('bottleneck');
-  // Create a new limiter that allows x request per second
-  const limiter = new Bottleneck({
-    minTime: 100, // 20 request per 1000ms
-  })
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   if (address === undefined) return [];
   let coinID = "ethereum";
@@ -38,7 +33,6 @@ export default async function getWalletEthHistory(address, ethPriceHistory) {
       console.error(`Failed to fetch Eth history from Etherscan: ${error}`);
       // Handle the error or do something with the error here...
     }
-    //await delay(500);
     let responseInternalTx = await axios(historyListInternalURL);
     const result1 = await responseTx.data.result
     const result2 = await responseInternalTx.data.result;

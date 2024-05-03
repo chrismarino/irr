@@ -1,4 +1,4 @@
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef } from 'react';
 import useNodeFinalizedRewardSnapshots from "../hooks/useNodeFinalizedRewardSnapshots";
 import useNodePendingRewardSnapshot from "../hooks/useNodePendingRewardSnapshot";
 import useNodeOngoingRewardSnapshot from "../hooks/useNodeOngoingRewardSnapshot";
