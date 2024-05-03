@@ -14,7 +14,6 @@
     "@testing-library/user-event": "^13.5.0",
     "alchemy-sdk": "^3.1.2",
     "axios": "^1.6.7",
-    "bottleneck": "^2.19.5",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.7.0",
     "moment": "^2.30.1",

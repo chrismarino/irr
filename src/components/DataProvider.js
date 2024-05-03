@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import DataContext from './DataContext';
 import getPriceHistory from '../getPriceHistory';
 import useNodePeriodicRewards from '../hooks/useNodePeriodicRewards'; // Adjust the path as needed
-import CalcNodeIRRs from '../components/CalcNodeIRRs';
+
 
 function DataProvider({ children }) {
   let defaultAddress = process.env.REACT_APP_DEFAULT_NODE_ADDRESS;
@@ -67,7 +67,6 @@ function DataProvider({ children }) {
         done, setDone
       }}>
       {children}
-      <CalcNodeIRRs /> {/* If CalcNodeIRRs is a component */}
     </DataContext.Provider>
   );
 }
