@@ -32,8 +32,9 @@ export default function useMinipoolHistory(nodeAddress) {
 
     const results = [];
     for (let i = 0; i < addresses.length; i++) {
-      //console.log("Fetching minipool history for", addresses[i], "Waiting .25 seconds...");
+      console.log("Fetching minipool history for", addresses[i], "Waiting .25 seconds...");
       const result = await fetchMinipoolHistory(addresses[i], ethPriceHistory, provider);
+      await delay(250);
       setProgressStatus("Working on Minipool History. " + (i+1) + " of " + addresses.length);
       prevNodeAddress.current = nodeAddress; // set the previous node address
       results.push(result);
@@ -59,7 +60,6 @@ const fetchMinipoolHistory = async (minipoolAddress, ethPriceHistory, provider) 
     mpDelegateInterface,
     provider?.signer || provider
   );
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   // Note: we don't Promise.all these reads to be gentler on the rate-limit.
   // TODO: issue a multi-read call instead.
   // get the events for the minipool
