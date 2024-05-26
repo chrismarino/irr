@@ -26,7 +26,7 @@ export default async function getValidatorStats(validatorIndex) {
     })).filter(item => item.deposits_amount > 0 || item.withdrawals_amount > 0);
     // Set the minipool status to false if the minipool has exited. Do this before another async call.
     mpDepositsAndWithdrawals = mpDepositsAndWithdrawals.map(item => {
-      if (item.withdrawals_amount === 32000000000) {
+      if (item.withdrawals_amount > 32000000000) {
         status = false; // set the status for this minipool to false
         return { ...item, status: false }; //set it in the data array as well.
       } else {
