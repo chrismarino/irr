@@ -124,7 +124,7 @@ function useMinipoolIRRs(nodeDetails, minipoolHistory) {
       }
     }
     fetchMinipoolStats();
-  }, [gotRocketpoolDetails]);
+  }, [gotRocketpoolDetails, minipools]);
 
   // only calculate the IRR when the withdrawls and deposits have been fetched
   // only render when the all the stats. withdrawls and deposits have been fetched
